@@ -15,6 +15,7 @@ const FRUIT_OPTIONS: DropdownOption[] = [
   { label: "Orange", value: "orange" },
   { label: "Pineapple", value: "pineapple", disabled: true },
   { label: "Strawberry", value: "strawberry" },
+  { label: "Watermelon", value: "watermelon" },
 ];
 
 const meta = {
