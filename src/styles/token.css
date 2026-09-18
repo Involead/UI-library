@@ -1,0 +1,109 @@
+:root {
+  /* =========================
+     BRAND COLORS
+     ========================= */
+
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-active: #1e40af;
+
+  --color-secondary: #64748b;
+  --color-secondary-hover: #475569;
+
+  /* =========================
+     BACKGROUND
+     ========================= */
+
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f8fafc;
+  --color-surface-hover: #f1f5f9;
+
+  /* =========================
+     TEXT
+     ========================= */
+
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+  --color-text-disabled: #d1d5db;
+  --color-text-inverse: #ffffff;
+
+  /* =========================
+     BORDER
+     ========================= */
+
+  --color-border: #e5e7eb;
+  --color-border-hover: #d1d5db;
+  --color-border-focus: #2563eb;
+  --color-border-error: #dc2626;
+
+  /* =========================
+     STATUS
+     ========================= */
+
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --color-info: #2563eb;
+
+  /* =========================
+     BASE
+     ========================= */
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* =========================
+     SPACING
+     ========================= */
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+
+  /* Numeric spacing scale */
+
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+
+  /* =========================
+     BORDER RADIUS
+     ========================= */
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* =========================
+     SHADOW
+     ========================= */
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.1);
+
+  /* =========================
+     Z-INDEX
+     ========================= */
+
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-popover: 1030;
+  --z-modal: 1100;
+  --z-toast: 1200;
+}
