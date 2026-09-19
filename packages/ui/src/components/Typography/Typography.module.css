@@ -1,0 +1,159 @@
+.base {
+  margin: 0;
+  font-family: var(--font-family-primary);
+}
+
+/* =========================
+   VARIANTS
+   ========================= */
+
+.h1 {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.h2 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+.h3 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.h4 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+}
+
+.h5 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+}
+
+.h6 {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+}
+
+/* Below --breakpoint-md (768px, see token.css) — scale down the larger
+   headings one step so they don't look oversized on mobile. h5/h6 are
+   already small enough to leave alone. */
+@media (max-width: 767px) {
+  .h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  .h2 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .h3 {
+    font-size: var(--font-size-xl);
+  }
+
+  .h4 {
+    font-size: var(--font-size-lg);
+  }
+}
+
+.body-lg {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+}
+
+.body-md {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+}
+
+.body-sm {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+}
+
+.caption {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+}
+
+/* =========================
+   COLORS
+   ========================= */
+
+.primary {
+  color: var(--color-text-primary);
+}
+
+.secondary {
+  color: var(--color-text-secondary);
+}
+
+.tertiary {
+  color: var(--color-text-tertiary);
+}
+
+.disabled {
+  color: var(--color-text-disabled);
+}
+
+.inverse {
+  color: var(--color-text-inverse);
+}
+
+.success {
+  color: var(--color-success);
+}
+
+.warning {
+  color: var(--color-warning);
+}
+
+.error {
+  color: var(--color-error);
+}
+
+.info {
+  color: var(--color-info);
+}
+
+/* =========================
+   WEIGHT OVERRIDES
+   ========================= */
+
+.regular {
+  font-weight: var(--font-weight-regular);
+}
+
+.medium {
+  font-weight: var(--font-weight-medium);
+}
+
+.semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.bold {
+  font-weight: var(--font-weight-bold);
+}
+
+/* =========================
+   TRUNCATE
+   ========================= */
+
+.truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

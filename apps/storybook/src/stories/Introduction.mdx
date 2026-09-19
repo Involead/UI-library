@@ -117,6 +117,11 @@ name: `import { Button } from "@involead/ui"`.
   Apply them to CSS Modules classes by name: `styles[variant]`, `styles[size]`.
 - **State props** (`loading`, `disabled`, `fullWidth`, ...) are booleans,
   applied as extra classes or attributes (`aria-busy`, `disabled`).
+- **Polymorphic components** (rendering as different HTML tags, e.g.
+  `Typography`): accept an `as?: ElementType` prop that only changes the
+  rendered tag, never the applied styles — those always follow the
+  component's own variant/style props. See `Typography.tsx` for the
+  reference shape (`TypographyProps<E extends ElementType>`).
 
 ## Styling rules
 
@@ -222,9 +227,19 @@ Setup lives entirely in `packages/ui` (not `apps/storybook`):
   (`--breakpoint-sm/md/lg/xl` = `640/768/1024/1280px`) — **but a CSS custom
   property cannot be read inside an `@media` condition**, so this is a
   reference table, not something you `var()` into a media query. When
-  writing `@media (min-width: 768px)` in a component's `.module.css`,
-  that literal `768px` must match `--breakpoint-md` here — never invent a
-  new breakpoint number.
+  writing `@media (max-width: 767px)` in a component's `.module.css`,
+  that literal boundary must match one of these tokens (`767px` = one below
+  `--breakpoint-md`'s `768px`) — never invent a new breakpoint number.
+- See `Typography.module.css` for the reference example: `h1`–`h4` scale
+  down one step below `--breakpoint-md` so headings don't look oversized on
+  mobile. Not every component needs this — `Button` and `Input` don't have
+  a `@media` rule at all, because they're already fluid (content-sized or
+  opt-in `fullWidth`, no fixed pixel widths to overflow). Only add a media
+  query when a component's layout actually needs to change at a breakpoint.
+- A `@media` rule isn't verifiable by a jsdom unit test (there's no real
+  layout engine) — check it visually in Storybook by resizing the preview,
+  or via the "Strongly recommended" visual regression testing in the
+  charter's Testing and Quality section once that's set up.
 
 ## Changelog
 

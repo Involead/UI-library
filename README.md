@@ -18,13 +18,16 @@ apps/storybook/        # Storybook + a small Next.js app that consumes @involead
   sizes; loading, disabled, full-width, and icon states.
 - **Input** - labels, helper and error text, validation states, common HTML
   input types, password visibility toggling, icons, and three sizes.
+- **Typography** - a single `variant`-driven component (headings, body
+  sizes, caption) with a polymorphic `as` prop, color and weight overrides,
+  and truncation.
 - **Design tokens** - shared color, spacing, radius, shadow, z-index,
   breakpoint, and typography variables in `packages/ui/src/styles`.
 - **Storybook** - interactive stories and autodocs for developing and
   reviewing components in isolation.
 
-More components (Typography, Icon, and others from the project charter) are
-in progress — see `CHANGELOG.md` for what's shipped so far.
+More components (Icon, and others from the project charter) are in progress
+— see `CHANGELOG.md` for what's shipped so far.
 
 ## Why use it?
 
@@ -133,7 +136,8 @@ export function ExampleForm() {
 
 `Button` and `Input` are client components. Add `"use client"` to
 the consuming component when it uses these components directly from a Next.js
-Server Component boundary.
+Server Component boundary. `Typography` has no hooks or browser APIs, so it
+works directly inside a Server Component.
 
 Global styles (in a Next.js app, `app/globals.css`) load the design tokens
 from the package itself:
@@ -174,6 +178,31 @@ Input supports `text`, `password`, `email`, `number`, `tel`, `url`, `search`,
 `date`, `datetime-local`, `time`, `month`, `week`, `color`, `file`, and
 `hidden` types. It also accepts native input props such as `value`,
 `defaultValue`, `onChange`, and `name`.
+
+#### Typography
+
+```tsx
+<Typography variant="h2">Section title</Typography>
+<Typography variant="body-md" color="secondary">
+  Supporting paragraph text.
+</Typography>
+<Typography variant="h3" as="span">
+  Styled like a heading, rendered as an inline span
+</Typography>
+```
+
+| Prop | Values / type | Default |
+| --- | --- | --- |
+| `variant` | `h1`–`h6`, `body-lg`, `body-md`, `body-sm`, `caption` | `body-md` |
+| `color` | `primary`, `secondary`, `tertiary`, `disabled`, `inverse`, `success`, `warning`, `error`, `info` | `primary` |
+| `weight` | `regular`, `medium`, `semibold`, `bold` | variant's default |
+| `truncate` | `boolean` | `false` |
+| `as` | any element/component type | tag matching `variant` (e.g. `h1`→`<h1>`, `body-*`→`<p>`, `caption`→`<span>`) |
+
+`as` only changes the rendered tag — it doesn't affect the applied styles,
+which always follow `variant`. Use it to keep semantic HTML correct without
+changing the visual style (e.g. one `<h1>` per page, styled as `h1` even
+where a smaller heading is semantically required).
 
 ## Project structure
 
