@@ -5,19 +5,26 @@ built with Next.js, TypeScript, and Storybook. It provides consistent,
 accessible building blocks for InvoLead products and keeps common interaction
 patterns in one place.
 
+This repository is an **npm-workspaces monorepo**:
+
+```text
+packages/ui/          # @involead/ui — the published component library
+apps/storybook/        # Storybook + a small Next.js app that consumes @involead/ui
+```
+
 ## What is included?
 
 - **Button** - primary, secondary, outline, ghost, and danger variants; three
   sizes; loading, disabled, full-width, and icon states.
 - **Input** - labels, helper and error text, validation states, common HTML
   input types, password visibility toggling, icons, and three sizes.
-- **Dropdown** - single- and multi-select modes, searchable and clearable
-  selections, disabled options, keyboard interaction, helper and error text,
-  and configurable width.
-- **Design tokens** - shared color, spacing, radius, shadow, z-index, and
-  typography variables in `src/styles`.
+- **Design tokens** - shared color, spacing, radius, shadow, z-index,
+  breakpoint, and typography variables in `packages/ui/src/styles`.
 - **Storybook** - interactive stories and autodocs for developing and
   reviewing components in isolation.
+
+More components (Typography, Icon, and others from the project charter) are
+in progress — see `CHANGELOG.md` for what's shipped so far.
 
 ## Why use it?
 
@@ -32,41 +39,55 @@ Using shared components helps product teams:
 ## Requirements
 
 - Node.js 20 or newer
-- npm (the repository includes `package-lock.json`)
+- npm (the repository includes `package-lock.json` and uses npm workspaces)
 
 ## Getting started
+
+All commands below are run from the **repository root**, not from inside
+`packages/ui` or `apps/storybook` — npm's `-w` workspace flag routes them to
+the right place.
 
 1. Clone the repository and enter the project directory:
 
    ```bash
    git clone <repository-url>
-   cd ui-library
+   cd temp-main
    ```
 
-2. Install dependencies:
+2. Install dependencies for every workspace:
 
    ```bash
    npm install
    ```
 
-3. Start the Next.js development server:
+3. Build the component library once (the demo app's global styles import the
+   compiled token CSS from `@involead/ui`, so this has to exist before the
+   app or Storybook can pick up tokens):
+
+   ```bash
+   npm run build:ui
+   ```
+
+4. Start the Next.js demo app:
 
    ```bash
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000).
+5. Open [http://localhost:3000](http://localhost:3000).
 
 ## Storybook
 
 Use Storybook to browse components, adjust props, and review states without
-running the application page:
+running the demo app:
 
 ```bash
 npm run storybook
 ```
 
-Open [http://localhost:6006](http://localhost:6006).
+Open [http://localhost:6006](http://localhost:6006). Storybook reads stories
+directly from `packages/ui/src`, so `npm run build:ui` isn't required first
+for this command.
 
 To create a static Storybook build:
 
@@ -76,22 +97,15 @@ npm run build-storybook
 
 ## Using the components
 
-The components are currently consumed from the repository source. In a
-Next.js application in this project, import them from the shared barrel:
+Consumers import from the published package name, `@involead/ui` — inside
+this repo, `apps/storybook` does exactly this as a real workspace dependency
+(npm symlinks it to `packages/ui`, no publish step needed for local
+development):
 
 ```tsx
 "use client";
 
-import {
-  Button,
-  Dropdown,
-  Input,
-} from "@/components";
-
-const options = [
-  { label: "Design", value: "design" },
-  { label: "Engineering", value: "engineering" },
-];
+import { Button, Input } from "@involead/ui";
 
 export function ExampleForm() {
   return (
@@ -103,15 +117,6 @@ export function ExampleForm() {
         placeholder="you@example.com"
         helperText="We will never share your email."
         fullWidth
-      />
-
-      <Dropdown
-        label="Team"
-        name="team"
-        options={options}
-        placeholder="Select a team"
-        searchable
-        required
       />
 
       <Button
@@ -126,9 +131,17 @@ export function ExampleForm() {
 }
 ```
 
-`Button`, `Input`, and `Dropdown` are client components. Add `"use client"` to
+`Button` and `Input` are client components. Add `"use client"` to
 the consuming component when it uses these components directly from a Next.js
 Server Component boundary.
+
+Global styles (in a Next.js app, `app/globals.css`) load the design tokens
+from the package itself:
+
+```css
+@import "@involead/ui/styles/token.css";
+@import "@involead/ui/styles/typography.css";
+```
 
 ### Component API overview
 
@@ -162,62 +175,62 @@ Input supports `text`, `password`, `email`, `number`, `tel`, `url`, `search`,
 `hidden` types. It also accepts native input props such as `value`,
 `defaultValue`, `onChange`, and `name`.
 
-#### Dropdown
-
-```tsx
-<Dropdown
-  label="Notifications"
-  multiple
-  options={[
-    { label: "Email", value: "email" },
-    { label: "SMS", value: "sms" },
-    { label: "Push", value: "push", disabled: true },
-  ]}
-  defaultValue={["email"]}
-  onChange={(values) => console.log(values)}
-/>
-```
-
-Use `multiple={true}` for a multi-select dropdown. Single-select dropdowns
-return `string | null`; multi-select dropdowns return `string[]`. For
-controlled usage, pass `value` and the matching `onChange` callback.
-
 ## Project structure
 
 ```text
-src/
-├── app/                 # Next.js application and global styles
-├── components/          # Reusable components and their stories
-├── styles/              # Design tokens and typography variables
-├── utils/               # Shared helpers
-└── stories/             # Storybook example content
-.storybook/              # Storybook configuration
+package.json               # workspace root ("workspaces": ["packages/*", "apps/*"])
+CHANGELOG.md
+
+packages/ui/                 # @involead/ui
+  package.json
+  tsup.config.ts              # library build (ESM + CJS + type declarations)
+  vitest.config.ts            # unit test config
+  src/
+    index.ts                  # public entry point
+    components/                # each component: Name.tsx, Name.module.css,
+                                # Name.stories.tsx, Name.test.tsx, index.ts
+    styles/                     # design tokens and typography variables
+    utils/
+
+apps/storybook/               # storybook-app
+  package.json
+  next.config.ts
+  .storybook/                  # Storybook configuration
+  src/
+    app/                        # Next.js demo app and global styles
+    stories/                    # Introduction.mdx and other standalone docs
 ```
 
-The application global stylesheet imports the design tokens, so the example
-Next.js app has the variables available automatically. When integrating the
-components into another app, load `src/styles/token.css` (and the typography
-stylesheet if needed) in that app's global stylesheet.
+Full contribution rules (how to add a component, styling/token conventions,
+testing requirements, responsive rules) live in Storybook's **Introduction**
+page (`apps/storybook/src/stories/Introduction.mdx`) — read that before
+adding or modifying a component; this README stays focused on setup and
+usage.
 
 ## Available scripts
 
+Run from the repository root:
+
 | Command | Purpose |
 | --- | --- |
-| `npm run dev` | Start the Next.js development server |
-| `npm run build` | Create a production Next.js build |
-| `npm run start` | Serve the production build |
-| `npm run lint` | Run ESLint |
+| `npm install` | Install dependencies for every workspace |
+| `npm run dev` | Start the Next.js demo app (`apps/storybook`) |
+| `npm run build:ui` | Build `@involead/ui` (`packages/ui/dist`) |
 | `npm run storybook` | Start Storybook on port 6006 |
-| `npm run build-storybook` | Build Storybook for deployment |
+| `npm run build-storybook` | Build a static Storybook site |
+| `npm run test` | Run `@involead/ui`'s unit tests (Vitest) |
+| `npm run lint` | Run ESLint across every workspace |
 
-Before opening a pull request, run the relevant Storybook checks and
-`npm run lint`. Add or update a story when changing a component's visual
-states or public behavior.
+Before opening a pull request, run `npm run test`, `npm run lint`, and the
+relevant Storybook build. Add or update a story and a unit test when
+changing a component's visual states or public behavior.
 
 ## Contributing
 
 1. Create a branch for your change.
-2. Update the component, styles, and stories together when behavior changes.
-3. Run linting and the relevant Next.js or Storybook build.
-4. Ensure keyboard and disabled/error states remain usable.
-5. Open a pull request describing the change and its user-facing impact.
+2. Update the component, styles, stories, and unit tests together when
+   behavior changes (see Storybook's Introduction page for the full rules).
+3. Run `npm run test`, `npm run lint`, and `npm run build:ui`.
+4. Ensure keyboard, disabled, and error states remain usable.
+5. Add an entry to `CHANGELOG.md` under `[Unreleased]`.
+6. Open a pull request describing the change and its user-facing impact.

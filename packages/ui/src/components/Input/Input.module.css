@@ -71,19 +71,19 @@
    ========================= */
 
 .small {
-  min-height: 32px;
+  min-height: var(--spacing-8);
   padding: 0 var(--spacing-md);
   font-size: var(--font-size-sm);
 }
 
 .medium {
-  min-height: 40px;
+  min-height: var(--spacing-10);
   padding: 0 var(--spacing-lg);
   font-size: var(--font-size-md);
 }
 
 .large {
-  min-height: 48px;
+  min-height: var(--spacing-12);
   padding: 0 var(--spacing-xl);
   font-size: var(--font-size-lg);
 }

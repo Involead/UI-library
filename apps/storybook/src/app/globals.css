@@ -1,5 +1,5 @@
-@import "../styles/token.css";
-@import "../styles/typography.css";
+@import "@involead/ui/styles/token.css";
+@import "@involead/ui/styles/typography.css";
 
 * {
   box-sizing: border-box;

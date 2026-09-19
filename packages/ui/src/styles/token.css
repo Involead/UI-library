@@ -106,4 +106,17 @@
   --z-popover: 1030;
   --z-modal: 1100;
   --z-toast: 1200;
+
+  /* =========================
+     BREAKPOINTS
+     =========================
+     Reference scale only. A CSS custom property cannot be read inside an
+     `@media` condition, so these values must be copied as literal px into
+     component `@media` rules — pick one of these, never invent a new
+     number. (`--breakpoint-md` here `@media (min-width: 768px)` there.) */
+
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
 }

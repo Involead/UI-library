@@ -1,0 +1,235 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction" />
+
+# Involead Design System
+
+This is the internal design system for the project. It documents the
+monorepo layout, how to run it, how to add components, and the design tokens
+that **every** component must follow. Read this before adding or modifying a
+component.
+
+## Repository layout
+
+This is an npm-workspaces monorepo:
+
+```
+package.json              # workspace root ("workspaces": ["packages/*", "apps/*"])
+packages/ui/               # the @involead/ui package — components, tokens, utils
+  src/
+    components/
+    styles/
+    utils/
+apps/storybook/             # Storybook + a small Next.js app that consumes @involead/ui
+  .storybook/
+  src/app/                  # demo app (layout, page, globals.css)
+```
+
+`apps/storybook` depends on `@involead/ui` as a normal workspace dependency —
+npm symlinks it to `packages/ui`, so editing a component there is reflected
+immediately, with no publish or reinstall step in between.
+
+## Running the project
+
+All commands are run from the **repo root** (not inside `packages/ui` or
+`apps/storybook`), using npm's `-w` workspace flag under the hood:
+
+| Command | What it does |
+|---|---|
+| `npm install` | Installs dependencies for every workspace and links `@involead/ui` into `apps/storybook`. |
+| `npm run storybook` | Starts Storybook at `http://localhost:6006`, watching all `.stories.tsx` files under `packages/ui/src`. |
+| `npm run dev` | Starts the Next.js demo app (`apps/storybook`) at `http://localhost:3000`. |
+| `npm run build:ui` | Builds `@involead/ui` (`packages/ui`) — compiles TypeScript to `packages/ui/dist` (ESM + CJS + `.d.ts`) and copies the raw `.module.css`/token CSS files alongside it. |
+| `npm run build-storybook` | Builds a static Storybook site into `apps/storybook/storybook-static`. |
+| `npm run lint` | Runs ESLint in every workspace. |
+
+Run `npm run build:ui` at least once after installing, or after pulling
+changes to `packages/ui` — the demo app's `globals.css` imports the compiled
+token CSS from `@involead/ui/styles/*.css`, which only exists once
+`packages/ui/dist` has been built.
+
+## Adding a new component
+
+1. Create a folder under `packages/ui/src/components/<ComponentName>/` with
+   exactly four files (see [Folder structure](#folder-structure) below).
+2. Follow the [Component rules](#component-rules) and
+   [Styling rules](#styling-rules) sections when writing the component and
+   its CSS.
+3. Re-export it from the barrel file
+   `packages/ui/src/components/index.ts`:
+
+   ```ts
+   export { MyComponent } from "./MyComponent";
+   export type { MyComponentProps } from "./MyComponent";
+   ```
+
+   That barrel is re-exported from `packages/ui/src/index.ts`, which is the
+   package's public entry point — so once it's in the barrel, consumers can
+   do `import { MyComponent } from "@involead/ui"`.
+4. Write `.stories.tsx` following the [Storybook rules](#storybook-rules) —
+   no extra Storybook config is needed, `apps/storybook/.storybook/main.ts`
+   already globs every `.stories.tsx` under `packages/ui/src`.
+5. Verify it end to end:
+   - `npm run storybook` — the new component's docs page should appear
+     automatically (from `tags: ["autodocs"]`).
+   - `npm run build:ui` — confirms it compiles and generates valid types
+     (this is also what CI/consumers will run).
+   - `npm run lint` — confirms it follows project lint rules.
+
+## Folder structure
+
+Every component lives under `packages/ui/src/components/<ComponentName>/`
+with exactly four files:
+
+```
+packages/ui/src/components/Button/
+├── Button.tsx              # component implementation
+├── Button.module.css       # scoped styles (CSS Modules)
+├── Button.stories.tsx      # Storybook stories (tag: "autodocs")
+└── index.ts                # re-exports the component
+```
+
+Within `packages/ui`'s own source, files use the `@/*` alias to reference
+other package-internal modules (e.g. `import { cx } from "@/utils"`) — this
+alias only resolves inside `packages/ui`, it is not how consumers import the
+package. Consumers (like `apps/storybook`) always import from the package
+name: `import { Button } from "@involead/ui"`.
+
+## Component rules
+
+- **Client components**: if the component uses hooks, event handlers, or
+  browser APIs, start the file with `"use client";` (see `Button.tsx`).
+- **Props**: extend the matching native HTML element's attributes
+  (e.g. `ButtonHTMLAttributes<HTMLButtonElement>`) instead of re-declaring
+  standard props like `disabled`, `onClick`, etc.
+- **Escape hatches**: always spread `...props` onto the root element, and
+  accept an optional `className` merged last with the `cx()` utility from
+  `@/utils`. This is what lets consumers override styles with their own
+  `style` or `className` (padding, margin, etc.) without extra props.
+- **Variant / size props**: expose variation as typed string unions, not
+  booleans, e.g.:
+
+  ```ts
+  type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
+  type ButtonSize = "small" | "medium" | "large";
+  ```
+
+  Apply them to CSS Modules classes by name: `styles[variant]`, `styles[size]`.
+- **State props** (`loading`, `disabled`, `fullWidth`, ...) are booleans,
+  applied as extra classes or attributes (`aria-busy`, `disabled`).
+
+## Styling rules
+
+- Use **CSS Modules** only (`ComponentName.module.css`) — no inline styles,
+  no styled-components, no Tailwind classes inside component source.
+- **Never hardcode colors, fonts, spacing, radii, or shadows.** Always
+  reference a design token variable (`var(--color-primary)`,
+  `var(--spacing-md)`, `var(--font-family-primary)`, ...).
+- One class block per variant/state, grouped with a comment banner, e.g.:
+
+  ```css
+  /* =========================
+     PRIMARY
+     ========================= */
+  .primary {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+  ```
+
+## Design tokens
+
+Tokens live in two files, inside `packages/ui/src/styles/`, and are consumed
+by the demo app globally via `apps/storybook/src/app/globals.css`
+(`@import "@involead/ui/styles/token.css";`) — the same way any other
+consumer of the published package would load them:
+
+| File | Contains |
+|---|---|
+| `packages/ui/src/styles/token.css` | colors, spacing, radius, shadow, z-index, breakpoints |
+| `packages/ui/src/styles/typography.css` | font family, font size, font weight, line height |
+
+### Adding a new color
+
+1. Add the variable to the right section of `packages/ui/src/styles/token.css`
+   (e.g. `BRAND COLORS`, `STATUS`), following the naming pattern
+   `--color-<name>`, with `--color-<name>-hover` / `-active` variants if
+   the color is interactive.
+2. Consume it in component CSS via `var(--color-<name>)` — never a raw hex
+   value in a component file.
+3. If it introduces a new variant (e.g. a `"tertiary"` button), update the
+   variant type union in the component and the `argTypes` options in its
+   `.stories.tsx`.
+
+### Adding a new font
+
+1. Add a `--font-family-*` variable in `packages/ui/src/styles/typography.css`,
+   or extend an existing fallback stack.
+2. If it's a webfont, load it via `next/font` in
+   `apps/storybook/src/app/layout.tsx` (or a `@font-face` block in
+   `typography.css` for self-hosted fonts), then point the CSS variable at it.
+3. Consume it in component CSS via `var(--font-family-*)` — never hardcode
+   a font name in a component file.
+
+## Storybook rules
+
+Every component needs a `.stories.tsx` with:
+
+- `tags: ["autodocs"]` so a docs page is generated automatically.
+- `argTypes` for every variant/size/boolean prop, using `control: "select"`
+  for unions and `control: "boolean"` for flags.
+- At minimum, one story per variant and one per size.
+
+## Testing rules
+
+**Unit tests are mandatory — a component is not "done" without them**, per
+the project charter's Definition of Done and Testing sections.
+
+Setup lives entirely in `packages/ui` (not `apps/storybook`):
+
+- **Stack**: Vitest + `@testing-library/react` + `@testing-library/user-event`
+  + `@testing-library/jest-dom` (matchers like `toBeDisabled()`,
+  `toHaveClass()`), running in a `jsdom` environment.
+- **Config**: `packages/ui/vitest.config.ts` — sets `environment: "jsdom"`,
+  `globals: true` (required for Testing Library's automatic
+  unmount-between-tests cleanup), the `@` path alias (mirrors
+  `tsconfig.json`, since Vite doesn't read `tsconfig` paths on its own), and
+  a setup file (`packages/ui/vitest.setup.ts`) that imports
+  `@testing-library/jest-dom/vitest` for the extra matchers.
+- **Types**: `packages/ui/tsconfig.json` declares
+  `"types": ["vitest/globals", "@testing-library/jest-dom"]` so `tsc`
+  recognizes the global `describe`/`it`/`expect` and the jest-dom matchers.
+- **File convention**: a co-located `ComponentName.test.tsx` next to the
+  component (see `Button/Button.test.tsx` for the reference shape) — import
+  the component directly (not through `@involead/ui`), `render()` it, and
+  query through `screen` using accessible roles/names, not test IDs, except
+  for opaque children like icons.
+- At minimum, cover: the default render, `onClick`/interaction firing,
+  `disabled` (and that it blocks the interaction), `loading` (and that it
+  also blocks the interaction), any conditionally-rendered content (icons,
+  helper text), `className` merging, and variant/size props being applied.
+  For components with keyboard interaction (e.g. a future `Select`/`Tabs`),
+  also cover `Enter`/`Escape`/arrow keys.
+- Run `npm run test -w @involead/ui` (or `npm run test` from the repo root)
+  before opening a PR.
+
+## Responsive rules
+
+- A component must not overflow its container or become unusable at mobile
+  widths. Pair any fixed pixel width with `max-width: 100%` so it shrinks
+  inside narrow containers.
+- `packages/ui/src/styles/token.css` defines a breakpoint scale
+  (`--breakpoint-sm/md/lg/xl` = `640/768/1024/1280px`) — **but a CSS custom
+  property cannot be read inside an `@media` condition**, so this is a
+  reference table, not something you `var()` into a media query. When
+  writing `@media (min-width: 768px)` in a component's `.module.css`,
+  that literal `768px` must match `--breakpoint-md` here — never invent a
+  new breakpoint number.
+
+## Changelog
+
+- Every merged component addition or breaking change gets an entry in
+  `CHANGELOG.md` at the repo root, under an `Unreleased` heading, following
+  [Keep a Changelog](https://keepachangelog.com/) format.
+- Breaking changes require a major version bump and migration guidance, per
+  the project charter's governance section.
