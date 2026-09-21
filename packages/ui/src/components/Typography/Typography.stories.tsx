@@ -175,6 +175,22 @@ export const Colors: Story = {
   ),
 };
 
+export const CustomColor: Story = {
+  name: "Custom color (arbitrary value)",
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <Typography
+        variant="h3"
+        color="#ff6600"
+      >
+        Hex color
+      </Typography>
+      <Typography color="rebeccapurple">Named CSS color</Typography>
+      <Typography color="rgb(10, 200, 90)">RGB color</Typography>
+    </div>
+  ),
+};
+
 /* =========================
    POLYMORPHIC "as"
    ========================= */

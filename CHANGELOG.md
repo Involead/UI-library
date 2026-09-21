@@ -27,6 +27,10 @@ project uses [Semantic Versioning](https://semver.org/) once published.
 - Responsive heading sizes for `Typography`: `h1`–`h4` scale down one step
   below `--breakpoint-md` (768px) so they don't look oversized on mobile —
   the first component to actually use the breakpoint token scale.
+- `Typography` `color` prop now also accepts arbitrary CSS color values
+  (hex, `rgb()`, named colors, etc.) in addition to the design-token names.
+  Token names still resolve to the existing token-based classes; any other
+  value is applied via inline `style` instead.
 
 ### Fixed
 

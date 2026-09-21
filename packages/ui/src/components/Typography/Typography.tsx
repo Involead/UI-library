@@ -29,7 +29,20 @@ export type TypographyColor =
   | "success"
   | "warning"
   | "error"
-  | "info";
+  | "info"
+  | (string & {});
+
+const TOKEN_COLORS = new Set<string>([
+  "primary",
+  "secondary",
+  "tertiary",
+  "disabled",
+  "inverse",
+  "success",
+  "warning",
+  "error",
+  "info",
+]);
 
 export type TypographyWeight =
   | "regular"
@@ -72,22 +85,29 @@ export function Typography<E extends ElementType = "p">({
   as,
   className = "",
   children,
+  style,
   ...props
 }: TypographyProps<E>) {
   const Component = as ?? variantElement[variant];
+  const isTokenColor = TOKEN_COLORS.has(color);
 
   const classes = cx(
     styles.base,
     styles[variant],
-    styles[color],
+    isTokenColor && styles[color],
     weight && styles[weight],
     truncate && styles.truncate,
     className,
   );
 
+  const mergedStyle = isTokenColor
+    ? style
+    : { color, ...style };
+
   return (
     <Component
       className={classes}
+      style={mergedStyle}
       {...props}
     >
       {children}
