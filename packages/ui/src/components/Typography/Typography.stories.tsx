@@ -11,6 +11,34 @@ const meta = {
 
   parameters: {
     layout: "padded",
+
+    docs: {
+      description: {
+        component: `
+Usage:
+
+\`\`\`tsx
+import { Typography } from "@involead/ui";
+
+function PageHeader() {
+  return (
+    <>
+      <Typography variant="h1">Dashboard</Typography>
+      <Typography variant="body-md" color="secondary">
+        Overview of your account activity.
+      </Typography>
+    </>
+  );
+}
+\`\`\`
+
+Use \`as\` to change the rendered tag without changing the applied
+variant styles (e.g. \`<Typography variant="h3" as="span">\`). \`color\`
+accepts the design-token names or any arbitrary CSS color (hex, \`rgb()\`,
+named colors).
+        `,
+      },
+    },
   },
 
   tags: ["autodocs"],

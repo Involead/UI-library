@@ -11,6 +11,33 @@ const meta = {
 
   parameters: {
     layout: "centered",
+
+    docs: {
+      description: {
+        component: `
+Usage:
+
+\`\`\`tsx
+import { Button } from "@involead/ui";
+
+function SaveBar() {
+  return (
+    <Button
+      variant="primary"
+      size="medium"
+      onClick={() => save()}
+    >
+      Save changes
+    </Button>
+  );
+}
+\`\`\`
+
+\`ref\` is forwarded to the underlying \`<button>\` element, so it works with
+\`useRef\` for imperative focus/measurement.
+        `,
+      },
+    },
   },
 
   tags: ["autodocs"],

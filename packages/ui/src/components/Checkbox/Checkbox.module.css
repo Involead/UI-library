@@ -1,0 +1,181 @@
+.container {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+/* =========================
+   WRAPPER (label)
+   ========================= */
+
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.wrapper.disabled {
+  cursor: not-allowed;
+}
+
+/* =========================
+   NATIVE INPUT (visually hidden, kept accessible)
+   ========================= */
+
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+/* =========================
+   BOX
+   ========================= */
+
+.box {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: transparent;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.input:hover:not(:disabled) + .box {
+  border-color: var(--color-border-hover);
+}
+
+.input:checked + .box,
+.input:indeterminate + .box {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.input:focus-visible + .box {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.box.error {
+  border-color: var(--color-border-error);
+}
+
+.input:focus-visible + .box.error {
+  outline-color: var(--color-border-error);
+}
+
+.input:disabled + .box {
+  background: var(--color-surface-secondary);
+  border-color: var(--color-border);
+}
+
+.input:disabled:checked + .box,
+.input:disabled:indeterminate + .box {
+  /* The checked/indeterminate state already renders a white check on a
+     colored box; a plain background swap here would leave a white check
+     on the near-white disabled surface, making it invisible. Dim the
+     whole box instead so the check stays visible at reduced opacity. */
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  opacity: 0.5;
+}
+
+/* =========================
+   SIZES
+   ========================= */
+
+.small {
+  width: var(--spacing-4);
+  height: var(--spacing-4);
+}
+
+.medium {
+  width: var(--spacing-5);
+  height: var(--spacing-5);
+}
+
+.large {
+  width: var(--spacing-6);
+  height: var(--spacing-6);
+}
+
+/* =========================
+   CHECK / INDETERMINATE MARKS
+   ========================= */
+
+.checkIcon {
+  opacity: 0;
+}
+
+.input:checked + .box .checkIcon {
+  opacity: 1;
+}
+
+.input:indeterminate + .box .checkIcon {
+  opacity: 0;
+}
+
+.indeterminateMark {
+  position: absolute;
+  width: 60%;
+  height: 2px;
+  background: currentColor;
+  opacity: 0;
+}
+
+.input:indeterminate + .box .indeterminateMark {
+  opacity: 1;
+}
+
+/* =========================
+   LABEL TEXT
+   ========================= */
+
+.label {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-md);
+  color: var(--color-text-primary);
+}
+
+.wrapper.disabled .label {
+  color: var(--color-text-disabled);
+}
+
+.required {
+  margin-left: var(--spacing-xs);
+  color: var(--color-error);
+}
+
+/* =========================
+   HELPER / ERROR TEXT
+   ========================= */
+
+.helperText {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.errorText {
+  color: var(--color-error);
+}

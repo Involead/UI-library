@@ -1,3 +1,4 @@
+import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -109,5 +110,12 @@ describe("Button", () => {
     const button = screen.getByRole("button", { name: "Delete" });
     expect(button.className).toContain("danger");
     expect(button.className).toContain("large");
+  });
+
+  it("forwards the ref to the underlying button element", () => {
+    const ref = createRef<HTMLButtonElement>();
+    render(<Button ref={ref}>Save</Button>);
+
+    expect(ref.current).toBe(screen.getByRole("button", { name: "Save" }));
   });
 });

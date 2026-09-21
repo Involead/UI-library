@@ -1,7 +1,7 @@
 "use client";
 
 import type {
-  ButtonHTMLAttributes,
+  ComponentPropsWithRef,
   ReactNode,
 } from "react";
 
@@ -22,7 +22,7 @@ type ButtonSize =
   | "large";
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  extends ComponentPropsWithRef<"button"> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
@@ -41,6 +41,7 @@ export function Button({
   children,
   disabled,
   className = "",
+  ref,
   ...props
 }: ButtonProps) {
   const buttonClasses = cx(
@@ -53,6 +54,7 @@ export function Button({
 
   return (
     <button
+      ref={ref}
       type="button"
       className={buttonClasses}
       disabled={disabled || loading}

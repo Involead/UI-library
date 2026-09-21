@@ -11,6 +11,41 @@ const meta = {
 
   parameters: {
     layout: "centered",
+
+    docs: {
+      description: {
+        component: `
+Usage (controlled):
+
+\`\`\`tsx
+import { useState } from "react";
+import { Input } from "@involead/ui";
+
+function LoginForm() {
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState<string | undefined>();
+
+  return (
+    <Input
+      label="Email"
+      name="email"
+      type="email"
+      placeholder="you@company.com"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      error={error}
+      required
+    />
+  );
+}
+\`\`\`
+
+Omit \`value\`/\`onChange\` (use \`defaultValue\` instead) for an uncontrolled
+input. \`ref\` is forwarded to the underlying \`<input>\`, so it works with
+\`useRef\` or form libraries like react-hook-form.
+        `,
+      },
+    },
   },
 
   tags: ["autodocs"],

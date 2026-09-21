@@ -184,6 +184,13 @@ Every component needs a `.stories.tsx` with:
 - `argTypes` for every variant/size/boolean prop, using `control: "select"`
   for unions and `control: "boolean"` for flags.
 - At minimum, one story per variant and one per size.
+- `parameters.docs.description.component`: a short markdown usage example
+  (a real `import { X } from "@involead/ui"` + a minimal working snippet,
+  controlled example first if the component has controlled/uncontrolled
+  modes). This renders at the top of the autodocs page, above the props
+  table, so a consumer doesn't have to reverse-engineer usage from the
+  controls alone. See `Input.stories.tsx` or `Checkbox.stories.tsx` for the
+  reference shape.
 
 ## Testing rules
 

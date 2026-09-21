@@ -3,7 +3,7 @@
 import {
   useId,
   useState,
-  type InputHTMLAttributes,
+  type ComponentPropsWithRef,
   type ReactNode,
 } from "react";
 
@@ -31,7 +31,7 @@ type InputType =
   | "hidden";
 
 export interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "type"> {
+  extends Omit<ComponentPropsWithRef<"input">, "size" | "type"> {
   label?: string;
   helperText?: string;
   error?: string;
@@ -55,6 +55,7 @@ export function Input({
   required,
   id,
   className = "",
+  ref,
   ...props
 }: InputProps) {
   const generatedId = useId();
@@ -114,6 +115,7 @@ export function Input({
         )}
 
         <input
+          ref={ref}
           id={inputId}
           type={resolvedType}
           className={inputClasses}

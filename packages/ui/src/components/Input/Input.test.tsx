@@ -1,3 +1,4 @@
+import { createRef } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
@@ -135,5 +136,17 @@ describe("Input", () => {
     );
 
     expect(screen.getByLabelText("Email")).toHaveClass("custom-class");
+  });
+
+  it("forwards the ref to the underlying input element", () => {
+    const ref = createRef<HTMLInputElement>();
+    render(
+      <Input
+        label="Email"
+        ref={ref}
+      />,
+    );
+
+    expect(ref.current).toBe(screen.getByLabelText("Email"));
   });
 });
