@@ -1,223 +1,110 @@
 # InvoLead UI Library
 
-InvoLead UI Library is a reusable React component and design-token library
-built with Next.js, TypeScript, and Storybook. It provides consistent,
-accessible building blocks for InvoLead products and keeps common interaction
-patterns in one place.
+- Package: `@involead/ui`
+- Purpose: shared React component library for InvoLead products
+- Stack: React, Next.js, TypeScript, Storybook, Vite, Vitest
 
-## What is included?
+## Current state
 
-- **Button** - primary, secondary, outline, ghost, and danger variants; three
-  sizes; loading, disabled, full-width, and icon states.
-- **Input** - labels, helper and error text, validation states, common HTML
-  input types, password visibility toggling, icons, and three sizes.
-- **Dropdown** - single- and multi-select modes, searchable and clearable
-  selections, disabled options, keyboard interaction, helper and error text,
-  and configurable width.
-- **Design tokens** - shared color, spacing, radius, shadow, z-index, and
-  typography variables in `src/styles`.
-- **Storybook** - interactive stories and autodocs for developing and
-  reviewing components in isolation.
-
-## Why use it?
-
-Using shared components helps product teams:
-
-- deliver a consistent visual and interaction language;
-- avoid duplicating form, loading, and validation behavior;
-- make accessibility improvements available across the application;
-- develop UI states quickly with Storybook controls; and
-- keep styling decisions centralized in reusable design tokens.
+- Built foundation includes:
+  - `Button`
+  - `Input`
+  - `Dropdown`
+- Component capabilities:
+  - Button: variants, sizes, loading, disabled, full width, icons
+  - Input: labels, helper/error text, validation, passwords, common HTML input types
+  - Dropdown: single/multi-select, search, clearable state, keyboard interaction, disabled options
+- Design system:
+  - CSS variable tokens in `src/styles`
+  - typed token exports in `src/theme`
+  - active global brand colors:
+    - primary blue: `rgb(11, 65, 205)`
+    - black/text base: `rgb(33, 32, 31)`
+- Tooling:
+  - Storybook configured
+  - Vitest + Playwright browser tests configured
+  - Vite package build configured
+  - Type declaration build configured
+- Version: `0.1.0`
 
 ## Requirements
 
-- Node.js 20 or newer
-- npm (the repository includes `package-lock.json`)
+- Node.js 20+
+- npm
 
-## Getting started
+## Setup
 
-1. Clone the repository and enter the project directory:
-
-   ```bash
-   git clone <repository-url>
-   cd ui-library
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-3. Start the Next.js development server:
-
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000).
+- Install dependencies:
+  ```bash
+  npm install
+  ```
+- Run the example app:
+  ```bash
+  npm run dev
+  ```
+- Open: http://localhost:3000
 
 ## Storybook
 
-Use Storybook to browse components, adjust props, and review states without
-running the application page:
+- Start Storybook:
+  ```bash
+  npm run storybook
+  ```
+- Open: http://localhost:6006
+- Build Storybook:
+  ```bash
+  npm run build-storybook
+  ```
 
-```bash
-npm run storybook
-```
+## Usage
 
-Open [http://localhost:6006](http://localhost:6006).
+- Import from the shared barrel:
+  ```tsx
+  "use client";
 
-To create a static Storybook build:
-
-```bash
-npm run build-storybook
-```
-
-## Using the components
-
-The components are currently consumed from the repository source. In a
-Next.js application in this project, import them from the shared barrel:
-
-```tsx
-"use client";
-
-import {
-  Button,
-  Dropdown,
-  Input,
-} from "@/components";
-
-const options = [
-  { label: "Design", value: "design" },
-  { label: "Engineering", value: "engineering" },
-];
-
-export function ExampleForm() {
-  return (
-    <form>
-      <Input
-        label="Email"
-        name="email"
-        type="email"
-        placeholder="you@example.com"
-        helperText="We will never share your email."
-        fullWidth
-      />
-
-      <Dropdown
-        label="Team"
-        name="team"
-        options={options}
-        placeholder="Select a team"
-        searchable
-        required
-      />
-
-      <Button
-        type="submit"
-        variant="primary"
-        loading={false}
-      >
-        Save changes
-      </Button>
-    </form>
-  );
-}
-```
-
-`Button`, `Input`, and `Dropdown` are client components. Add `"use client"` to
-the consuming component when it uses these components directly from a Next.js
-Server Component boundary.
-
-### Component API overview
-
-#### Button
-
-| Prop | Values / type | Default |
-| --- | --- | --- |
-| `variant` | `primary`, `secondary`, `outline`, `ghost`, `danger` | `primary` |
-| `size` | `small`, `medium`, `large` | `medium` |
-| `loading` | `boolean` | `false` |
-| `fullWidth` | `boolean` | `false` |
-| `leftIcon`, `rightIcon` | `ReactNode` | - |
-
-Button also accepts native `HTMLButtonElement` props such as `onClick`,
-`disabled`, `aria-label`, and `type`.
-
-#### Input
-
-```tsx
-<Input
-  label="Password"
-  type="password"
-  error="Password is required."
-  required
-  onChange={(event) => console.log(event.target.value)}
-/>
-```
-
-Input supports `text`, `password`, `email`, `number`, `tel`, `url`, `search`,
-`date`, `datetime-local`, `time`, `month`, `week`, `color`, `file`, and
-`hidden` types. It also accepts native input props such as `value`,
-`defaultValue`, `onChange`, and `name`.
-
-#### Dropdown
-
-```tsx
-<Dropdown
-  label="Notifications"
-  multiple
-  options={[
-    { label: "Email", value: "email" },
-    { label: "SMS", value: "sms" },
-    { label: "Push", value: "push", disabled: true },
-  ]}
-  defaultValue={["email"]}
-  onChange={(values) => console.log(values)}
-/>
-```
-
-Use `multiple={true}` for a multi-select dropdown. Single-select dropdowns
-return `string | null`; multi-select dropdowns return `string[]`. For
-controlled usage, pass `value` and the matching `onChange` callback.
+  import { Button, Dropdown, Input } from "@/components";
+  ```
+- Consumer pattern:
+  - `Button`, `Input`, and `Dropdown` are client components
+  - add `"use client"` when used across a Next.js server boundary
+- Package-level exports also include:
+  - component types
+  - `cx`
+  - token references
 
 ## Project structure
 
-```text
-src/
-├── app/                 # Next.js application and global styles
-├── components/          # Reusable components and their stories
-├── styles/              # Design tokens and typography variables
-├── utils/               # Shared helpers
-└── stories/             # Storybook example content
-.storybook/              # Storybook configuration
-```
+- `src/app/` — Next.js example app and global styles
+- `src/components/` — reusable components and stories
+- `src/styles/` — CSS tokens and typography
+- `src/theme/` — typed token references
+- `src/utils/` — shared utilities
+- `src/index.ts` — public package entry point
+- `.storybook/` — Storybook config
+- `vite.config.ts` — package build config
+- `tsconfig.build.json` — declaration build config
 
-The application global stylesheet imports the design tokens, so the example
-Next.js app has the variables available automatically. When integrating the
-components into another app, load `src/styles/token.css` (and the typography
-stylesheet if needed) in that app's global stylesheet.
+## Scripts
 
-## Available scripts
+- `npm run dev` — start the example app
+- `npm run build` — create Next.js production build
+- `npm run start` — serve the Next.js build
+- `npm run lint` — run ESLint
+- `npm run typecheck` — run TypeScript checks
+- `npm run test` — run Vitest / Storybook tests
+- `npm run build:types` — generate declaration files
+- `npm run build:package` — build declarations and package output
+- `npm run storybook` — start Storybook
+- `npm run build-storybook` — build Storybook output
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start the Next.js development server |
-| `npm run build` | Create a production Next.js build |
-| `npm run start` | Serve the production build |
-| `npm run lint` | Run ESLint |
-| `npm run storybook` | Start Storybook on port 6006 |
-| `npm run build-storybook` | Build Storybook for deployment |
+## Quality gate before PR
 
-Before opening a pull request, run the relevant Storybook checks and
-`npm run lint`. Add or update a story when changing a component's visual
-states or public behavior.
-
-## Contributing
-
-1. Create a branch for your change.
-2. Update the component, styles, and stories together when behavior changes.
-3. Run linting and the relevant Next.js or Storybook build.
-4. Ensure keyboard and disabled/error states remain usable.
-5. Open a pull request describing the change and its user-facing impact.
+- Run:
+  ```bash
+  npm run typecheck
+  npm run test
+  npm run build:package
+  npm run build-storybook
+  ```
+- Update component implementation, styles, and stories together when behavior changes
+- Keep public behavior accessible and token-driven
