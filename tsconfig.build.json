@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "outDir": "./dist/types",
+    "plugins": []
+  },
+  "include": ["src/index.ts", "src/components/**/*.ts", "src/components/**/*.tsx", "src/theme/**/*.ts", "src/utils/**/*.ts", "src/types/**/*.d.ts"]
+}
