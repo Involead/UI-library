@@ -1,6 +1,6 @@
 {
   "name": "@involead/ui",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "private": false,
   "scripts": {
     "dev": "next dev",
@@ -15,9 +15,11 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "next": "16.3.5",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "next": "16.3.5"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "files": [
     "dist",
@@ -29,31 +31,30 @@
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
       "import": "./dist/index.es.js",
       "require": "./dist/index.cjs.js"
     },
-    "./styles/*": "./src/styles/*"
+    "./ui.css": "./dist/ui.css"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "latest",
+    "@storybook/addon-a11y": "^10.6.0",
+    "@storybook/addon-docs": "^10.6.0",
+    "@storybook/addon-vitest": "^10.6.0",
+    "@storybook/nextjs-vite": "^10.6.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.0.4",
+    "@vitest/browser-playwright": "latest",
+    "@vitest/coverage-v8": "latest",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
-    "typescript": "^5",
-    "storybook": "^10.6.0",
-    "@storybook/nextjs-vite": "^10.6.0",
-    "@chromatic-com/storybook": "latest",
-    "@storybook/addon-vitest": "^10.6.0",
-    "@storybook/addon-a11y": "^10.6.0",
-    "@storybook/addon-docs": "^10.6.0",
-    "vite": "latest",
-    "@vitejs/plugin-react": "latest",
     "eslint-plugin-storybook": "^10.6.0",
-    "vitest": "latest",
     "playwright": "latest",
-    "@vitest/browser-playwright": "latest",
-    "@vitest/coverage-v8": "latest"
+    "storybook": "^10.6.0",
+    "typescript": "^5",
+    "vite": "^7.1.7",
+    "vitest": "latest"
   }
 }

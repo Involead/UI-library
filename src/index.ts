@@ -5,6 +5,7 @@ export { Input } from "./components/Input";
 export type { InputProps } from "./components/Input";
 
 export { Dropdown } from "./components/Dropdown";
+import "./styles/index.css";
 export type {
   DropdownOption,
   DropdownProps,
