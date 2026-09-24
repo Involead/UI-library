@@ -3,7 +3,7 @@
 `@involead/ui` is a React-first, Next.js-compatible component library for consistent, accessible InvoLead product interfaces.
 
 - **Package:** `@involead/ui`
-- **Version:** `0.1.4`
+- **Version:** `0.1.5`
 - **Stack:** React, Next.js, TypeScript, Storybook, Vite, Vitest
 - **Styling:** CSS Modules and CSS custom properties
 - **Distribution:** npm package with ESM, CommonJS, CSS, and TypeScript declarations
@@ -37,7 +37,7 @@ Open the example application at [http://localhost:3000](http://localhost:3000).
 
 ## Storybook
 
-Storybook is the component development, documentation, accessibility, and visual review environment.
+Storybook is the component development, documentation, accessibility, and visual review environment. It includes the library component stories under `src/components/` and the Storybook documentation and examples under `src/stories/`.
 
 ```bash
 npm run storybook
@@ -66,7 +66,7 @@ import { Button, Dropdown, Input } from "@involead/ui";
 import "@involead/ui/ui.css";
 ```
 
-The public package entry point also exports component types, `cx`, and typed design tokens.
+The public package entry point exports `Button`, `Input`, `Dropdown`, their public types, `cx`, and typed design tokens. The package stylesheet is available from the `@involead/ui/ui.css` subpath.
 
 ## Project structure
 
@@ -74,8 +74,8 @@ The public package entry point also exports component types, `cx`, and typed des
 src/
 ├── app/                  # Next.js example application
 ├── components/           # Component implementation, CSS, and stories
-├── stories/              # Storybook examples and assets
-├── styles/               # CSS variables and typography
+├── stories/              # Storybook documentation, examples, and assets
+├── styles/               # CSS variables, typography, and package stylesheet
 ├── theme/                # Typed token references
 ├── utils/                # Shared utilities
 ├── types/                # Type declarations
@@ -96,7 +96,7 @@ dist/                     # Generated package output
 | `npm run typecheck` | Run TypeScript checks |
 | `npm run test` | Run Vitest tests |
 | `npm run build:types` | Generate TypeScript declarations |
-| `npm run build:package` | Generate declarations and Vite package output |
+| `npm run build:package` | Generate declarations and Vite package output, including `dist/ui.css` |
 | `npm run storybook` | Start Storybook |
 | `npm run build-storybook` | Build static Storybook output |
 
