@@ -11,3 +11,6 @@ export type {
   SingleDropdownProps,
   MultipleDropdownProps,
 } from "./Dropdown";
+
+export { Checkbox } from "./Checkbox";
+export type { CheckboxProps } from "./Checkbox";
