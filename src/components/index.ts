@@ -11,3 +11,6 @@ export type {
   SingleDropdownProps,
   MultipleDropdownProps,
 } from "./Dropdown";
+
+export { Typography } from "./Typography";
+export type { TypographyProps } from "./Typography";
