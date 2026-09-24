@@ -18,7 +18,17 @@
   cursor: pointer;
 }
 
-.disabled .field {
+/* Label not clickable: only the control shows the pointer */
+.labelStatic {
+  cursor: default;
+}
+
+.labelStatic .control {
+  cursor: pointer;
+}
+
+.disabled .field,
+.disabled .labelStatic .control {
   cursor: not-allowed;
 }
 
@@ -82,6 +92,18 @@
 
   opacity: 0;
   transition: opacity 0.2s ease;
+}
+
+/* Custom icon: fit any consumer SVG into the indicator box */
+.customIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.customIcon > svg {
+  width: 100%;
+  height: 100%;
 }
 
 /* =========================

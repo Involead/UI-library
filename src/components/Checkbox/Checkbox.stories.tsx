@@ -76,6 +76,14 @@ const meta = {
     checked: {
       control: false,
     },
+
+    labelClickable: {
+      control: "boolean",
+    },
+
+    icon: {
+      control: false,
+    },
   },
 } satisfies Meta<typeof Checkbox>;
 
@@ -88,6 +96,12 @@ const stack = {
   flexDirection: "column",
   gap: "var(--spacing-lg)",
 } as const;
+
+const StarIcon = (
+  <svg viewBox="0 0 24 24" fill="currentColor">
+    <path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" />
+  </svg>
+);
 
 /* =========================
    ALL
@@ -202,5 +216,44 @@ export const WithHelperText: Story = {
   args: {
     label: "Subscribe to newsletter",
     helperText: "We'll send you updates once a month.",
+  },
+};
+
+/* =========================
+   LABEL CLICKABLE
+   ========================= */
+
+export const LabelClickable: Story = {
+  argTypes: {
+    labelClickable: {
+      control: false,
+    },
+  },
+
+  render: (args) => (
+    <div style={stack}>
+      <Checkbox
+        {...args}
+        labelClickable
+        label="Clicking this label toggles the checkbox"
+      />
+      <Checkbox
+        {...args}
+        labelClickable={false}
+        label="Only the checkbox itself toggles"
+      />
+    </div>
+  ),
+};
+
+/* =========================
+   WITH ICON
+   ========================= */
+
+export const WithIcon: Story = {
+  args: {
+    label: "Add to favourites",
+    icon: StarIcon,
+    defaultChecked: true,
   },
 };

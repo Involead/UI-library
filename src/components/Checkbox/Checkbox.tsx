@@ -3,6 +3,7 @@
 import {
   useId,
   type InputHTMLAttributes,
+  type ReactNode,
 } from "react";
 
 import { cx } from "@/utils";
@@ -17,6 +18,17 @@ export interface CheckboxProps
   helperText?: string;
   error?: string;
   size?: CheckboxSize;
+  /**
+   * When `true`, clicking the label toggles the checkbox.
+   * When `false`, only the checkbox itself toggles the state.
+   */
+  labelClickable?: boolean;
+  /**
+   * Custom SVG or React node shown inside the box when checked,
+   * replacing the default checkmark. Use `currentColor` to inherit
+   * the indicator colour.
+   */
+  icon?: ReactNode;
 }
 
 export function Checkbox({
@@ -24,6 +36,8 @@ export function Checkbox({
   helperText,
   error,
   size = "medium",
+  labelClickable = true,
+  icon,
   disabled,
   id,
   className = "",
@@ -32,7 +46,12 @@ export function Checkbox({
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const helperId = `${inputId}-helper`;
+  const labelId = `${inputId}-label`;
   const hasError = Boolean(error);
+
+  // A non-clickable label must not be a <label>, or clicks would toggle the
+  // input; the input is then named via aria-labelledby instead.
+  const FieldElement = labelClickable ? "label" : "div";
 
   const wrapperClasses = cx(
     styles.wrapper,
@@ -44,9 +63,12 @@ export function Checkbox({
 
   return (
     <div className={wrapperClasses}>
-      <label
-        className={styles.field}
-        htmlFor={inputId}
+      <FieldElement
+        className={cx(
+          styles.field,
+          !labelClickable && styles.labelStatic,
+        )}
+        htmlFor={labelClickable ? inputId : undefined}
       >
         <span className={styles.control}>
           <input
@@ -55,30 +77,44 @@ export function Checkbox({
             className={styles.input}
             disabled={disabled}
             aria-invalid={hasError}
+            aria-labelledby={
+              !labelClickable && label ? labelId : undefined
+            }
             aria-describedby={
               helperText || error ? helperId : undefined
             }
             {...props}
           />
 
-          <svg
-            className={styles.icon}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M20 6 9 17l-5-5" />
-          </svg>
+          {icon ? (
+            <span
+              className={cx(styles.icon, styles.customIcon)}
+              aria-hidden="true"
+            >
+              {icon}
+            </span>
+          ) : (
+            <svg
+              className={styles.icon}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          )}
         </span>
 
         {label && (
-          <span className={styles.label}>{label}</span>
+          <span id={labelId} className={styles.label}>
+            {label}
+          </span>
         )}
-      </label>
+      </FieldElement>
 
       {(helperText || error) && (
         <span
