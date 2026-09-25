@@ -151,8 +151,10 @@ label.row {
 
 .label {
   font-size: var(--radio-font-size);
-  /* Tight line box so the text centres on the circle instead of sitting low. */
+  /* Trim the line box to the cap height so flex centering lines the letters
+     up with the circle, instead of the (descender-padded) line box. */
   line-height: var(--line-height-tight);
+  text-box: trim-both cap alphabetic;
   color: var(--color-text-primary);
   user-select: none;
 }
