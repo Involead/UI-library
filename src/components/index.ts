@@ -13,3 +13,10 @@ export type {
 } from "./Dropdown";
 export { Radio } from "./Radio";
 export type { RadioProps } from "./Radio";
+
+
+export { Checkbox } from "./Checkbox";
+export type { CheckboxProps } from "./Checkbox";
+
+export { Typography } from "./Typography";
+export type { TypographyProps } from "./Typography";
