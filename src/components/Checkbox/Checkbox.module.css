@@ -1,0 +1,200 @@
+.wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+
+  font-family: var(--font-family-primary);
+}
+
+/* =========================
+   FIELD (checkbox + label)
+   ========================= */
+
+.field {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+
+  cursor: pointer;
+}
+
+/* Label not clickable: only the control shows the pointer */
+.labelStatic {
+  cursor: default;
+}
+
+.labelStatic .control {
+  cursor: pointer;
+}
+
+.disabled .field,
+.disabled .labelStatic .control {
+  cursor: not-allowed;
+}
+
+/* =========================
+   SIZES
+   ========================= */
+
+.small {
+  --checkbox-size: 16px;
+  font-size: var(--font-size-sm);
+}
+
+.medium {
+  --checkbox-size: 20px;
+  font-size: var(--font-size-md);
+}
+
+.large {
+  --checkbox-size: 24px;
+  font-size: var(--font-size-lg);
+}
+
+/* =========================
+   CONTROL
+   ========================= */
+
+.control {
+  position: relative;
+  top: 0.1em; /* optical alignment: glyphs sit below the line box centre */
+  display: inline-flex;
+  flex-shrink: 0;
+
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+}
+
+.input {
+  appearance: none;
+
+  width: 100%;
+  height: 100%;
+  margin: 0;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+
+  cursor: inherit;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.icon {
+  position: absolute;
+  inset: 15%;
+
+  color: var(--color-white);
+  pointer-events: none;
+
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Custom icon: fit any consumer SVG into the indicator box */
+.customIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.customIcon > svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================
+   HOVER
+   ========================= */
+
+.input:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+
+.input:checked:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+/* =========================
+   FOCUS
+   ========================= */
+
+.input:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* =========================
+   CHECKED
+   ========================= */
+
+.input:checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.input:checked + .icon {
+  opacity: 1;
+}
+
+/* =========================
+   ERROR
+   ========================= */
+
+.error .input:not(:disabled) {
+  border-color: var(--color-border-error);
+}
+
+.error .input:checked:not(:disabled) {
+  background: var(--color-error);
+}
+
+.error .input:focus-visible {
+  outline-color: var(--color-border-error);
+}
+
+/* =========================
+   DISABLED
+   ========================= */
+
+.input:disabled {
+  background: var(--color-surface-secondary);
+  border-color: var(--color-border-hover);
+}
+
+.input:disabled:checked {
+  background: var(--color-text-disabled);
+  border-color: var(--color-text-disabled);
+}
+
+/* =========================
+   LABEL
+   ========================= */
+
+.label {
+  color: var(--color-text-primary);
+  line-height: var(--line-height-normal);
+  user-select: none;
+}
+
+.disabled .label {
+  color: var(--color-text-disabled);
+}
+
+/* =========================
+   HELPER / ERROR TEXT
+   ========================= */
+
+.helperText {
+  padding-left: calc(var(--checkbox-size) + var(--spacing-sm));
+
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.error .helperText {
+  color: var(--color-error);
+}
