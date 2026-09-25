@@ -13,6 +13,9 @@ export type {
   SingleDropdownProps,
 } from "./components/Dropdown";
 
+export { Typography } from "./components/Typography";
+export type { TypographyProps } from "./components/Typography";
+
 export { cx } from "./utils";
 export type { ClassValue } from "./utils";
 
