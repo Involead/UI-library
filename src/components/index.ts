@@ -11,3 +11,5 @@ export type {
   SingleDropdownProps,
   MultipleDropdownProps,
 } from "./Dropdown";
+export { Radio } from "./Radio";
+export type { RadioProps } from "./Radio";

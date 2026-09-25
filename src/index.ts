@@ -12,6 +12,9 @@ export type {
   SingleDropdownProps,
 } from "./components/Dropdown";
 
+export { Radio } from "./components/Radio";
+export type { RadioProps } from "./components/Radio";
+
 export { cx } from "./utils";
 export type { ClassValue } from "./utils";
 
