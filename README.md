@@ -1,31 +1,25 @@
 # InvoLead UI Library
 
-- Package: `@involead/ui`
-- Purpose: shared React component library for InvoLead products
-- Stack: React, Next.js, TypeScript, Storybook, Vite, Vitest
+`@involead/ui` is a React-first, Next.js-compatible component library for consistent, accessible InvoLead product interfaces.
 
-## Current state
+- **Package:** `@involead/ui`
+- **Version:** `0.1.5`
+- **Stack:** React, Next.js, TypeScript, Storybook, Vite, Vitest
+- **Styling:** CSS Modules and CSS custom properties
+- **Distribution:** npm package with ESM, CommonJS, CSS, and TypeScript declarations
 
-- Built foundation includes:
-  - `Button`
-  - `Input`
-  - `Dropdown`
-- Component capabilities:
-  - Button: variants, sizes, loading, disabled, full width, icons
-  - Input: labels, helper/error text, validation, passwords, common HTML input types
-  - Dropdown: single/multi-select, search, clearable state, keyboard interaction, disabled options
-- Design system:
-  - CSS variable tokens in `src/styles`
-  - typed token exports in `src/theme`
-  - active global brand colors:
-    - primary blue: `rgb(11, 65, 205)`
-    - black/text base: `rgb(33, 32, 31)`
-- Tooling:
-  - Storybook configured
-  - Vitest + Playwright browser tests configured
-  - Vite package build configured
-  - Type declaration build configured
-- Version: `0.1.0`
+## Architecture and documentation
+
+- [Technical design](./docs/technical-design.md) — architecture, styling, tokens, package output, and component definition of done.
+- [Contributing and release process](./docs/contributing-and-release.md) — implementation, code review, validation, publishing, and consumer verification.
+
+The library is React-first rather than Next.js-specific, so consuming applications do not need Next.js just to render components. The local Next.js app is used for development and compatibility validation.
+
+## Current components
+
+- `Button` — variants, sizes, loading, disabled, full width, and icons.
+- `Input` — labels, helper/error text, validation, passwords, and common HTML input types.
+- `Dropdown` — single/multi-select, search, clearable state, keyboard interaction, and disabled options.
 
 ## Requirements
 
@@ -34,77 +28,125 @@
 
 ## Setup
 
-- Install dependencies:
-  ```bash
-  npm install
-  ```
-- Run the example app:
-  ```bash
-  npm run dev
-  ```
-- Open: http://localhost:3000
+```bash
+npm install
+npm run dev
+```
+
+Open the example application at [http://localhost:3000](http://localhost:3000).
 
 ## Storybook
 
-- Start Storybook:
-  ```bash
-  npm run storybook
-  ```
-- Open: http://localhost:6006
-- Build Storybook:
-  ```bash
-  npm run build-storybook
-  ```
+Storybook is the component development, documentation, accessibility, and visual review environment. It includes the library component stories under `src/components/` and the Storybook documentation and examples under `src/stories/`.
+
+```bash
+npm run storybook
+```
+
+Open [http://localhost:6006](http://localhost:6006). Build the static Storybook output with:
+
+```bash
+npm run build-storybook
+```
 
 ## Usage
 
-- Import from the shared barrel:
-  ```tsx
-  "use client";
+Install the published package in a consuming project:
 
-  import { Button, Dropdown, Input } from "@/components";
-  ```
-- Consumer pattern:
-  - `Button`, `Input`, and `Dropdown` are client components
-  - add `"use client"` when used across a Next.js server boundary
-- Package-level exports also include:
-  - component types
-  - `cx`
-  - token references
+```bash
+npm install @involead/ui
+```
+
+Interactive components should be used inside a client boundary in Next.js:
+
+```tsx
+"use client";
+
+import { Button, Dropdown, Input } from "@involead/ui";
+import "@involead/ui/ui.css";
+```
+
+The public package entry point exports `Button`, `Input`, `Dropdown`, their public types, `cx`, and typed design tokens. The package stylesheet is available from the `@involead/ui/ui.css` subpath.
 
 ## Project structure
 
-- `src/app/` — Next.js example app and global styles
-- `src/components/` — reusable components and stories
-- `src/styles/` — CSS tokens and typography
-- `src/theme/` — typed token references
-- `src/utils/` — shared utilities
-- `src/index.ts` — public package entry point
-- `.storybook/` — Storybook config
-- `vite.config.ts` — package build config
-- `tsconfig.build.json` — declaration build config
+```text
+src/
+├── app/                  # Next.js example application
+├── components/           # Component implementation, CSS, and stories
+├── stories/              # Storybook documentation, examples, and assets
+├── styles/               # CSS variables, typography, and package stylesheet
+├── theme/                # Typed token references
+├── utils/                # Shared utilities
+├── types/                # Type declarations
+└── index.ts              # Public package entry point
+.storybook/               # Storybook configuration
+docs/                     # Architecture and release documentation
+dist/                     # Generated package output
+```
 
 ## Scripts
 
-- `npm run dev` — start the example app
-- `npm run build` — create Next.js production build
-- `npm run start` — serve the Next.js build
-- `npm run lint` — run ESLint
-- `npm run typecheck` — run TypeScript checks
-- `npm run test` — run Vitest / Storybook tests
-- `npm run build:types` — generate declaration files
-- `npm run build:package` — build declarations and package output
-- `npm run storybook` — start Storybook
-- `npm run build-storybook` — build Storybook output
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Next.js example application |
+| `npm run build` | Create the Next.js production build |
+| `npm run start` | Serve the Next.js production build |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run TypeScript checks |
+| `npm run test` | Run Vitest tests |
+| `npm run build:types` | Generate TypeScript declarations |
+| `npm run build:package` | Generate declarations and Vite package output, including `dist/ui.css` |
+| `npm run storybook` | Start Storybook |
+| `npm run build-storybook` | Build static Storybook output |
 
-## Quality gate before PR
+## Making and reviewing changes
 
-- Run:
-  ```bash
-  npm run typecheck
-  npm run test
-  npm run build:package
-  npm run build-storybook
-  ```
-- Update component implementation, styles, and stories together when behavior changes
-- Keep public behavior accessible and token-driven
+For a component change, update the implementation, scoped styles, Storybook stories, tests, and documentation together. Keep public exports deliberate and use design tokens instead of arbitrary values.
+
+Before opening a pull request:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test
+npm run build:package
+npm run build-storybook
+```
+
+The review flow is:
+
+```text
+Requirement → API discussion → Implementation + tests + Storybook
+→ Accessibility/visual review → Pull request
+→ CI quality gates → Core UI team approval → Merge
+```
+
+Every component must have a typed API, Storybook coverage, appropriate tests, keyboard and focus behavior, accessible labels/roles/states, and code review. Breaking changes require migration guidance, a changelog entry, and a major version.
+
+## Build and publish
+
+Check the package metadata and npm account:
+
+```bash
+npm pkg get name version
+npm whoami
+```
+
+Build and publish the current public npm package:
+
+```bash
+npm run build:package
+npm publish --access public
+npm view @involead/ui version
+```
+
+Publishing must happen only after the quality gates pass. Do not commit credentials, internal screenshots, product data, or proprietary documentation. The target release architecture is an InvoLead-approved private registry; use its protected credentials and registry-specific command once that infrastructure is configured.
+
+## Quality and release principles
+
+- Accessibility is part of the definition of done.
+- Public APIs must remain strongly typed and backward-compatible where possible.
+- Components must remain reusable and free of application-specific business logic.
+- Releases use Semantic Versioning: PATCH for fixes, MINOR for compatible features, and MAJOR for breaking changes.
+- Storybook is part of the development workflow, not only a documentation site.
