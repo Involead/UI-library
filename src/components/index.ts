@@ -14,3 +14,6 @@ export type {
 
 export { Checkbox } from "./Checkbox";
 export type { CheckboxProps } from "./Checkbox";
+
+export { Typography } from "./Typography";
+export type { TypographyProps } from "./Typography";

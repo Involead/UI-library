@@ -5,6 +5,7 @@ export { Input } from "./components/Input";
 export type { InputProps } from "./components/Input";
 
 export { Dropdown } from "./components/Dropdown";
+import "./styles/index.css";
 export type {
   DropdownOption,
   DropdownProps,
@@ -14,6 +15,9 @@ export type {
 
 export { Checkbox } from "./components/Checkbox";
 export type { CheckboxProps } from "./components/Checkbox";
+
+export { Typography } from "./components/Typography";
+export type { TypographyProps } from "./components/Typography";
 
 export { cx } from "./utils";
 export type { ClassValue } from "./utils";
