@@ -1,6 +1,6 @@
 .root {
   --radio-size: 20px;
-  --radio-dot-size: 8px;
+  --radio-dot-size: 10px;
   --radio-font-size: var(--font-size-md);
 
   display: inline-flex;
@@ -15,19 +15,19 @@
 
 .small {
   --radio-size: 16px;
-  --radio-dot-size: 6px;
+  --radio-dot-size: 8px;
   --radio-font-size: var(--font-size-sm);
 }
 
 .medium {
   --radio-size: 20px;
-  --radio-dot-size: 8px;
+  --radio-dot-size: 10px;
   --radio-font-size: var(--font-size-md);
 }
 
 .large {
   --radio-size: 24px;
-  --radio-dot-size: 10px;
+  --radio-dot-size: 12px;
   --radio-font-size: var(--font-size-lg);
 }
 
@@ -76,18 +76,24 @@ label.row {
   width: 100%;
   height: 100%;
 
-  /* Ring drawn as an inset shadow. When checked, the ring thickens until only
-     a dot of the background is left — one painted shape, so the dot is always
-     concentric regardless of display scaling. */
+  /* One painted shape, so the dot is always concentric at any display scale:
+     - outer inset shadow  = the thin ring
+     - inner inset shadow  = the fill between ring and dot
+     - background          = the dot, visible only where the fill stops.
+     Unchecked, the fill covers the whole circle; checked, it stops short of
+     the centre to reveal the dot. */
   --radio-ring: var(--color-border);
-  --radio-ring-width: 1.5px;
+  --radio-fill: var(--color-surface);
+  --radio-dot: var(--color-primary);
+  --radio-fill-width: var(--radio-size); /* more than the radius: fully covers */
 
-  background: var(--color-surface);
-  box-shadow: inset 0 0 0 var(--radio-ring-width) var(--radio-ring);
+  background: var(--radio-dot);
+  box-shadow:
+    inset 0 0 0 1.5px var(--radio-ring),
+    inset 0 0 0 var(--radio-fill-width) var(--radio-fill);
   border-radius: var(--radius-full);
 
   transition:
-    background-color 0.2s ease,
     box-shadow 0.2s ease;
 }
 
@@ -100,14 +106,13 @@ label.row {
 /* Checked */
 .input:checked + .circle {
   --radio-ring: var(--color-primary);
-  --radio-ring-width: calc((var(--radio-size) - var(--radio-dot-size)) / 2);
-
-  background: var(--color-text-inverse);
+  --radio-fill-width: calc((var(--radio-size) - var(--radio-dot-size)) / 2);
 }
 
 .root:not(.disabled) label.row:hover .input:checked + .circle,
 .input:not(:disabled):checked:hover + .circle {
   --radio-ring: var(--color-primary-hover);
+  --radio-dot: var(--color-primary-hover);
 }
 
 /* Focus */
@@ -123,6 +128,7 @@ label.row {
 
 .error .input:checked + .circle {
   --radio-ring: var(--color-error);
+  --radio-dot: var(--color-error);
 }
 
 .error .input:focus-visible + .circle {
@@ -136,13 +142,13 @@ label.row {
 }
 
 .disabled .circle {
-  background: var(--color-surface-secondary);
   --radio-ring: var(--color-border);
+  --radio-fill: var(--color-surface-secondary);
 }
 
 .disabled .input:checked + .circle {
-  background: var(--color-text-inverse);
   --radio-ring: var(--color-text-disabled);
+  --radio-dot: var(--color-text-disabled);
 }
 
 /* =========================
