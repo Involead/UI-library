@@ -13,6 +13,12 @@ export type {
   SingleDropdownProps,
 } from "./components/Dropdown";
 
+export { Checkbox } from "./components/Checkbox";
+export type { CheckboxProps } from "./components/Checkbox";
+
+export { Typography } from "./components/Typography";
+export type { TypographyProps } from "./components/Typography";
+
 export { cx } from "./utils";
 export type { ClassValue } from "./utils";
 
