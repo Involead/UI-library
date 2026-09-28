@@ -1,0 +1,273 @@
+import type { ExplorerArgs, ExplorerComponent } from "../explorer-config";
+import { getComponentDefaults } from "./args";
+import { typographyColors, typographyVariants, type TypographyVariant } from "./types";
+
+export function formatExplorerCode(
+  component: string,
+  args: ExplorerArgs,
+  composition?: ExplorerComponent["stories"][number]["composition"],
+): string {
+  const componentCode = (nextArgs: ExplorerArgs): string =>
+    formatExplorerCode(component, nextArgs).split("\n\n").slice(1).join("\n\n");
+  if (component === "Checkbox" && composition) {
+    const orientation = args.orientation === "vertical" ? "vertical" : "horizontal";
+    const componentArgs = Object.fromEntries(
+      Object.entries(args).filter(([key]) => key !== "orientation"),
+    ) as ExplorerArgs;
+    const examples: ExplorerArgs[] =
+      composition === "all"
+        ? [
+            { ...componentArgs, label: "Unchecked", checked: false },
+            { ...componentArgs, label: "Checked", checked: true },
+            { ...componentArgs, label: "Disabled", checked: false, disabled: true },
+            { ...componentArgs, label: "Disabled checked", checked: true, disabled: true },
+            { ...componentArgs, label: "With helper text", helperText: "You can change this later in settings." },
+            { ...componentArgs, label: "With error", error: "You must accept the terms to continue." },
+          ]
+        : composition === "sizes"
+          ? (["small", "medium", "large"] as const).map((size) => ({
+              ...componentArgs,
+              size,
+              label: size[0].toUpperCase() + size.slice(1),
+            }))
+          : composition === "states"
+            ? [
+                { ...componentArgs, label: "Unchecked", checked: false },
+                { ...componentArgs, label: "Checked", checked: true },
+                { ...componentArgs, label: "Disabled", checked: false, disabled: true },
+                { ...componentArgs, label: "Disabled checked", checked: true, disabled: true },
+                { ...componentArgs, label: "Error", error: "This field is required." },
+              ]
+            : composition === "label-clickable"
+              ? [
+                  { ...componentArgs, label: "Clicking this label toggles the checkbox", labelClickable: true },
+                  { ...componentArgs, label: "Only the checkbox itself toggles", labelClickable: false },
+                ]
+              : [];
+    const wrapperStyle = orientation === "horizontal"
+      ? '{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "16px" }'
+      : '{ display: "flex", flexDirection: "column", gap: "16px" }';
+    return `import { Checkbox } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<div style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
+  }
+  if (component === "Typography" && composition) {
+    const orientation = args.orientation === "horizontal" ? "horizontal" : "vertical";
+    const variants: TypographyVariant[] =
+      composition === "headings"
+        ? ["h1", "h2", "h3", "h4", "h5", "h6"]
+        : typographyVariants;
+    const examples: ExplorerArgs[] =
+      composition === "all" || composition === "headings"
+        ? variants.map((variant) => ({
+            ...args,
+            variant,
+            children:
+              variant === "body" || variant === "bodySmall"
+                ? "The quick brown fox jumps over the lazy dog."
+                : variant === "label"
+                  ? "Email address"
+                  : variant === "caption"
+                    ? "Last updated 2 hours ago"
+                    : `Heading ${variant.slice(1)}`,
+          }))
+        : composition === "colors"
+          ? typographyColors.map((color) => ({
+              ...args,
+              color,
+              children: `${color[0].toUpperCase()}${color.slice(1)} text color`,
+            }))
+          : [];
+    const wrapperStyle = orientation === "horizontal"
+      ? '{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "16px" }'
+      : '{ display: "flex", flexDirection: "column", gap: "16px" }';
+    return `import { Typography } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<div style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
+  }
+
+  const props = Object.entries(args)
+    .filter(([key, value]) =>
+      key !== "children" &&
+      key !== "orientation" &&
+      value !== null &&
+      value !== ""
+    )
+    .map(([key, value]) => {
+      if (key === "icon" && value === "star") {
+        return `  icon={<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" /></svg>}`;
+      }
+      if (typeof value === "boolean") return `  ${key}={${value}}`;
+      if (Array.isArray(value)) return `  ${key}={${JSON.stringify(value)}}`;
+      if (key === "options") {
+        if (typeof value !== "string") return `  ${key}={[]}`;
+        try {
+          return `  ${key}={${JSON.stringify(JSON.parse(value), null, 2)}}`;
+        } catch {
+          return `  ${key}={${value}}`;
+        }
+      }
+      return `  ${key}=${JSON.stringify(value)}`;
+    });
+  const children = typeof args.children === "string" ? args.children : "";
+  const body = children
+    ? `>\n  {${JSON.stringify(children)}}\n</${component}>`
+    : " />";
+  return `import { ${component} } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<${component}${props.length ? `\n${props.join("\n")}\n` : ""}${body}`;
+}
+
+export function parseExplorerCode(code: string, component: ExplorerComponent): ExplorerArgs | null {
+  const componentTag = new RegExp(`<${component.name}\\b([\\s\\S]*?)(?:\\/?>)`);
+  const tag = code.match(componentTag);
+  if (!tag) return null;
+
+  const args = getComponentDefaults(component);
+  const attributes = tag[1];
+  for (const control of component.controls) {
+    const escapedName = control.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const expression = new RegExp(`\\b${escapedName}\\s*=\\s*`);
+    const start = attributes.search(expression);
+    if (start < 0) continue;
+    const valueStart = start + attributes.slice(start).match(expression)![0].length;
+    const quote = attributes[valueStart];
+    let raw = "";
+    if (quote === '"' || quote === "'") {
+      const end = attributes.indexOf(quote, valueStart + 1);
+      if (end < 0) return null;
+      raw = attributes.slice(valueStart + 1, end);
+    } else if (quote === "{") {
+      let depth = 0;
+      let stringQuote = "";
+      let escaped = false;
+      let end = -1;
+      for (let index = valueStart; index < attributes.length; index += 1) {
+        const character = attributes[index];
+        if (stringQuote) {
+          if (escaped) escaped = false;
+          else if (character === "\\") escaped = true;
+          else if (character === stringQuote) stringQuote = "";
+          continue;
+        }
+        if (character === '"' || character === "'") stringQuote = character;
+        else if (character === "{") depth += 1;
+        else if (character === "}") {
+          depth -= 1;
+          if (depth === 0) {
+            end = index;
+            break;
+          }
+        }
+      }
+      if (end < 0) return null;
+      raw = attributes.slice(valueStart + 1, end).trim();
+    } else {
+      return null;
+    }
+    if (control.kind === "boolean") {
+      if (raw !== "true" && raw !== "false") return null;
+      args[control.name] = raw === "true";
+    } else if (control.kind === "json" || control.kind === "multi-select") {
+      try {
+        const parsed: unknown = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return null;
+        if (control.kind === "json") {
+          args[control.name] = JSON.stringify(parsed, null, 2);
+        } else if (parsed.every((item) => typeof item === "string")) {
+          args[control.name] = parsed;
+        } else {
+          return null;
+        }
+      } catch {
+        return null;
+      }
+    } else {
+      args[control.name] = raw;
+    }
+  }
+  if (component.controls.some((control) => control.name === "orientation")) {
+    const direction = code.match(/flexDirection:\s*["'](row|column)["']/)?.[1];
+    if (direction) args.orientation = direction === "row" ? "horizontal" : "vertical";
+  }
+  const children = readComponentBody(code, component.name);
+  if (children !== null && component.controls.some((control) => control.name === "children")) {
+    args.children = parseTextChild(children);
+  }
+  if (component.name === "Checkbox" && /\bicon\s*=\s*\{\s*<svg\b/.test(attributes)) {
+    args.icon = "star";
+  }
+  return args;
+}
+
+export function readComponentBody(code: string, component: string): string | null {
+  const start = code.indexOf(`<${component}`);
+  if (start < 0) return null;
+
+  let braceDepth = 0;
+  let quote = "";
+  let escaped = false;
+  let openingTagEnd = -1;
+  for (let index = start + component.length + 1; index < code.length; index += 1) {
+    const character = code[index];
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (character === "\\") escaped = true;
+      else if (character === quote) quote = "";
+      continue;
+    }
+    if (character === '"' || character === "'") quote = character;
+    else if (character === "{") braceDepth += 1;
+    else if (character === "}") braceDepth -= 1;
+    else if (character === ">" && braceDepth === 0) {
+      openingTagEnd = index;
+      break;
+    }
+  }
+  if (openingTagEnd < 0 || code[openingTagEnd - 1] === "/") return null;
+
+  const closingTagStart = code.indexOf(`</${component}>`, openingTagEnd + 1);
+  if (closingTagStart < 0) return null;
+  return code.slice(openingTagEnd + 1, closingTagStart).trim();
+}
+
+export function parseTextChild(value: string) {
+  const child = value.trim();
+  const expression = child.startsWith("{") && child.endsWith("}")
+    ? child.slice(1, -1).trim()
+    : child;
+  if (expression.startsWith('"') && expression.endsWith('"')) {
+    try {
+      const parsed: unknown = JSON.parse(expression);
+      if (typeof parsed === "string") return parsed;
+    } catch {
+      return child;
+    }
+  }
+  return child;
+}
+
+export function formatButtonCode(
+  children: string,
+  variant: string,
+  size: string,
+  loading: boolean,
+  disabled: boolean,
+  fullWidth: boolean,
+  leftIcon = false,
+  rightIcon = false,
+) {
+  const leftIconProp = leftIcon
+    ? `\n  leftIcon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" /></svg>}`
+    : "";
+  const rightIconProp = rightIcon
+    ? `\n  rightIcon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>}`
+    : "";
+  const iconProps = [leftIconProp, rightIconProp].filter(Boolean).join("\n");
+  return `import { Button } from "@involead/ui";
+import "@involead/ui/ui.css";
+
+<Button
+  variant="${variant}"
+  size="${size}"
+  loading={${loading}}
+  disabled={${disabled}}
+  fullWidth={${fullWidth}}${iconProps}
+>
+  {${JSON.stringify(children)}}
+</Button>`;
+}

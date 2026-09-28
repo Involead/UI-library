@@ -1,35 +1,7 @@
 "use client";
 
-import type {
-  ButtonHTMLAttributes,
-  ReactNode,
-} from "react";
-
-import { cx } from "@/utils";
-
-import styles from "./Button.module.css";
-
-type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "outline"
-  | "ghost"
-  | "danger";
-
-type ButtonSize =
-  | "small"
-  | "medium"
-  | "large";
-
-export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  loading?: boolean;
-  fullWidth?: boolean;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
-}
+import type { ButtonProps } from "./Button.types";
+import "./Button.css";
 
 export function Button({
   variant = "primary",
@@ -43,13 +15,15 @@ export function Button({
   className = "",
   ...props
 }: ButtonProps) {
-  const buttonClasses = cx(
-    styles.button,
-    styles[variant],
-    styles[size],
-    fullWidth && styles.fullWidth,
+  const buttonClasses = [
+    "button",
+    variant,
+    size,
+    fullWidth ? "fullWidth" : "",
     className,
-  );
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <button
@@ -61,13 +35,13 @@ export function Button({
     >
       {loading ? (
         <span
-          className={styles.spinner}
+          className="spinner"
           aria-hidden="true"
         />
       ) : (
         leftIcon && (
           <span
-            className={styles.icon}
+            className="icon"
             aria-hidden="true"
           >
             {leftIcon}
@@ -79,7 +53,7 @@ export function Button({
 
       {!loading && rightIcon && (
         <span
-          className={styles.icon}
+          className="icon"
           aria-hidden="true"
         >
           {rightIcon}
