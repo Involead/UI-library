@@ -21,6 +21,7 @@ export type InputType =
   | "color"
   | "file";
 export type CheckboxSize = "small" | "medium" | "large";
+export type RadioSize = "small" | "medium" | "large";
 export type DropdownSize = "small" | "medium" | "large";
 export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
 export type ButtonSize = "small" | "medium" | "large";
@@ -93,6 +94,12 @@ export const typographyColors: TypographyColor[] = [
   "secondary",
   "tertiary",
   "disabled",
+];
+
+export const radioGroupOptions = [
+  { label: "Email", value: "email" },
+  { label: "SMS", value: "sms" },
+  { label: "Push notification", value: "push" },
 ];
 
 export function isChoice<T extends string>(value: string, choices: T[]): value is T {

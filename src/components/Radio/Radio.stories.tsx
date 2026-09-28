@@ -94,6 +94,27 @@ export const DisabledChecked: Story = {
 };
 
 /* =========================
+   GROUP
+   ========================= */
+
+export const Group: Story = {
+  render: (args) => (
+    <div
+      role="radiogroup"
+      aria-label="Notification method"
+      style={{ display: "flex", flexDirection: "column", gap: 16 }}
+    >
+      <Radio {...args} label="Email" value="email" defaultChecked />
+      <Radio {...args} label="SMS" value="sms" />
+      <Radio {...args} label="Push notification" value="push" />
+    </div>
+  ),
+  args: {
+    name: "radio-group",
+  },
+};
+
+/* =========================
    LABEL CLICKABLE
    ========================= */
 
