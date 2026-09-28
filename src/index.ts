@@ -19,6 +19,8 @@ export type { CheckboxProps } from "./components/Checkbox";
 export { Typography } from "./components/Typography";
 export type { TypographyProps } from "./components/Typography";
 
+export * from "./components/Icon";
+
 export { cx } from "./utils";
 export type { ClassValue } from "./utils";
 

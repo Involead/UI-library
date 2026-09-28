@@ -459,7 +459,7 @@ function ChevronIcon({ isOpen }: { isOpen: boolean }) {
       strokeLinejoin="round"
       className={isOpen ? styles.chevronOpen : undefined}
     >
-      <path d="m6 9 6 6 6-6" />
+      <path d="M5 9l7 7 7-7" />
     </svg>
   );
 }
@@ -476,8 +476,7 @@ function CloseIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M18 6 6 18" />
-      <path d="M6 6l12 12" />
+      <path d="M5.5 5.5l13 13M18.5 5.5l-13 13" />
     </svg>
   );
 }
@@ -494,7 +493,7 @@ function CheckIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M20 6 9 17l-5-5" />
+      <path d="M4.5 12.5l4.75 4.75L19.5 7" />
     </svg>
   );
 }

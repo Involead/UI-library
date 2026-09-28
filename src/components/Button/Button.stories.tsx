@@ -156,9 +156,9 @@ export const WithLeftIcon: Story = {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M12 3v12" />
-        <path d="m7 10 5 5 5-5" />
-        <path d="M5 21h14" />
+        <path d="M12 4v11" />
+        <path d="M7.5 10.5 12 15l4.5-4.5" />
+        <path d="M5 20h14" />
       </svg>
     ),
   },
@@ -180,7 +180,7 @@ export const WithRightIcon: Story = {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="m9 18 6-6-6-6" />
+        <path d="M9 5l7 7-7 7" />
       </svg>
     ),
   },
@@ -202,8 +202,8 @@ export const WithBothIcons: Story = {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M5 12h14" />
-        <path d="m12 5 7 7-7 7" />
+        <path d="M4 12h15.5" />
+        <path d="M13 5.5l6.5 6.5-6.5 6.5" />
       </svg>
     ),
 
@@ -218,7 +218,7 @@ export const WithBothIcons: Story = {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="m9 18 6-6-6-6" />
+        <path d="M9 5l7 7-7 7" />
       </svg>
     ),
   },
