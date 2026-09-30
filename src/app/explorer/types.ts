@@ -24,6 +24,7 @@ export type CheckboxSize = "small" | "medium" | "large";
 export type RadioSize = "small" | "medium" | "large";
 export type RadioLabelPosition = "right" | "left";
 export type DropdownSize = "small" | "medium" | "large";
+export type DropdownLabelPosition = "top" | "left" | "right";
 export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
 export type ButtonSize = "small" | "medium" | "large";
 export type TypographyVariant =
