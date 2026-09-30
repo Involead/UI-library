@@ -4,6 +4,7 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  publicDir: false,
 
   resolve: {
     alias: {
@@ -13,7 +14,7 @@ export default defineConfig({
 
   build: {
     lib: {
-      entry: path.resolve(__dirname, "src/index.ts"),
+      entry: path.resolve(__dirname, "src/package.ts"),
       formats: ["es", "cjs"],
       fileName: (format) => `index.${format}.js`,
     },

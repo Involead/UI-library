@@ -8,5 +8,5 @@
     "outDir": "./dist/types",
     "plugins": []
   },
-  "include": ["src/index.ts", "src/components/**/*.ts", "src/components/**/*.tsx", "src/icons/**/*.ts", "src/icons/**/*.tsx", "src/theme/**/*.ts", "src/utils/**/*.ts", "src/types/**/*.d.ts"]
+  "include": ["src/index.ts", "src/types/css-modules.d.ts"]
 }

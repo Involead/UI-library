@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:package": "npm run build:types && vite build",
+    "build:package": "vite build && npm run build:types",
     "build:types": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build:package",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "start": "next start",
@@ -31,6 +32,7 @@
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/index.es.js",
       "require": "./dist/index.cjs.js"
     },

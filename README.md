@@ -20,6 +20,8 @@ The library is React-first rather than Next.js-specific, so consuming applicatio
 - `Button` — variants, sizes, loading, disabled, full width, and icons.
 - `Input` — labels, helper/error text, validation, passwords, and common HTML input types.
 - `Dropdown` — single/multi-select, search, clearable state, keyboard interaction, and disabled options.
+- `Checkbox` — sizes, helper/error text, clickable labels, and custom checked indicators.
+- `Typography` — semantic heading/body variants, configurable elements, and text colors.
 
 ## Requirements
 
@@ -62,11 +64,11 @@ Interactive components should be used inside a client boundary in Next.js:
 ```tsx
 "use client";
 
-import { Button, Dropdown, Input } from "@involead/ui";
+import { Button, Checkbox, Dropdown, Input, Typography } from "@involead/ui";
 import "@involead/ui/ui.css";
 ```
 
-The public package entry point exports `Button`, `Input`, `Dropdown`, their public types, `cx`, and typed design tokens. The package stylesheet is available from the `@involead/ui/ui.css` subpath.
+The public package entry point exports all five React components, their public types, `cx`, and typed design tokens. The package stylesheet is available from the `@involead/ui/ui.css` subpath. `npm pack` runs the package build automatically before creating the publishable tarball; Storybook stories are not runtime package entry points.
 
 ## Project structure
 
@@ -96,7 +98,7 @@ dist/                     # Generated package output
 | `npm run typecheck` | Run TypeScript checks |
 | `npm run test` | Run Vitest tests |
 | `npm run build:types` | Generate TypeScript declarations |
-| `npm run build:package` | Generate declarations and Vite package output, including `dist/ui.css` |
+| `npm run build:package` | Generate Vite package output and TypeScript declarations |
 | `npm run storybook` | Start Storybook |
 | `npm run build-storybook` | Build static Storybook output |
 
