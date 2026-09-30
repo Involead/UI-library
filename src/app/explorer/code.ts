@@ -1,6 +1,7 @@
-import type { ExplorerArgs, ExplorerComponent } from "../explorer-config";
+import { icons } from "@/icons";
+import { iconColors, type ExplorerArgs, type ExplorerComponent, type ExplorerValue } from "../explorer-config";
 import { getComponentDefaults } from "./args";
-import { radioGroupOptions, typographyColors, typographyVariants, type TypographyVariant } from "./types";
+import { iconSizes, radioGroupOptions, typographyColors, typographyVariants, type TypographyVariant } from "./types";
 
 export function formatExplorerCode(
   component: string,
@@ -184,11 +185,49 @@ export function formatExplorerCode(
       : '{ display: "flex", flexDirection: "column", gap: "16px" }';
     return `import { Typography } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<div style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
   }
+  if (component === "Icon" && composition) {
+    const orientation = args.orientation === "vertical" ? "vertical" : "horizontal";
+    const componentArgs = Object.fromEntries(
+      Object.entries(args).filter(([key]) => key !== "orientation" && key !== "title"),
+    ) as ExplorerArgs;
+    const wrapperStyle = orientation === "horizontal"
+      ? '{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "16px" }'
+      : '{ display: "flex", flexDirection: "column", gap: "16px" }';
+    const imports = `import { Icon } from "@involead/ui";\nimport "@involead/ui/ui.css";`;
+    if (composition === "gallery") {
+      // Map over the names rather than listing ~40 near-identical <Icon> tags.
+      const tileProps = componentCode(
+        Object.fromEntries(Object.entries(componentArgs).filter(([key]) => key !== "name")),
+      )
+        .split("\n")
+        .filter((line) => line.startsWith("  "))
+        .map((line) => `    ${line}`)
+        .join("\n");
+      return `import { Icon, type IconName } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\nconst names: IconName[] = ${JSON.stringify(Object.keys(icons))};\n\n<div style={${wrapperStyle}}>\n  {names.map((name) => (\n    <Icon\n      key={name}\n      name={name}\n${tileProps}\n    />\n  ))}\n</div>`;
+    }
+    const examples: ExplorerArgs[] =
+      composition === "sizes"
+        ? iconSizes.map((size) => ({ ...componentArgs, size: String(size) }))
+        : composition === "colors"
+          ? iconColors.map((color) => ({ ...componentArgs, color }))
+          : [];
+    return `${imports}\n\n<div style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
+  }
 
+  // Icon: `svg` holds custom markup rendered as children (so `name` is unused),
+  // and `clickable` stands in for an onClick handler.
+  const iconSvg = component === "Icon" && typeof args.svg === "string" ? args.svg.trim() : "";
+  const isIconOnlyArg = (key: string, value: ExplorerValue) =>
+    component === "Icon" &&
+    (key === "svg" ||
+      key === "clickable" ||
+      (key === "name" && iconSvg !== "") ||
+      (key === "disabled" && value === false));
   const props = Object.entries(args)
     .filter(([key, value]) =>
       key !== "children" &&
       key !== "orientation" &&
+      !isIconOnlyArg(key, value) &&
       value !== null &&
       value !== ""
     )
@@ -197,6 +236,14 @@ export function formatExplorerCode(
         return `  icon={<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" /></svg>}`;
       }
       if (typeof value === "boolean") return `  ${key}={${value}}`;
+      if (
+        component === "Icon" &&
+        (key === "size" || key === "strokeWidth") &&
+        typeof value === "string" &&
+        Number.isFinite(Number(value))
+      ) {
+        return `  ${key}={${value}}`;
+      }
       if (Array.isArray(value)) return `  ${key}={${JSON.stringify(value)}}`;
       if (key === "options") {
         if (typeof value !== "string") return `  ${key}={[]}`;
@@ -209,9 +256,14 @@ export function formatExplorerCode(
       return `  ${key}=${JSON.stringify(value)}`;
     });
   const children = typeof args.children === "string" ? args.children : "";
-  const body = children
-    ? `>\n  {${JSON.stringify(children)}}\n</${component}>`
-    : " />";
+  if (component === "Icon" && args.clickable === true) {
+    props.push('  onClick={() => console.log("icon clicked")}');
+  }
+  const body = iconSvg
+    ? `>\n${iconSvg.split("\n").map((line) => `  ${line}`).join("\n")}\n</${component}>`
+    : children
+      ? `>\n  {${JSON.stringify(children)}}\n</${component}>`
+      : " />";
   return `import { ${component} } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<${component}${props.length ? `\n${props.join("\n")}\n` : ""}${body}`;
 }
 
@@ -296,7 +348,23 @@ export function parseExplorerCode(code: string, component: ExplorerComponent): E
   if (component.name === "Checkbox" && /\bicon\s*=\s*\{\s*<svg\b/.test(attributes)) {
     args.icon = "star";
   }
+  if (component.name === "Icon") {
+    args.clickable = /\bonClick\s*=/.test(attributes);
+    // A custom <svg> child: keep its markup so the preview draws it.
+    const body = readComponentBody(code, "Icon");
+    args.svg = body && /^<svg\b/.test(body) ? dedent(body) : null;
+  }
   return args;
+}
+
+function dedent(text: string) {
+  const lines = text.split("\n");
+  const indent = Math.min(
+    ...lines.slice(1).filter((line) => line.trim()).map((line) => line.match(/^\s*/)![0].length),
+  );
+  return Number.isFinite(indent)
+    ? [lines[0], ...lines.slice(1).map((line) => line.slice(indent))].join("\n")
+    : text;
 }
 
 export function readComponentBody(code: string, component: string): string | null {

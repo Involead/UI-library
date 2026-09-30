@@ -1,9 +1,10 @@
-name: Deploy Storybook
+name: Deploy Storybook and Explorer
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -32,12 +33,22 @@ jobs:
         run: npm ci
 
       - name: Build Storybook
-        run: npm run build-storybook
+        run: npm run build-storybook -- -o site
 
-      - name: Upload Storybook artifact
+      - name: Build Explorer app
+        run: npm run build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /UI-library/app
+
+      - name: Add Explorer under /app
+        run: |
+          mkdir -p site/app
+          cp -r out/. site/app/
+
+      - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: storybook-static
+          path: site
 
   deploy:
     environment:

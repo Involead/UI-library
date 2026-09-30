@@ -1,19 +1,21 @@
 ﻿import { TransitionLink } from './TransitionLink';
 import './landing.css';
 
+
+const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 export default function Home() {
   return (
     <main className="landing">
       <header className="landing-nav">
         <div className="landing-brand">
-          <img src="/involead-logo.jpe" alt="" className="landing-logo" />
+          <img src={`${base}/involead-logo.jpe`} alt="" className="landing-logo" />
           <span>InvoLead</span>
         </div>
       </header>
 
       <section className="landing-hero">
         <TransitionLink href="/explorer" className="landing-badge">
-          5 components ready to explore
+          Accessible components, ready to use
           <svg
             viewBox="0 0 24 24"
             fill="none"

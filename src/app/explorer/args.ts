@@ -42,12 +42,18 @@ export function getComponentDefaults(component: ExplorerComponent): ExplorerArgs
         if (component.name === "Typography" && control.name === "variant") {
           return [control.name, "body"];
         }
+        if (component.name === "Icon") {
+          if (control.name === "color") return [control.name, "currentColor"];
+          if (control.name === "name") return [control.name, "search"];
+        }
         return [
           control.name,
           defaults[control.name] ?? control.options?.[0] ?? "",
         ];
       }
       if (control.name === "value") return [control.name, null];
+      if (component.name === "Icon" && control.name === "size") return [control.name, "24"];
+      if (component.name === "Icon" && control.name === "strokeWidth") return [control.name, "2"];
       return [control.name, ""];
     }),
   );

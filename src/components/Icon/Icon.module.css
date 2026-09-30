@@ -1,0 +1,64 @@
+/* The wrapper owns size and color; the svg inside just fills it and paints
+   with currentColor, so neither built-in nor custom svgs need editing. */
+.icon {
+  --icon-size: 24px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  vertical-align: middle;
+  line-height: 0;
+
+  color: var(--icon-color, currentColor);
+  transition: color 0.2s ease;
+}
+
+/* CSS beats the svg's own width/height attributes, so any svg (even one
+   declaring 800px) scales to the wrapper. */
+.icon > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* An svg with no fill defaults to black; paint it with the icon color.
+   Explicit fills (e.g. `fill="none"` on outline icons) are left alone. */
+.icon > svg:not([fill]) {
+  fill: currentColor;
+}
+
+.icon:not(.disabled):hover {
+  color: var(--icon-hover-color, var(--icon-color, currentColor));
+}
+
+/* =========================
+   INTERACTIVE (<button>)
+   ========================= */
+
+.interactive {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.interactive:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* =========================
+   DISABLED
+   ========================= */
+
+.icon.disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}

@@ -109,7 +109,7 @@ export function Checkbox({
               strokeLinejoin="round"
               aria-hidden="true"
             >
-              <path d="M20 6 9 17l-5-5" />
+              <path d="M4.5 12.5l4.75 4.75L19.5 7" />
             </svg>
           )}
         </span>

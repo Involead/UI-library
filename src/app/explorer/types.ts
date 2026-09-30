@@ -106,6 +106,8 @@ export const radioGroupOptions = [
   { label: "Push notification", value: "push" },
 ];
 
+export const iconSizes = [12, 16, 20, 24, 32, 48];
+
 export function isChoice<T extends string>(value: string, choices: T[]): value is T {
   return choices.includes(value as T);
 }
