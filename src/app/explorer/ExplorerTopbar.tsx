@@ -54,7 +54,6 @@ export function ExplorerTopbar({
         href="/"
         className="brand-region"
         aria-label="Back to home"
-        style={{ textDecoration: "none", color: "inherit" }}
       >
         <img className="brand-mark" src="/involead-logo.jpe" alt="InvoLead" />
         <div>

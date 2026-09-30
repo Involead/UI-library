@@ -1,6 +1,6 @@
 import type { ExplorerArgs, ExplorerComponent } from "../explorer-config";
 import { getComponentDefaults } from "./args";
-import { typographyColors, typographyVariants, type TypographyVariant } from "./types";
+import { radioGroupOptions, typographyColors, typographyVariants, type TypographyVariant } from "./types";
 
 export function formatExplorerCode(
   component: string,
@@ -9,6 +9,56 @@ export function formatExplorerCode(
 ): string {
   const componentCode = (nextArgs: ExplorerArgs): string =>
     formatExplorerCode(component, nextArgs).split("\n\n").slice(1).join("\n\n");
+  if (component === "Dropdown" && composition) {
+    const orientation = args.orientation === "vertical" ? "vertical" : "horizontal";
+    let options = "[]";
+    try {
+      options = JSON.stringify(JSON.parse(typeof args.options === "string" ? args.options : "[]"), null, 2);
+    } catch {
+      // Invalid options JSON is reported by the preview; keep the code readable.
+    }
+    const size = typeof args.size === "string" && args.size ? args.size : "medium";
+    const stateArgs: ExplorerArgs = {
+      size,
+      searchable: args.searchable === true,
+      clearable: args.clearable === true,
+    };
+    const allArgs: ExplorerArgs = { disabled: args.disabled === true };
+    const examples: ExplorerArgs[] =
+      composition === "states"
+        ? [
+            { label: "Default", placeholder: "Select a fruit", ...stateArgs },
+            { label: "With value", defaultValue: "cherry", ...stateArgs },
+            { label: "With helper text", placeholder: "Select a fruit", helperText: "You can change this later in settings.", ...stateArgs },
+            { label: "Error", placeholder: "Select a fruit", error: "Please select a fruit.", required: true, ...stateArgs },
+            { label: "Disabled", placeholder: "Select a fruit", disabled: true, ...stateArgs },
+            { label: "Disabled with value", defaultValue: "mango", disabled: true, ...stateArgs },
+            { label: "Multi — error", multiple: true, placeholder: "Select fruits", defaultValue: ["apple"], error: "Select at least two fruits.", ...stateArgs },
+            { label: "Multi — disabled", multiple: true, defaultValue: ["apple", "grape"], disabled: true, ...stateArgs },
+            { label: "Disabled option (Pineapple)", placeholder: "Open to see", helperText: "Disabled options can't be highlighted or selected.", ...stateArgs },
+            { label: "Value not in options", placeholder: "Select a fruit", defaultValue: "kiwi", helperText: "An unmatched value falls back to the placeholder.", ...stateArgs },
+          ]
+        : composition === "all"
+          ? [
+              { label: "Small", size: "small", placeholder: "Select a fruit", ...allArgs },
+              { label: "Medium", size: "medium", placeholder: "Select a fruit", ...allArgs },
+              { label: "Large", size: "large", placeholder: "Select a fruit", ...allArgs },
+              { label: "Single select", placeholder: "Select a fruit", ...allArgs },
+              { label: "Single — searchable & clearable", defaultValue: "banana", searchable: true, clearable: true, ...allArgs },
+              { label: "Single — error", placeholder: "Select a fruit", error: "Please select a fruit.", ...allArgs },
+              { label: "Multi select", multiple: true, placeholder: "Select fruits", defaultValue: ["apple", "mango"], ...allArgs },
+              { label: "Multi — searchable & clearable", multiple: true, placeholder: "Select fruits", defaultValue: ["cherry", "grape"], searchable: true, clearable: true, ...allArgs },
+              { label: "Multi — many selected", multiple: true, defaultValue: ["apple", "banana", "cherry", "grape", "mango", "orange", "strawberry"], clearable: true, ...allArgs },
+            ]
+          : [];
+    const wrapperStyle = orientation === "horizontal"
+      ? '{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "16px" }'
+      : '{ display: "flex", flexDirection: "column", gap: "16px" }';
+    const exampleCode = examples
+      .map((example) => componentCode(example).replace("<Dropdown\n", "<Dropdown\n  options={options}\n"))
+      .join("\n");
+    return `import { Dropdown } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\nconst options = ${options};\n\n<div style={${wrapperStyle}}>\n${exampleCode}\n</div>`;
+  }
   if (component === "Checkbox" && composition) {
     const orientation = args.orientation === "vertical" ? "vertical" : "horizontal";
     const componentArgs = Object.fromEntries(
@@ -48,6 +98,59 @@ export function formatExplorerCode(
       ? '{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "16px" }'
       : '{ display: "flex", flexDirection: "column", gap: "16px" }';
     return `import { Checkbox } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<div style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
+  }
+  if (component === "Radio" && composition) {
+    const orientation = args.orientation === "vertical" ? "vertical" : "horizontal";
+    const componentArgs = Object.fromEntries(
+      Object.entries(args).filter(([key]) => key !== "orientation"),
+    ) as ExplorerArgs;
+    const examples: ExplorerArgs[] =
+      composition === "all"
+        ? [
+            { ...componentArgs, label: "Unchecked", checked: false },
+            { ...componentArgs, label: "Checked", checked: true },
+            { ...componentArgs, label: "Disabled", checked: false, disabled: true },
+            { ...componentArgs, label: "Disabled checked", checked: true, disabled: true },
+            { ...componentArgs, label: "With helper text", helperText: "We'll send a summary once a day." },
+            { ...componentArgs, label: "With error", error: "Please choose a notification method." },
+          ]
+        : composition === "sizes"
+          ? (["small", "medium", "large"] as const).map((size) => ({
+              ...componentArgs,
+              size,
+              label: size[0].toUpperCase() + size.slice(1),
+            }))
+          : composition === "states"
+            ? [
+                { ...componentArgs, label: "Unchecked", checked: false },
+                { ...componentArgs, label: "Checked", checked: true },
+                { ...componentArgs, label: "Disabled", checked: false, disabled: true },
+                { ...componentArgs, label: "Disabled checked", checked: true, disabled: true },
+                { ...componentArgs, label: "Error", error: "This field is required." },
+                { ...componentArgs, label: "Error checked", checked: true, error: true },
+              ]
+            : composition === "group"
+              ? radioGroupOptions.map((option, index) => ({
+                  ...componentArgs,
+                  checked: null,
+                  name: "notifications",
+                  value: option.value,
+                  label: option.label,
+                  ...(index === 0 ? { defaultChecked: true } : {}),
+                }))
+              : composition === "label-clickable"
+                ? [
+                    { ...componentArgs, label: "Clicking this label selects the radio", labelClickable: true },
+                    { ...componentArgs, label: "Only the circle itself selects", labelClickable: false },
+                  ]
+                : [];
+    const wrapperStyle = orientation === "horizontal"
+      ? '{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "16px" }'
+      : '{ display: "flex", flexDirection: "column", gap: "16px" }';
+    const groupAttributes = composition === "group"
+      ? ' role="radiogroup" aria-label="Notification method"'
+      : "";
+    return `import { Radio } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<div${groupAttributes} style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
   }
   if (component === "Typography" && composition) {
     const orientation = args.orientation === "horizontal" ? "horizontal" : "vertical";
@@ -163,6 +266,8 @@ export function parseExplorerCode(code: string, component: ExplorerComponent): E
       if (raw !== "true" && raw !== "false") return null;
       args[control.name] = raw === "true";
     } else if (control.kind === "json" || control.kind === "multi-select") {
+      // A variable reference (e.g. `options={options}`) keeps the default value.
+      if (/^[A-Za-z_$][\w$]*$/.test(raw)) continue;
       try {
         const parsed: unknown = JSON.parse(raw);
         if (!Array.isArray(parsed)) return null;

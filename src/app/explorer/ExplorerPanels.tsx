@@ -1,47 +1,23 @@
-import type {
-  ExplorerArgs,
-  ExplorerComponent,
-  ExplorerValue,
-} from "../explorer-config";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
+import type { ExplorerArgs, ExplorerComponent, ExplorerValue } from "../explorer-config";
 import { getComponentDefaults, getDropdownOptions } from "./args";
 import { ExplorerControlField } from "./ExplorerControlField";
 import type { ButtonSize, ButtonVariant, Panel } from "./types";
-import { useRef, useState } from "react";
-import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
-import "./explorer.css";
 
 const MIN_HEIGHT = 160;
 const MAX_VIEWPORT_RATIO = 0.85;
 const DEFAULT_HEIGHT = 340;
 const KEY_STEP = 24;
+const FALLBACK_TOPBAR_HEIGHT = 58; // only used if .canvas can't be found
 
 const buttonPropRows = [
-  {
-    name: "children",
-    description: "Button label content",
-    defaultValue: "Primary Button",
-  },
-  {
-    name: "variant",
-    description: "Visual button style",
-    defaultValue: "primary",
-  },
+  { name: "children", description: "Button label content", defaultValue: "Primary Button" },
+  { name: "variant", description: "Visual button style", defaultValue: "primary" },
   { name: "size", description: "Button size", defaultValue: "medium" },
-  {
-    name: "loading",
-    description: "Shows a loading state",
-    defaultValue: "false",
-  },
-  {
-    name: "disabled",
-    description: "Disables interaction",
-    defaultValue: "false",
-  },
-  {
-    name: "fullWidth",
-    description: "Fills the available width",
-    defaultValue: "false",
-  },
+  { name: "loading", description: "Shows a loading state", defaultValue: "false" },
+  { name: "disabled", description: "Disables interaction", defaultValue: "false" },
+  { name: "fullWidth", description: "Fills the available width", defaultValue: "false" },
 ];
 
 type ButtonState = {
@@ -91,30 +67,52 @@ export function ExplorerPanels({
   onReset,
 }: Props) {
   const [height, setHeight] = useState(DEFAULT_HEIGHT);
+  const [isDragging, setIsDragging] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startY: number; startHeight: number } | null>(null);
 
-  const clampHeight = (value: number) =>
-    Math.min(
-      Math.max(value, MIN_HEIGHT),
-      window.innerHeight * MAX_VIEWPORT_RATIO,
-    );
+  const clampHeight = useCallback((value: number) => {
+    const canvasHeight =
+      panelRef.current?.closest<HTMLElement>(".canvas")?.clientHeight ??
+      window.innerHeight - FALLBACK_TOPBAR_HEIGHT;
+    return Math.min(Math.max(value, MIN_HEIGHT), canvasHeight * MAX_VIEWPORT_RATIO);
+  }, []);
 
   const handleResizeStart = (event: ReactPointerEvent<HTMLDivElement>) => {
-    event.currentTarget.setPointerCapture(event.pointerId);
+    if (event.button !== 0) return;
+    event.preventDefault();
     dragRef.current = { startY: event.clientY, startHeight: height };
+    setIsDragging(true);
   };
 
-  const handleResizeMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current) return;
-    // dragging up (smaller clientY) => taller panel
-    const delta = dragRef.current.startY - event.clientY;
-    setHeight(clampHeight(dragRef.current.startHeight + delta));
-  };
+  // While dragging, listen on window so the resize keeps working
+  // wherever the pointer goes, and always clean up.
+  useEffect(() => {
+    if (!isDragging) return;
 
-  const handleResizeEnd = (event: ReactPointerEvent<HTMLDivElement>) => {
-    dragRef.current = null;
-    event.currentTarget.releasePointerCapture(event.pointerId);
-  };
+    const onMove = (event: PointerEvent) => {
+      const drag = dragRef.current;
+      if (!drag) return;
+      // dragging up (smaller clientY) => taller panel
+      setHeight(clampHeight(drag.startHeight + (drag.startY - event.clientY)));
+    };
+    const stop = () => {
+      dragRef.current = null;
+      setIsDragging(false);
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+    document.body.classList.add("is-resizing");
+
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+      document.body.classList.remove("is-resizing");
+    };
+  }, [isDragging, clampHeight]);
 
   const handleResizeKey = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "ArrowUp") {
@@ -125,8 +123,9 @@ export function ExplorerPanels({
       setHeight((h) => clampHeight(h - KEY_STEP));
     }
   };
+
   return (
-    <div className="controls" style={{ height }}>
+    <div className="controls" ref={panelRef} style={{ height }}>
       <div
         className="resize-handle"
         role="separator"
@@ -136,11 +135,9 @@ export function ExplorerPanels({
         aria-valuemin={MIN_HEIGHT}
         tabIndex={0}
         onPointerDown={handleResizeStart}
-        onPointerMove={handleResizeMove}
-        onPointerUp={handleResizeEnd}
-        onPointerCancel={handleResizeEnd}
         onKeyDown={handleResizeKey}
       />
+
       <div className="controls-body">
         <div className="tabs" role="tablist" aria-label="Controls tabs">
           {(["controls", "actions", "code"] as Panel[]).map((panel) => (
@@ -161,10 +158,10 @@ export function ExplorerPanels({
           <div className="table-shell">
             <table className="controls-table">
               <colgroup>
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "28%" }} />
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "32%" }} />
+                <col />
+                <col />
+                <col />
+                <col />
               </colgroup>
               <thead>
                 <tr>
@@ -186,45 +183,29 @@ export function ExplorerPanels({
                             <input
                               className="control-input"
                               value={button.children}
-                              onChange={(event) =>
-                                onButtonControl(row.name, event.target.value)
-                              }
+                              onChange={(event) => onButtonControl(row.name, event.target.value)}
                               aria-label="Button children"
                             />
                           ) : row.name === "variant" ? (
                             <select
                               className="control-input"
                               value={button.variant}
-                              onChange={(event) =>
-                                onButtonControl(row.name, event.target.value)
-                              }
+                              onChange={(event) => onButtonControl(row.name, event.target.value)}
                               aria-label="Button variant"
                             >
-                              {[
-                                "primary",
-                                "secondary",
-                                "outline",
-                                "ghost",
-                                "danger",
-                              ].map((option) => (
-                                <option key={option} value={option}>
-                                  {option}
-                                </option>
+                              {["primary", "secondary", "outline", "ghost", "danger"].map((option) => (
+                                <option key={option} value={option}>{option}</option>
                               ))}
                             </select>
                           ) : row.name === "size" ? (
                             <select
                               className="control-input"
                               value={button.size}
-                              onChange={(event) =>
-                                onButtonControl(row.name, event.target.value)
-                              }
+                              onChange={(event) => onButtonControl(row.name, event.target.value)}
                               aria-label="Button size"
                             >
                               {["small", "medium", "large"].map((option) => (
-                                <option key={option} value={option}>
-                                  {option}
-                                </option>
+                                <option key={option} value={option}>{option}</option>
                               ))}
                             </select>
                           ) : (
@@ -238,9 +219,7 @@ export function ExplorerPanels({
                                     ? button.disabled
                                     : button.fullWidth
                               }
-                              onChange={(event) =>
-                                onButtonControl(row.name, event.target.checked)
-                              }
+                              onChange={(event) => onButtonControl(row.name, event.target.checked)}
                               aria-label={`Button ${row.name}`}
                             />
                           )}
@@ -248,11 +227,7 @@ export function ExplorerPanels({
                       </tr>
                     ))
                   : component.controls
-                      .filter(
-                        (control) =>
-                          control.name !== "orientation" ||
-                          selectedStory?.composition,
-                      )
+                      .filter((control) => control.name !== "orientation" || selectedStory?.composition)
                       .map((control) => {
                         const defaultArgs = {
                           ...getComponentDefaults(component),
@@ -263,17 +238,14 @@ export function ExplorerPanels({
                           ? defaultValue.join(", ")
                           : defaultValue === null
                             ? "None"
-                            : typeof defaultValue === "string" &&
-                                control.kind === "json"
+                            : typeof defaultValue === "string" && control.kind === "json"
                               ? `${getDropdownOptions(defaultArgs)?.length ?? 0} options`
                               : String(defaultValue ?? "");
                         return (
                           <tr key={control.name}>
                             <td>{control.name}</td>
                             <td>{control.description}</td>
-                            <td className="default-cell">
-                              {formattedDefault || "—"}
-                            </td>
+                            <td className="default-cell">{formattedDefault || "—"}</td>
                             <td className="control-cell">
                               <ExplorerControlField
                                 control={control}
@@ -294,11 +266,7 @@ export function ExplorerPanels({
           <div className="action-panel">
             <div className="action-panel-header">
               <span>Interaction events</span>
-              <button
-                type="button"
-                className="clear-actions"
-                onClick={onClearActions}
-              >
+              <button type="button" className="clear-actions" onClick={onClearActions}>
                 Clear
               </button>
             </div>
@@ -325,11 +293,7 @@ export function ExplorerPanels({
               aria-label={`Editable ${activeComponent} code`}
               spellCheck={false}
             />
-            {codeError ? (
-              <div className="code-error" role="alert">
-                {codeError}
-              </div>
-            ) : null}
+            {codeError ? <div className="code-error" role="alert">{codeError}</div> : null}
             <div className="code-actions">
               <button type="button" className="reset-btn" onClick={onApplyCode}>
                 Apply code
@@ -337,6 +301,7 @@ export function ExplorerPanels({
             </div>
           </>
         ) : null}
+
         <button type="button" className="reset-btn" onClick={onReset}>
           Reset controls
         </button>

@@ -11,6 +11,7 @@ import { cx } from "@/utils";
 import styles from "./Checkbox.module.css";
 
 type CheckboxSize = "small" | "medium" | "large";
+type CheckboxLabelPosition = "right" | "left";
 
 export interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "type"> {
@@ -23,6 +24,8 @@ export interface CheckboxProps
    * When `false`, only the checkbox itself toggles the state.
    */
   labelClickable?: boolean;
+  /** Which side of the checkbox the label sits on. */
+  labelPosition?: CheckboxLabelPosition;
   /**
    * Custom SVG or React node shown inside the box when checked,
    * replacing the default checkmark. Use `currentColor` to inherit
@@ -37,6 +40,7 @@ export function Checkbox({
   error,
   size = "medium",
   labelClickable = true,
+  labelPosition = "right",
   icon,
   disabled,
   id,
@@ -56,6 +60,7 @@ export function Checkbox({
   const wrapperClasses = cx(
     styles.wrapper,
     styles[size],
+    labelPosition === "left" && styles.labelLeft,
     hasError && styles.error,
     disabled && styles.disabled,
     className,
