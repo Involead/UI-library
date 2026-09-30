@@ -110,12 +110,6 @@ const rowStyle: CSSProperties = {
 };
 
 /* =========================
-   PLAYGROUND
-   ========================= */
-
-export const Playground: Story = {};
-
-/* =========================
    GALLERY
    ========================= */
 

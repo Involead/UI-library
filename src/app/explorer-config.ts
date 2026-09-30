@@ -296,7 +296,6 @@ export const explorerComponents: ExplorerComponent[] = [
       select("orientation", "Arrange examples in a row or stacked like Storybook", ["horizontal", "vertical"]),
     ],
     stories: [
-      { name: "Playground", description: "A single configurable icon", args: { name: "search", size: "24", strokeWidth: "2", color: "currentColor" } },
       { name: "Gallery", description: "Every icon in the set, searchable by name", args: { size: "24", strokeWidth: "2", color: "currentColor", orientation: "horizontal" }, composition: "gallery" },
       { name: "Sizes", description: "Common icon sizes from 12px to 48px", args: { name: "search", strokeWidth: "2", color: "currentColor", orientation: "horizontal" }, composition: "sizes" },
       { name: "Colors", description: "Semantic colors, plus currentColor inheritance", args: { name: "info", size: "24", strokeWidth: "2", orientation: "horizontal" }, composition: "colors" },
