@@ -19,6 +19,7 @@ import { ButtonPreview } from "./previews/ButtonPreview";
 import { CheckboxPreview } from "./previews/CheckboxPreview";
 import { DropdownPreview } from "./previews/DropdownPreview";
 import { InputPreview } from "./previews/InputPreview";
+import { RadioPreview } from "./previews/RadioPreview";
 import { TypographyPreview } from "./previews/TypographyPreview";
 import {
   isChoice,
@@ -69,7 +70,7 @@ function defaultLayoutForStory(
 ): PreviewLayout {
   if (args?.orientation === "vertical") return "vertical";
   if (args?.orientation === "horizontal") return "horizontal";
-  if (componentName === "Checkbox" && composition) return "horizontal";
+  if (((componentName === "Checkbox" || componentName === "Dropdown") || componentName === "Radio") && composition) return "horizontal";
   return "vertical";
 }
 
@@ -265,9 +266,12 @@ export function ExplorerPage() {
       return (
         <DropdownPreview
           args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
           onChange={(next) => {
-            updateComponentArg("value", next);
-            recordAction("dropdown: selection changed");
+            // Composition examples are uncontrolled; only single stories drive `value`.
+            if (!composition) updateComponentArg("value", next);
+            recordAction(`dropdown: selection changed (${JSON.stringify(next)})`);
           }}
           onOpenChange={(isOpen) => {
             if (isOpen) recordAction("dropdown: opened");
@@ -284,6 +288,19 @@ export function ExplorerPage() {
           onChange={(event) => {
             updateComponentArg("checked", event.currentTarget.checked);
             recordAction("checkbox: change");
+          }}
+        />
+      );
+    }
+    if (activeComponent === "Radio") {
+      return (
+        <RadioPreview
+          args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
+          onChange={(event) => {
+            if (composition !== "group") updateComponentArg("checked", event.currentTarget.checked);
+            recordAction(`radio: change (${event.currentTarget.value})`);
           }}
         />
       );

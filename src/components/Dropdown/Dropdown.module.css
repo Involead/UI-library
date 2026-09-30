@@ -27,6 +27,79 @@
   color: var(--color-error);
 }
 
+/* Side labels: the label takes one column, and the trigger, panel and helper
+   text stack in the other. `width` (--dropdown-width) sizes the dropdown
+   column only; the wrapper grows to fit the label beside it. The dropdown
+   column never shrinks below --dropdown-min-width — the label wraps first. */
+.labelLeft,
+.labelRight {
+  --dropdown-min-width: 120px;
+
+  display: grid;
+  align-items: center;
+  column-gap: var(--spacing-md);
+  row-gap: var(--spacing-xs);
+  width: auto;
+  max-width: 100%;
+}
+
+.labelLeft {
+  grid-template-columns:
+    auto
+    minmax(var(--dropdown-min-width), var(--dropdown-width, 240px));
+}
+
+.labelRight {
+  grid-template-columns:
+    minmax(var(--dropdown-min-width), var(--dropdown-width, 240px))
+    auto;
+}
+
+.fullWidth.labelLeft,
+.fullWidth.labelRight {
+  width: 100%;
+}
+
+.fullWidth.labelLeft {
+  grid-template-columns: auto minmax(var(--dropdown-min-width), 1fr);
+}
+
+.fullWidth.labelRight {
+  grid-template-columns: minmax(var(--dropdown-min-width), 1fr) auto;
+}
+
+.labelLeft .label,
+.labelRight .label {
+  grid-row: 1;
+  overflow-wrap: anywhere;
+}
+
+.labelLeft .label {
+  grid-column: 1;
+}
+
+.labelRight .label {
+  grid-column: 2;
+}
+
+.labelLeft > :not(.label) {
+  grid-column: 2;
+}
+
+.labelRight > :not(.label) {
+  grid-column: 1;
+}
+
+/* Pinning the trigger and panel to row 1 lines the label up with the trigger,
+   and makes that grid cell the panel's containing block so it opens right
+   under the trigger. */
+.labelLeft .trigger,
+.labelRight .trigger,
+.labelLeft .panel,
+.labelRight .panel {
+  grid-row: 1;
+}
+
 /* =========================
    TRIGGER
    ========================= */
@@ -73,6 +146,13 @@
   background: var(--color-surface-secondary);
   color: var(--color-text-disabled);
   cursor: not-allowed;
+}
+
+.trigger.disabled .singleValue,
+.trigger.disabled .placeholder,
+.trigger.disabled .chip,
+.trigger.disabled .indicators {
+  color: var(--color-text-disabled);
 }
 
 /* =========================
@@ -210,6 +290,7 @@
   box-shadow: var(--shadow-md);
 
   overflow: hidden;
+  text-align: left;
 }
 
 /* =========================
@@ -222,6 +303,7 @@
 }
 
 .searchInput {
+  box-sizing: border-box;
   width: 100%;
   border: none;
   outline: none;
@@ -234,6 +316,10 @@
   color: var(--color-text-primary);
 }
 
+.searchInput:focus-visible {
+  box-shadow: 0 0 0 1px var(--color-border-focus);
+}
+
 .searchInput::placeholder {
   color: var(--color-text-tertiary);
 }
@@ -243,6 +329,8 @@
    ========================= */
 
 .list {
+  margin: 0;
+  padding: var(--spacing-xs) 0;
   list-style: none;
   max-height: 240px;
   overflow-y: auto;
@@ -292,14 +380,33 @@
 
   width: 16px;
   height: 16px;
-  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border: 1px solid var(--color-text-secondary);
   border-radius: var(--radius-sm);
   color: var(--color-white);
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.option.highlighted .checkbox {
+  border-color: var(--color-primary);
 }
 
 .checkboxChecked {
   background: var(--color-primary);
   border-color: var(--color-primary);
+}
+
+.option.optionDisabled .checkbox {
+  background: var(--color-surface-secondary);
+  border-color: var(--color-border-hover);
+}
+
+.option.optionDisabled .checkboxChecked {
+  background: var(--color-text-disabled);
+  border-color: var(--color-text-disabled);
 }
 
 /* =========================

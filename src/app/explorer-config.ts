@@ -13,7 +13,7 @@ export type ExplorerStory = {
   name: string;
   description: string;
   args: ExplorerArgs;
-  composition?: "all" | "sizes" | "states" | "headings" | "colors" | "label-clickable";
+  composition?: "all" | "sizes" | "states" | "headings" | "colors" | "label-clickable" | "group";
 };
 
 export type ExplorerComponent = {
@@ -144,6 +144,7 @@ export const explorerComponents: ExplorerComponent[] = [
     ],
     controls: [
       text("label", "Visible dropdown label"),
+      select("labelPosition", "Where the label sits relative to the dropdown", ["top", "left", "right"]),
       text("placeholder", "Empty-state prompt"),
       select("size", "Dropdown size", ["small", "medium", "large"]),
       { name: "options", description: "Options as a JSON array", kind: "json" },
@@ -157,20 +158,15 @@ export const explorerComponents: ExplorerComponent[] = [
       boolean("disabled", "Disables the dropdown"),
       boolean("fullWidth", "Fills the available width"),
       text("width", "Custom width (for example, 400px)"),
+      select("orientation", "Arrange examples in a row or stacked like Storybook", ["horizontal", "vertical"]),
     ],
     stories: [
-      { name: "Single", description: "Single selection", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, value: null } },
-      { name: "Single Clearable", description: "Single selection with a clear action", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, clearable: true, value: "banana" } },
-      { name: "Multiple", description: "Multiple selected values", args: { label: "Favorite fruits", placeholder: "Select fruits", options: fruitOptions, multiple: true, value: ["apple", "mango"] } },
-      { name: "Multiple Clearable", description: "Multi-select with a clear action", args: { label: "Favorite fruits", placeholder: "Select fruits", options: fruitOptions, multiple: true, clearable: true, value: ["apple", "cherry", "grape"] } },
-      { name: "Many Selected Wrap", description: "Wraps multiple selected values", args: { label: "Favorite fruits", placeholder: "Select fruits", options: fruitOptions, multiple: true, value: ["apple", "banana", "cherry", "grape", "mango", "orange", "strawberry"] } },
-      { name: "Searchable", description: "Searches the available options", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, searchable: true, value: null } },
-      { name: "Searchable Multiple", description: "Searchable multi-select", args: { label: "Favorite fruits", placeholder: "Select fruits", options: fruitOptions, multiple: true, searchable: true, clearable: true, value: [] } },
-      { name: "With Helper Text", description: "Supporting guidance", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, helperText: "You can change this later in settings.", value: null } },
-      { name: "With Error", description: "Validation error state", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, error: "Please select a fruit.", value: null } },
-      { name: "Disabled", description: "Disabled dropdown", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, disabled: true, value: null } },
-      { name: "Small", description: "Small dropdown", args: { label: "Small", size: "small", options: fruitOptions, value: null } },
-      { name: "Large", description: "Large dropdown", args: { label: "Large", size: "large", options: fruitOptions, value: null } },
+      { name: "Single Select", description: "Choose one option", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, value: null } },
+      { name: "Multi Select", description: "Choose several options; the value is an array", args: { label: "Favorite fruits", placeholder: "Select fruits", options: fruitOptions, multiple: true, value: ["apple", "mango"] } },
+      { name: "Searchable", description: "Filters options as you type", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, searchable: true, value: null } },
+      { name: "Clearable", description: "Clears the selection with one click or Backspace", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, clearable: true, value: "banana" } },
+      { name: "States", description: "Value, helper, error, disabled, disabled option, and unmatched value states", args: { options: fruitOptions, orientation: "horizontal" }, composition: "states" },
+      { name: "All", description: "Sizes plus single and multi select variants", args: { options: fruitOptions, orientation: "horizontal" }, composition: "all" },
       { name: "Full Width", description: "Fills available width", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, fullWidth: true, value: null } },
       { name: "Custom Width", description: "Custom width dropdown", args: { label: "Favorite fruit", placeholder: "Select a fruit", options: fruitOptions, width: "400px", value: null } },
     ],
@@ -203,6 +199,37 @@ export const explorerComponents: ExplorerComponent[] = [
       { name: "With Helper Text", description: "Checkbox with supporting guidance", args: { label: "Subscribe to newsletter", helperText: "We'll send you updates once a month.", checked: false } },
       { name: "Label Clickable", description: "Controls whether the label toggles the checkbox", args: { checked: false, orientation: "vertical" }, composition: "label-clickable" },
       { name: "With Icon", description: "Custom checked indicator", args: { label: "Add to favourites", checked: true, icon: "star" } },
+    ],
+  },
+  {
+    name: "Radio",
+    description: "Accessible radio button for choosing one option from a group, with helper and error messaging and sizing.",
+    accessibility: [
+      "Radios use native radio inputs, so arrow keys move the selection within a group.",
+      "Give radios in the same group a shared name and wrap them in a radiogroup with a label.",
+      "Labels can be configured to select or only describe the control.",
+      "Helper and error messages are associated with the radio.",
+    ],
+    controls: [
+      text("label", "Visible radio label"),
+      text("helperText", "Supporting guidance"),
+      text("error", "Validation error message"),
+      select("size", "Radio size", ["small", "medium", "large"]),
+      select("labelPosition", "Which side of the radio the label sits on", ["right", "left"]),
+      select("orientation", "Arrange examples in a row or stacked like Storybook", ["horizontal", "vertical"]),
+      boolean("checked", "Checked state"),
+      boolean("disabled", "Disables the radio"),
+      boolean("labelClickable", "Makes the label select the radio"),
+    ],
+    stories: [
+      { name: "All", description: "Common radio states", args: { label: "Option", checked: false, orientation: "horizontal" }, composition: "all" },
+      { name: "Group", description: "A group of radios sharing one name", args: { orientation: "vertical" }, composition: "group" },
+      { name: "Sizes", description: "Small, medium, and large sizes", args: { checked: false, orientation: "horizontal" }, composition: "sizes" },
+      { name: "States", description: "Checked, disabled, and error states", args: { checked: false, orientation: "horizontal" }, composition: "states" },
+      { name: "Default", description: "Single labeled radio", args: { label: "Email notifications", checked: false } },
+      { name: "With Helper Text", description: "Radio with supporting guidance", args: { label: "Email notifications", helperText: "We'll send a summary once a day.", checked: false } },
+      { name: "With Error", description: "Validation error state", args: { label: "Email notifications", error: "Please choose a notification method.", checked: false } },
+      { name: "Label Clickable", description: "Controls whether the label selects the radio", args: { checked: false, orientation: "vertical" }, composition: "label-clickable" },
     ],
   },
   {
