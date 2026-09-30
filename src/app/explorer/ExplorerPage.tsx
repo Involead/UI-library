@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   explorerComponents,
   type ExplorerArgs,
@@ -73,15 +73,8 @@ function defaultLayoutForStory(
   return "vertical";
 }
 
-// Single place that changes the URL. pushState is synced with usePathname by Next.js,
-// so this does not remount the page (search text, expanded groups and story are kept).
-function syncUrl(path: string) {
-  if (window.location.pathname !== path) {
-    window.history.pushState(null, "", path);
-  }
-}
-
 export function ExplorerPage() {
+  const router = useRouter();
   const pathname = usePathname();
   const showIntro = pathname === INTRO_PATH;
 
@@ -133,7 +126,7 @@ export function ExplorerPage() {
     if (!selectedStory) {
       throw new Error(`Unknown ${componentName} story "${story}".`);
     }
-    syncUrl(EXPLORER_PATH);
+    if (pathname !== EXPLORER_PATH) router.push(EXPLORER_PATH, { scroll: false });
     setActiveComponent(componentName as ComponentName);
     setActiveStory(story);
     setActionLog([]);
@@ -379,7 +372,9 @@ export function ExplorerPage() {
           activeStory={activeStory}
           onSelectStory={selectStory}
           introActive={showIntro}
-          onSelectIntro={() => syncUrl(INTRO_PATH)}
+          onSelectIntro={() => {
+            if (pathname !== INTRO_PATH) router.push(INTRO_PATH, { scroll: false });
+          }}
         />
         <main className="canvas">
           {showIntro ? (

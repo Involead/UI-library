@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 import type { ExplorerArgs, ExplorerComponent, ExplorerValue } from "../explorer-config";
 import { getComponentDefaults, getDropdownOptions } from "./args";
@@ -67,32 +67,52 @@ export function ExplorerPanels({
   onReset,
 }: Props) {
   const [height, setHeight] = useState(DEFAULT_HEIGHT);
+  const [isDragging, setIsDragging] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startY: number; startHeight: number } | null>(null);
 
-  const clampHeight = (value: number) => {
+  const clampHeight = useCallback((value: number) => {
     const canvasHeight =
       panelRef.current?.closest<HTMLElement>(".canvas")?.clientHeight ??
       window.innerHeight - FALLBACK_TOPBAR_HEIGHT;
     return Math.min(Math.max(value, MIN_HEIGHT), canvasHeight * MAX_VIEWPORT_RATIO);
-  };
+  }, []);
 
   const handleResizeStart = (event: ReactPointerEvent<HTMLDivElement>) => {
-    event.currentTarget.setPointerCapture(event.pointerId);
+    if (event.button !== 0) return;
+    event.preventDefault();
     dragRef.current = { startY: event.clientY, startHeight: height };
+    setIsDragging(true);
   };
 
-  const handleResizeMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current) return;
-    // dragging up (smaller clientY) => taller panel
-    const delta = dragRef.current.startY - event.clientY;
-    setHeight(clampHeight(dragRef.current.startHeight + delta));
-  };
+  // While dragging, listen on window so the resize keeps working
+  // wherever the pointer goes, and always clean up.
+  useEffect(() => {
+    if (!isDragging) return;
 
-  const handleResizeEnd = (event: ReactPointerEvent<HTMLDivElement>) => {
-    dragRef.current = null;
-    event.currentTarget.releasePointerCapture(event.pointerId);
-  };
+    const onMove = (event: PointerEvent) => {
+      const drag = dragRef.current;
+      if (!drag) return;
+      // dragging up (smaller clientY) => taller panel
+      setHeight(clampHeight(drag.startHeight + (drag.startY - event.clientY)));
+    };
+    const stop = () => {
+      dragRef.current = null;
+      setIsDragging(false);
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+    document.body.classList.add("is-resizing");
+
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+      document.body.classList.remove("is-resizing");
+    };
+  }, [isDragging, clampHeight]);
 
   const handleResizeKey = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "ArrowUp") {
@@ -115,9 +135,6 @@ export function ExplorerPanels({
         aria-valuemin={MIN_HEIGHT}
         tabIndex={0}
         onPointerDown={handleResizeStart}
-        onPointerMove={handleResizeMove}
-        onPointerUp={handleResizeEnd}
-        onPointerCancel={handleResizeEnd}
         onKeyDown={handleResizeKey}
       />
 

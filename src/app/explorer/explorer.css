@@ -1090,4 +1090,9 @@ body:has(.storybook-page) {
   .layout-toggle button span.label {
     display: none;
   }
+
+  body.is-resizing {
+    cursor: row-resize;
+    user-select: none;
+  }
 }
