@@ -106,4 +106,6 @@
   --z-popover: 1030;
   --z-modal: 1100;
   --z-toast: 1200;
+
+  --color-text-faded: color-mix(in srgb, var(--color-text-primary) 78%, var(--color-white));
 }

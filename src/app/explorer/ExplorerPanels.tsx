@@ -161,10 +161,10 @@ export function ExplorerPanels({
           <div className="table-shell">
             <table className="controls-table">
               <colgroup>
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "28%" }} />
-                <col style={{ width: "20%" }} />
-                <col style={{ width: "32%" }} />
+                <col />
+                <col />
+                <col />
+                <col />
               </colgroup>
               <thead>
                 <tr>
