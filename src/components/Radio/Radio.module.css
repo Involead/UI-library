@@ -1,0 +1,200 @@
+.root {
+  --radio-size: 20px;
+  --radio-dot-size: 10px;
+  --radio-font-size: var(--font-size-md);
+
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  font-family: var(--font-family-primary);
+}
+
+/* =========================
+   SIZES
+   ========================= */
+
+.small {
+  --radio-size: 16px;
+  --radio-dot-size: 8px;
+  --radio-font-size: var(--font-size-sm);
+}
+
+.medium {
+  --radio-size: 20px;
+  --radio-dot-size: 10px;
+  --radio-font-size: var(--font-size-md);
+}
+
+.large {
+  --radio-size: 24px;
+  --radio-dot-size: 12px;
+  --radio-font-size: var(--font-size-lg);
+}
+
+/* =========================
+   ROW (control + label)
+   ========================= */
+
+.row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+label.row {
+  cursor: pointer;
+}
+
+/* Label on the left: flip visually, keeping the input first in the DOM. */
+.labelLeft .row {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+/* =========================
+   CONTROL
+   ========================= */
+
+.control {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: var(--radio-size);
+  height: var(--radio-size);
+}
+
+/* Native input stays in the tree (keyboard, forms, a11y) and covers the
+   circle, so clicking the circle always works — even when the label doesn't. */
+.input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.circle {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+
+  /* One painted shape, so the dot is always concentric at any display scale:
+     - outer inset shadow  = the thin ring
+     - inner inset shadow  = the fill between ring and dot
+     - background          = the dot, visible only where the fill stops.
+     Unchecked, the fill covers the whole circle; checked, it stops short of
+     the centre to reveal the dot. */
+  --radio-ring: var(--color-border);
+  --radio-fill: var(--color-surface);
+  --radio-dot: var(--color-primary);
+  --radio-fill-width: var(--radio-size); /* more than the radius: fully covers */
+
+  background: var(--radio-dot);
+  box-shadow:
+    inset 0 0 0 1.5px var(--radio-ring),
+    inset 0 0 0 var(--radio-fill-width) var(--radio-fill);
+  border-radius: var(--radius-full);
+
+  transition:
+    box-shadow 0.2s ease;
+}
+
+/* Hover */
+.root:not(.disabled) label.row:hover .input:not(:checked) + .circle,
+.input:not(:disabled):not(:checked):hover + .circle {
+  --radio-ring: var(--color-border-hover);
+}
+
+/* Checked */
+.input:checked + .circle {
+  --radio-ring: var(--color-primary);
+  --radio-fill-width: calc((var(--radio-size) - var(--radio-dot-size)) / 2);
+}
+
+.root:not(.disabled) label.row:hover .input:checked + .circle,
+.input:not(:disabled):checked:hover + .circle {
+  --radio-ring: var(--color-primary-hover);
+  --radio-dot: var(--color-primary-hover);
+}
+
+/* Focus */
+.input:focus-visible + .circle {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Error */
+.error .circle {
+  --radio-ring: var(--color-border-error);
+}
+
+.error .input:checked + .circle {
+  --radio-ring: var(--color-error);
+  --radio-dot: var(--color-error);
+}
+
+.error .input:focus-visible + .circle {
+  outline-color: var(--color-border-error);
+}
+
+/* Disabled */
+.disabled .input,
+.disabled label.row {
+  cursor: not-allowed;
+}
+
+.disabled .circle {
+  --radio-ring: var(--color-border);
+  --radio-fill: var(--color-surface-secondary);
+}
+
+.disabled .input:checked + .circle {
+  --radio-ring: var(--color-text-disabled);
+  --radio-dot: var(--color-text-disabled);
+}
+
+/* =========================
+   LABEL
+   ========================= */
+
+.label {
+  font-size: var(--radio-font-size);
+  /* Trim the line box to the cap height so flex centering lines the letters
+     up with the circle, instead of the (descender-padded) line box. */
+  line-height: var(--line-height-tight);
+  text-box: trim-both cap alphabetic;
+  color: var(--color-text-primary);
+  user-select: none;
+}
+
+.labelStatic {
+  cursor: default;
+}
+
+.disabled .label {
+  color: var(--color-text-disabled);
+}
+
+/* =========================
+   HELPER / ERROR TEXT
+   ========================= */
+
+.helperText {
+  /* Align with the label text, not the circle. */
+  padding-left: calc(var(--radio-size) + var(--spacing-sm));
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* The label already starts at the left edge. */
+.labelLeft .helperText {
+  padding-left: 0;
+}
+
+.errorText {
+  color: var(--color-error);
+}

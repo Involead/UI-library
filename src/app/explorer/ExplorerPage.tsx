@@ -19,6 +19,7 @@ import { ButtonPreview } from "./previews/ButtonPreview";
 import { CheckboxPreview } from "./previews/CheckboxPreview";
 import { DropdownPreview } from "./previews/DropdownPreview";
 import { InputPreview } from "./previews/InputPreview";
+import { RadioPreview } from "./previews/RadioPreview";
 import { TypographyPreview } from "./previews/TypographyPreview";
 import {
   isChoice,
@@ -69,7 +70,7 @@ function defaultLayoutForStory(
 ): PreviewLayout {
   if (args?.orientation === "vertical") return "vertical";
   if (args?.orientation === "horizontal") return "horizontal";
-  if (componentName === "Checkbox" && composition) return "horizontal";
+  if ((componentName === "Checkbox" || componentName === "Radio") && composition) return "horizontal";
   return "vertical";
 }
 
@@ -284,6 +285,19 @@ export function ExplorerPage() {
           onChange={(event) => {
             updateComponentArg("checked", event.currentTarget.checked);
             recordAction("checkbox: change");
+          }}
+        />
+      );
+    }
+    if (activeComponent === "Radio") {
+      return (
+        <RadioPreview
+          args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
+          onChange={(event) => {
+            if (composition !== "group") updateComponentArg("checked", event.currentTarget.checked);
+            recordAction(`radio: change (${event.currentTarget.value})`);
           }}
         />
       );

@@ -13,7 +13,7 @@ export type ExplorerStory = {
   name: string;
   description: string;
   args: ExplorerArgs;
-  composition?: "all" | "sizes" | "states" | "headings" | "colors" | "label-clickable";
+  composition?: "all" | "sizes" | "states" | "headings" | "colors" | "label-clickable" | "group";
 };
 
 export type ExplorerComponent = {
@@ -202,6 +202,37 @@ export const explorerComponents: ExplorerComponent[] = [
       { name: "With Helper Text", description: "Checkbox with supporting guidance", args: { label: "Subscribe to newsletter", helperText: "We'll send you updates once a month.", checked: false } },
       { name: "Label Clickable", description: "Controls whether the label toggles the checkbox", args: { checked: false, orientation: "vertical" }, composition: "label-clickable" },
       { name: "With Icon", description: "Custom checked indicator", args: { label: "Add to favourites", checked: true, icon: "star" } },
+    ],
+  },
+  {
+    name: "Radio",
+    description: "Accessible radio button for choosing one option from a group, with helper and error messaging and sizing.",
+    accessibility: [
+      "Radios use native radio inputs, so arrow keys move the selection within a group.",
+      "Give radios in the same group a shared name and wrap them in a radiogroup with a label.",
+      "Labels can be configured to select or only describe the control.",
+      "Helper and error messages are associated with the radio.",
+    ],
+    controls: [
+      text("label", "Visible radio label"),
+      text("helperText", "Supporting guidance"),
+      text("error", "Validation error message"),
+      select("size", "Radio size", ["small", "medium", "large"]),
+      select("labelPosition", "Which side of the radio the label sits on", ["right", "left"]),
+      select("orientation", "Arrange examples in a row or stacked like Storybook", ["horizontal", "vertical"]),
+      boolean("checked", "Checked state"),
+      boolean("disabled", "Disables the radio"),
+      boolean("labelClickable", "Makes the label select the radio"),
+    ],
+    stories: [
+      { name: "All", description: "Common radio states", args: { label: "Option", checked: false, orientation: "horizontal" }, composition: "all" },
+      { name: "Group", description: "A group of radios sharing one name", args: { orientation: "vertical" }, composition: "group" },
+      { name: "Sizes", description: "Small, medium, and large sizes", args: { checked: false, orientation: "horizontal" }, composition: "sizes" },
+      { name: "States", description: "Checked, disabled, and error states", args: { checked: false, orientation: "horizontal" }, composition: "states" },
+      { name: "Default", description: "Single labeled radio", args: { label: "Email notifications", checked: false } },
+      { name: "With Helper Text", description: "Radio with supporting guidance", args: { label: "Email notifications", helperText: "We'll send a summary once a day.", checked: false } },
+      { name: "With Error", description: "Validation error state", args: { label: "Email notifications", error: "Please choose a notification method.", checked: false } },
+      { name: "Label Clickable", description: "Controls whether the label selects the radio", args: { checked: false, orientation: "vertical" }, composition: "label-clickable" },
     ],
   },
   {
