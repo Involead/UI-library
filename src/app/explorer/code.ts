@@ -1,6 +1,6 @@
 import type { ExplorerArgs, ExplorerComponent } from "../explorer-config";
 import { getComponentDefaults } from "./args";
-import { typographyColors, typographyVariants, type TypographyVariant } from "./types";
+import { radioGroupOptions, typographyColors, typographyVariants, type TypographyVariant } from "./types";
 
 export function formatExplorerCode(
   component: string,
@@ -98,6 +98,59 @@ export function formatExplorerCode(
       ? '{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "16px" }'
       : '{ display: "flex", flexDirection: "column", gap: "16px" }';
     return `import { Checkbox } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<div style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
+  }
+  if (component === "Radio" && composition) {
+    const orientation = args.orientation === "vertical" ? "vertical" : "horizontal";
+    const componentArgs = Object.fromEntries(
+      Object.entries(args).filter(([key]) => key !== "orientation"),
+    ) as ExplorerArgs;
+    const examples: ExplorerArgs[] =
+      composition === "all"
+        ? [
+            { ...componentArgs, label: "Unchecked", checked: false },
+            { ...componentArgs, label: "Checked", checked: true },
+            { ...componentArgs, label: "Disabled", checked: false, disabled: true },
+            { ...componentArgs, label: "Disabled checked", checked: true, disabled: true },
+            { ...componentArgs, label: "With helper text", helperText: "We'll send a summary once a day." },
+            { ...componentArgs, label: "With error", error: "Please choose a notification method." },
+          ]
+        : composition === "sizes"
+          ? (["small", "medium", "large"] as const).map((size) => ({
+              ...componentArgs,
+              size,
+              label: size[0].toUpperCase() + size.slice(1),
+            }))
+          : composition === "states"
+            ? [
+                { ...componentArgs, label: "Unchecked", checked: false },
+                { ...componentArgs, label: "Checked", checked: true },
+                { ...componentArgs, label: "Disabled", checked: false, disabled: true },
+                { ...componentArgs, label: "Disabled checked", checked: true, disabled: true },
+                { ...componentArgs, label: "Error", error: "This field is required." },
+                { ...componentArgs, label: "Error checked", checked: true, error: true },
+              ]
+            : composition === "group"
+              ? radioGroupOptions.map((option, index) => ({
+                  ...componentArgs,
+                  checked: null,
+                  name: "notifications",
+                  value: option.value,
+                  label: option.label,
+                  ...(index === 0 ? { defaultChecked: true } : {}),
+                }))
+              : composition === "label-clickable"
+                ? [
+                    { ...componentArgs, label: "Clicking this label selects the radio", labelClickable: true },
+                    { ...componentArgs, label: "Only the circle itself selects", labelClickable: false },
+                  ]
+                : [];
+    const wrapperStyle = orientation === "horizontal"
+      ? '{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "16px" }'
+      : '{ display: "flex", flexDirection: "column", gap: "16px" }';
+    const groupAttributes = composition === "group"
+      ? ' role="radiogroup" aria-label="Notification method"'
+      : "";
+    return `import { Radio } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<div${groupAttributes} style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
   }
   if (component === "Typography" && composition) {
     const orientation = args.orientation === "horizontal" ? "horizontal" : "vertical";
