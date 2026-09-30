@@ -1,6 +1,7 @@
-import type { ExplorerArgs, ExplorerComponent } from "../explorer-config";
+import { icons } from "@/icons";
+import { iconColors, type ExplorerArgs, type ExplorerComponent } from "../explorer-config";
 import { getComponentDefaults } from "./args";
-import { radioGroupOptions, typographyColors, typographyVariants, type TypographyVariant } from "./types";
+import { iconSizes, radioGroupOptions, typographyColors, typographyVariants, type TypographyVariant } from "./types";
 
 export function formatExplorerCode(
   component: string,
@@ -184,6 +185,34 @@ export function formatExplorerCode(
       : '{ display: "flex", flexDirection: "column", gap: "16px" }';
     return `import { Typography } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<div style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
   }
+  if (component === "Icon" && composition) {
+    const orientation = args.orientation === "vertical" ? "vertical" : "horizontal";
+    const componentArgs = Object.fromEntries(
+      Object.entries(args).filter(([key]) => key !== "orientation" && key !== "title"),
+    ) as ExplorerArgs;
+    const wrapperStyle = orientation === "horizontal"
+      ? '{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "16px" }'
+      : '{ display: "flex", flexDirection: "column", gap: "16px" }';
+    const imports = `import { Icon } from "@involead/ui";\nimport "@involead/ui/ui.css";`;
+    if (composition === "gallery") {
+      // Map over the names rather than listing ~40 near-identical <Icon> tags.
+      const tileProps = componentCode(
+        Object.fromEntries(Object.entries(componentArgs).filter(([key]) => key !== "name")),
+      )
+        .split("\n")
+        .filter((line) => line.startsWith("  "))
+        .map((line) => `    ${line}`)
+        .join("\n");
+      return `import { Icon, type IconName } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\nconst names: IconName[] = ${JSON.stringify(Object.keys(icons))};\n\n<div style={${wrapperStyle}}>\n  {names.map((name) => (\n    <Icon\n      key={name}\n      name={name}\n${tileProps}\n    />\n  ))}\n</div>`;
+    }
+    const examples: ExplorerArgs[] =
+      composition === "sizes"
+        ? iconSizes.map((size) => ({ ...componentArgs, size: String(size) }))
+        : composition === "colors"
+          ? iconColors.map((color) => ({ ...componentArgs, color }))
+          : [];
+    return `${imports}\n\n<div style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
+  }
 
   const props = Object.entries(args)
     .filter(([key, value]) =>
@@ -197,6 +226,14 @@ export function formatExplorerCode(
         return `  icon={<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" /></svg>}`;
       }
       if (typeof value === "boolean") return `  ${key}={${value}}`;
+      if (
+        component === "Icon" &&
+        (key === "size" || key === "strokeWidth") &&
+        typeof value === "string" &&
+        Number.isFinite(Number(value))
+      ) {
+        return `  ${key}={${value}}`;
+      }
       if (Array.isArray(value)) return `  ${key}={${JSON.stringify(value)}}`;
       if (key === "options") {
         if (typeof value !== "string") return `  ${key}={[]}`;

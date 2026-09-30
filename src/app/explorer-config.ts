@@ -1,3 +1,5 @@
+import { icons } from "@/icons";
+
 export type ExplorerValue = string | boolean | string[] | null;
 export type ExplorerArgs = Record<string, ExplorerValue>;
 export type ExplorerControlKind = "text" | "boolean" | "select" | "json" | "multi-select";
@@ -13,7 +15,7 @@ export type ExplorerStory = {
   name: string;
   description: string;
   args: ExplorerArgs;
-  composition?: "all" | "sizes" | "states" | "headings" | "colors" | "label-clickable" | "group";
+  composition?: "all" | "sizes" | "states" | "headings" | "colors" | "label-clickable" | "group" | "gallery";
 };
 
 export type ExplorerComponent = {
@@ -38,6 +40,15 @@ const fruitOptions = JSON.stringify(
   ],
   null,
 );
+
+export const iconColors = [
+  "var(--color-text-primary)",
+  "var(--color-primary)",
+  "var(--color-success)",
+  "var(--color-warning)",
+  "var(--color-error)",
+  "var(--color-info)",
+];
 
 const text = (name: string, description: string): ExplorerControl => ({
   name,
@@ -255,6 +266,31 @@ export const explorerComponents: ExplorerComponent[] = [
       { name: "Label", description: "Label style", args: { variant: "label", children: "Email address" } },
       { name: "Caption", description: "Caption style", args: { variant: "caption", children: "Last updated 2 hours ago" } },
       { name: "Colors", description: "Available text colors", args: { variant: "body", orientation: "vertical" }, composition: "colors" },
+    ],
+  },
+  {
+    name: "Icon",
+    description: "Stroke icon set rendered by name, sized in px and colored via currentColor by default.",
+    accessibility: [
+      "Icons are decorative by default and hidden from assistive technology.",
+      "Pass a title (or aria-label) when the icon conveys meaning on its own; it is then announced as an image.",
+      "Pair icon-only controls with an accessible name on the control itself.",
+      "Icons inherit the text color, so they keep the contrast of the surrounding content.",
+    ],
+    controls: [
+      select("name", "Which icon to render", Object.keys(icons)),
+      text("size", "Width and height in px (or any CSS length)"),
+      select("color", "Stroke color", ["currentColor", ...iconColors]),
+      text("strokeWidth", "Stroke width"),
+      text("title", "Accessible name; leave empty for a decorative icon"),
+      select("orientation", "Arrange examples in a row or stacked like Storybook", ["horizontal", "vertical"]),
+    ],
+    stories: [
+      { name: "Playground", description: "A single configurable icon", args: { name: "search", size: "24", strokeWidth: "2", color: "currentColor" } },
+      { name: "Gallery", description: "Every icon in the set, searchable by name", args: { size: "24", strokeWidth: "2", color: "currentColor", orientation: "horizontal" }, composition: "gallery" },
+      { name: "Sizes", description: "Common icon sizes from 12px to 48px", args: { name: "search", strokeWidth: "2", color: "currentColor", orientation: "horizontal" }, composition: "sizes" },
+      { name: "Colors", description: "Semantic colors, plus currentColor inheritance", args: { name: "info", size: "24", strokeWidth: "2", orientation: "horizontal" }, composition: "colors" },
+      { name: "Labelled", description: "Meaningful icon with an accessible name", args: { name: "search", size: "24", strokeWidth: "2", color: "currentColor", title: "Search" } },
     ],
   },
 ];

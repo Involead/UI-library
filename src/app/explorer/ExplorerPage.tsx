@@ -18,6 +18,7 @@ import { LayoutToggle } from "./LayoutToggle";
 import { ButtonPreview } from "./previews/ButtonPreview";
 import { CheckboxPreview } from "./previews/CheckboxPreview";
 import { DropdownPreview } from "./previews/DropdownPreview";
+import { IconPreview } from "./previews/IconPreview";
 import { InputPreview } from "./previews/InputPreview";
 import { RadioPreview } from "./previews/RadioPreview";
 import { TypographyPreview } from "./previews/TypographyPreview";
@@ -314,6 +315,15 @@ export function ExplorerPage() {
         />
       );
     }
+    if (activeComponent === "Icon") {
+      return (
+        <IconPreview
+          args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
+        />
+      );
+    }
     return null;
   }
 
@@ -377,6 +387,7 @@ export function ExplorerPage() {
         onTabChange={setActiveTopTab}
         zoom={zoom}
         onZoomChange={setZoom}
+        showControls={!showIntro}
       />
       <div className="content">
         <ExplorerSidebar
