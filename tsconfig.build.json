@@ -5,6 +5,7 @@
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "noEmit": false,
+    "incremental": false,
     "outDir": "./dist/types",
     "plugins": []
   },
