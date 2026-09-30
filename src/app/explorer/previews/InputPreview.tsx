@@ -1,7 +1,7 @@
 import { Input } from "@/index";
 import type { ExplorerArgs } from "../../explorer-config";
 import { getBooleanArg, getStringArg } from "../args";
-import { inputTypes, isChoice, type InputSize, type InputType } from "../types";
+import { inputTypes, isChoice, type InputLabelPosition, type InputSize, type InputType } from "../types";
 
 type Props = {
   args: ExplorerArgs;
@@ -15,10 +15,15 @@ export function InputPreview({ args, onChange }: Props) {
     : "medium";
   const selectedType = getStringArg(args, "type", "text");
   const type: InputType = isChoice(selectedType, inputTypes) ? selectedType : "text";
+  const selectedLabelPosition = getStringArg(args, "labelPosition", "top");
+  const labelPosition: InputLabelPosition = isChoice(selectedLabelPosition, ["top", "left", "right"])
+    ? selectedLabelPosition
+    : "top";
 
   return (
     <Input
       label={getStringArg(args, "label")}
+      labelPosition={labelPosition}
       value={getStringArg(args, "value")}
       placeholder={getStringArg(args, "placeholder")}
       type={type}

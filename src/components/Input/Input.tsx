@@ -12,6 +12,7 @@ import { cx } from "@/utils";
 import styles from "./Input.module.css";
 
 type InputSize = "small" | "medium" | "large";
+type InputLabelPosition = "top" | "left" | "right";
 
 type InputType =
   | "text"
@@ -33,6 +34,8 @@ type InputType =
 export interface InputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "type"> {
   label?: string;
+  /** Where the label sits relative to the input. */
+  labelPosition?: InputLabelPosition;
   helperText?: string;
   error?: string;
   size?: InputSize;
@@ -44,6 +47,7 @@ export interface InputProps
 
 export function Input({
   label,
+  labelPosition = "top",
   helperText,
   error,
   size = "medium",
@@ -73,6 +77,8 @@ export function Input({
   const wrapperClasses = cx(
     styles.wrapper,
     fullWidth && styles.fullWidth,
+    labelPosition === "left" && styles.labelLeft,
+    labelPosition === "right" && styles.labelRight,
   );
 
   const fieldClasses = cx(

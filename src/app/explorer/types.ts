@@ -5,6 +5,7 @@ export type ComponentName = (typeof explorerComponents)[number]["name"];
 export type PreviewLayout = "horizontal" | "vertical";
 
 export type InputSize = "small" | "medium" | "large";
+export type InputLabelPosition = "top" | "left" | "right";
 export type InputType =
   | "text"
   | "password"

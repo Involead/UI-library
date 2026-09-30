@@ -25,6 +25,62 @@
   color: var(--color-error);
 }
 
+/* Side labels: the label takes one column, and the field and helper text
+   stack in the other. The field column never shrinks below
+   --input-min-width — the label wraps first. */
+.labelLeft,
+.labelRight {
+  --input-min-width: 120px;
+
+  display: inline-grid;
+  align-items: center;
+  column-gap: var(--spacing-md);
+  row-gap: var(--spacing-xs);
+  max-width: 100%;
+}
+
+.labelLeft {
+  grid-template-columns: auto minmax(var(--input-min-width), 1fr);
+}
+
+.labelRight {
+  grid-template-columns: minmax(var(--input-min-width), 1fr) auto;
+}
+
+.fullWidth.labelLeft,
+.fullWidth.labelRight {
+  display: grid;
+}
+
+.labelLeft .label,
+.labelRight .label {
+  grid-row: 1;
+  overflow-wrap: anywhere;
+}
+
+.labelLeft .label {
+  grid-column: 1;
+}
+
+.labelRight .label {
+  grid-column: 2;
+}
+
+.labelLeft > :not(.label) {
+  grid-column: 2;
+}
+
+.labelRight > :not(.label) {
+  grid-column: 1;
+}
+
+/* Pinning the field to row 1 lines the label up with it; the helper text
+   then flows into row 2, under the field. */
+.labelLeft .field,
+.labelRight .field {
+  grid-row: 1;
+}
+
 /* =========================
    FIELD (input container)
    ========================= */
