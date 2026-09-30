@@ -2,7 +2,7 @@ import type { ChangeEvent } from "react";
 import { Checkbox } from "@/index";
 import type { ExplorerArgs } from "../../explorer-config";
 import { getBooleanArg, getStringArg } from "../args";
-import type { CheckboxSize, PreviewLayout } from "../types";
+import type { CheckboxLabelPosition, CheckboxSize, PreviewLayout } from "../types";
 import { isChoice } from "../types";
 
 type Props = {
@@ -23,9 +23,14 @@ export function CheckboxPreview({ args, composition, layout, onChange }: Props) 
   const size: CheckboxSize = isChoice(selectedSize, ["small", "medium", "large"])
     ? selectedSize
     : "medium";
+  const selectedLabelPosition = getStringArg(args, "labelPosition", "right");
+  const labelPosition: CheckboxLabelPosition = isChoice(selectedLabelPosition, ["right", "left"])
+    ? selectedLabelPosition
+    : "right";
   const checked = getBooleanArg(args, "checked");
   const commonProps = {
     size,
+    labelPosition,
     disabled: getBooleanArg(args, "disabled"),
     labelClickable: getBooleanArg(args, "labelClickable", true),
     onChange,

@@ -21,6 +21,7 @@ export type InputType =
   | "color"
   | "file";
 export type CheckboxSize = "small" | "medium" | "large";
+export type CheckboxLabelPosition = "right" | "left";
 export type DropdownSize = "small" | "medium" | "large";
 export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
 export type ButtonSize = "small" | "medium" | "large";

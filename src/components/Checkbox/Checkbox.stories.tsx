@@ -81,6 +81,14 @@ const meta = {
       control: "boolean",
     },
 
+    labelPosition: {
+      control: "radio",
+      options: [
+        "right",
+        "left",
+      ],
+    },
+
     icon: {
       control: false,
     },
@@ -241,6 +249,34 @@ export const LabelClickable: Story = {
         {...args}
         labelClickable={false}
         label="Only the checkbox itself toggles"
+      />
+    </div>
+  ),
+};
+
+/* =========================
+   LABEL POSITION
+   ========================= */
+
+export const LabelPositions: Story = {
+  argTypes: {
+    labelPosition: {
+      control: false,
+    },
+  },
+
+  render: (args) => (
+    <div style={stack}>
+      <Checkbox
+        {...args}
+        labelPosition="right"
+        label="Label on the right"
+      />
+      <Checkbox
+        {...args}
+        labelPosition="left"
+        label="Label on the left"
+        helperText="Helper text lines up with the label."
       />
     </div>
   ),
