@@ -7,7 +7,6 @@ body:has(.storybook-page) {
 }
 
 .storybook-page {
-  --topbar-height: 58px;
   --scrollbar-size: 3px;
   --tint: color-mix(in srgb, var(--color-primary) 8%, transparent);
   --tint-strong: color-mix(in srgb, var(--color-primary) 12%, transparent);
@@ -130,8 +129,8 @@ body:has(.storybook-page) {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  height: 32px;
-  min-width: 32px;
+  height: var(--control-height-lg);
+  min-width: var(--control-height-lg);
   padding: 0 var(--spacing-2);
   border: 1px solid var(--color-border-hover);
   border-radius: var(--radius-md);
@@ -142,13 +141,16 @@ body:has(.storybook-page) {
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-none);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .utility svg {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: var(--icon-size-md);
+  height: var(--icon-size-md);
   flex-shrink: 0;
   stroke: currentColor;
   stroke-width: 2.25;
@@ -204,8 +206,8 @@ body:has(.storybook-page) {
 }
 
 .sidebar {
-  width: 228px;
-  flex: 0 0 228px;
+  width: var(--sidebar-width);
+  flex: 0 0 var(--sidebar-width);
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
@@ -218,7 +220,7 @@ body:has(.storybook-page) {
 
 .sidebar-search {
   margin: var(--spacing-1) var(--spacing-4) var(--spacing-3);
-  height: 32px;
+  height: var(--control-height-lg);
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
@@ -255,7 +257,7 @@ body:has(.storybook-page) {
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 30px;
+  min-height: var(--menu-item-height);
   padding: 0 var(--spacing-3) 0 var(--spacing-5);
   border: 0;
   border-left: 3px solid transparent;
@@ -268,8 +270,8 @@ body:has(.storybook-page) {
 }
 
 .menu-item .menu-icon {
-  width: 14px;
-  height: 16px;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-md);
   margin-right: var(--spacing-2);
   display: inline-block;
   position: relative;
@@ -279,8 +281,8 @@ body:has(.storybook-page) {
 }
 
 .menu-item.root .menu-icon {
-  width: 14px;
-  height: 14px;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
   background: transparent;
   clip-path: none;
   border-radius: 0;
@@ -292,7 +294,7 @@ body:has(.storybook-page) {
   height: 12px;
   margin-left: auto;
   color: var(--color-secondary);
-  transition: transform 160ms ease;
+  transition: transform var(--transition-normal) ease;
 }
 
 .menu-item.root .chevron.expanded {
@@ -348,8 +350,8 @@ body:has(.storybook-page) {
 }
 
 .menu-item.intro svg {
-  width: 14px;
-  height: 14px;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
   margin-right: var(--spacing-2);
   flex: 0 0 auto;
   color: var(--color-secondary);
@@ -427,7 +429,7 @@ body:has(.storybook-page) {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-2);
-  height: 28px;
+  height: var(--control-height-sm);
   padding: 0 var(--spacing-3);
   border: 0;
   border-radius: var(--radius-md);
@@ -443,8 +445,8 @@ body:has(.storybook-page) {
 }
 
 .layout-toggle svg {
-  width: 14px;
-  height: 14px;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
 }
 
 /* ---------- Controls panel ---------- */
@@ -489,7 +491,7 @@ body:has(.storybook-page) {
   border-radius: var(--radius-full);
   background: var(--color-border-hover);
   transform: translateX(-50%);
-  transition: background 0.15s;
+  transition: background var(--transition-fast);
 }
 
 .resize-handle:hover::after,
@@ -592,22 +594,22 @@ body:has(.storybook-page) {
 }
 
 .field-box {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   min-width: 146px;
-  height: 32px;
+  height: var(--control-height-lg);
   padding: 0 var(--spacing-3);
   border: 1px solid var(--color-border-hover);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-size: var(--font-size-xs);
-  line-height: 30px;
 }
 
 .control-input {
   width: 100%;
-  max-width: 260px;
-  height: 32px;
+  max-width: var(--control-max-width);
+  height: var(--control-height-lg);
   box-sizing: border-box;
   padding: 0 var(--spacing-3);
   border: 1px solid var(--color-border-hover);
@@ -634,15 +636,15 @@ body:has(.storybook-page) {
 }
 
 .control-checkbox {
-  width: 16px;
-  height: 16px;
+  width: var(--icon-size-md);
+  height: var(--icon-size-md);
   accent-color: var(--color-primary);
 }
 
 .reset-btn {
   margin-top: var(--spacing-5);
   padding: 0 var(--spacing-3);
-  height: 30px;
+  height: var(--control-height-md);
   border: 1px solid var(--color-border-hover);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -656,8 +658,8 @@ body:has(.storybook-page) {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--spacing-2) var(--spacing-3);
-  max-width: 260px;
-  max-height: 120px;
+  max-width: var(--control-max-width);
+  max-height: var(--multi-select-max-height);
   overflow-y: auto;
   padding: var(--spacing-2) var(--spacing-3);
   border: 1px solid var(--color-border-hover);
@@ -799,7 +801,7 @@ body:has(.storybook-page) {
 /* ---------- Docs / Introduction ---------- */
 
 .docs-page {
-  max-width: 980px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--spacing-8) var(--spacing-10) var(--spacing-16);
   color: var(--color-text-primary);
@@ -926,7 +928,9 @@ body:has(.storybook-page) {
   text-align: left;
   cursor: pointer;
   font: inherit;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .intro-card:hover {

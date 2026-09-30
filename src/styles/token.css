@@ -108,4 +108,24 @@
   --z-toast: 1200;
 
   --color-text-faded: color-mix(in srgb, var(--color-text-primary) 78%, var(--color-white));
+
+
+     --control-height-sm: 28px;
+     --control-height-md: 30px;
+     --control-height-lg: 32px;
+     --menu-item-height: 30px;
+   
+     --icon-size-sm: 14px;
+     --icon-size-md: 16px;
+   
+     --topbar-height: 58px;
+     --sidebar-width: 228px;
+     --content-max-width: 980px;
+     --control-max-width: 260px;
+     --multi-select-max-height: calc(var(--spacing-10) * 3); /* 120px */
+   
+   
+     --transition-fast: 150ms;
+     --transition-normal: 160ms;
+     --transition-slow: 220ms;
 }
