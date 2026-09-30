@@ -1,0 +1,179 @@
+.landing {
+    --landing-faded: color-mix(in srgb, var(--color-text-primary) 78%, var(--color-white));
+  
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    color: var(--color-text-primary);
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 70%),
+      radial-gradient(40% 40% at 90% 90%, color-mix(in srgb, var(--color-primary) 6%, transparent), transparent 70%),
+      var(--color-background);
+      transition:
+      opacity var(--transition-slow) ease,
+      transform var(--transition-slow) ease;
+    }
+  
+  .landing.landing-leaving {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  
+  .landing-nav {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-5) var(--spacing-8);
+  }
+  
+  .landing-brand {
+    display: flex;
+    align-items: center;
+    color: var(--landing-faded);
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  
+  .landing-logo {
+    display: block;
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 0;
+    mix-blend-mode: multiply;
+  }
+  
+  .landing-hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--spacing-6) var(--spacing-6) 96px;
+    animation: landing-rise 0.6s ease both;
+  }
+  
+  .landing-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid color-mix(in srgb, var(--color-primary) 22%, var(--color-white));
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-primary) 7%, var(--color-white));
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+  }
+  
+  .landing-badge:hover {
+    background: color-mix(in srgb, var(--color-primary) 12%, var(--color-white));
+    border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-white));
+  }
+  
+  .landing-badge svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .landing-title {
+    max-width: 860px;
+    margin: var(--spacing-6) 0 0;
+    font-size: clamp(38px, 6.5vw, 68px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    color: var(--landing-faded);
+  }
+  
+  .landing-title span {
+    font-size: 0.85em;
+    background: linear-gradient(
+      90deg,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary) 70%, var(--color-white))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  .landing-subtitle {
+    max-width: 620px;
+    margin: 22px 0 0;
+    font-size: clamp(16px, 2vw, 19px);
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+  }
+  
+  .landing-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-md);
+    margin-top: 34px;
+  }
+  
+  .landing-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 var(--spacing-xl);
+    border-radius: var(--radius-full);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  }
+  
+  .landing-btn:hover {
+    transform: translateY(-1px);
+  }
+  
+  .landing-btn:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-border-focus) 35%, transparent);
+    outline-offset: 2px;
+  }
+  
+  .landing-btn-primary {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--color-primary) 28%, transparent);
+  }
+  
+  .landing-btn-primary:hover {
+    /* --color-primary-hover is identical to primary, so darken slightly here */
+    background: color-mix(in srgb, var(--color-primary) 88%, var(--color-black));
+  }
+  
+  .landing-btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-primary);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 22%, var(--color-white));
+  }
+  
+  .landing-btn-secondary:hover {
+    background: color-mix(in srgb, var(--color-primary) 5%, var(--color-white));
+    border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-white));
+  }
+  
+  @keyframes landing-rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .landing-hero { animation: none; }
+    .landing-btn:hover { transform: none; }
+  }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   explorerComponents,
   type ExplorerArgs,
@@ -9,6 +10,7 @@ import {
 import { getComponentDefaults, getDropdownOptions, getExplorerComponent } from "./args";
 import { formatButtonCode, formatExplorerCode, parseExplorerCode, parseTextChild, readComponentBody } from "./code";
 import { ExplorerDocs } from "./ExplorerDocs";
+import { ExplorerIntro } from "./ExplorerIntro";
 import { ExplorerPanels } from "./ExplorerPanels";
 import { ExplorerSidebar } from "./ExplorerSidebar";
 import { ExplorerTopbar } from "./ExplorerTopbar";
@@ -27,6 +29,9 @@ import {
   type PreviewLayout,
 } from "./types";
 import "./explorer.css";
+
+const EXPLORER_PATH = "/explorer";
+const INTRO_PATH = "/explorer/introduction";
 
 const navGroups = explorerComponents.map((component) => ({
   title: component.name,
@@ -69,11 +74,14 @@ function defaultLayoutForStory(
 }
 
 export function ExplorerPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const showIntro = pathname === INTRO_PATH;
+
   const [activeTopTab, setActiveTopTab] = useState<"canvas" | "docs">("canvas");
+  const [zoom, setZoom] = useState(100);
   const [componentSearch, setComponentSearch] = useState("");
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    ...Object.fromEntries(explorerComponents.map((component) => [component.name, true])),
-  });
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [activeComponent, setActiveComponent] = useState<ComponentName>("Button");
   const [activeStory, setActiveStory] = useState("Primary");
   const [componentArgs, setComponentArgs] = useState<ExplorerArgs>({});
@@ -118,6 +126,7 @@ export function ExplorerPage() {
     if (!selectedStory) {
       throw new Error(`Unknown ${componentName} story "${story}".`);
     }
+    if (pathname !== EXPLORER_PATH) router.push(EXPLORER_PATH, { scroll: false });
     setActiveComponent(componentName as ComponentName);
     setActiveStory(story);
     setActionLog([]);
@@ -164,6 +173,16 @@ export function ExplorerPage() {
       ),
     );
     setButtonClickCount(0);
+  }
+
+  function toggleGroup(title: string) {
+    const isExpanding = !expandedGroups[title];
+    setExpandedGroups((current) => ({ ...current, [title]: isExpanding }));
+
+    if (isExpanding && (showIntro || activeComponent !== title)) {
+      const firstStory = navGroups.find((group) => group.title === title)?.items[0];
+      if (firstStory) selectStory(title, firstStory);
+    }
   }
 
   function applyCodeDraft() {
@@ -336,22 +355,37 @@ export function ExplorerPage() {
 
   return (
     <div className={`storybook-page${activeTopTab === "docs" ? " docs-mode" : ""}`}>
-      <ExplorerTopbar activeTab={activeTopTab} onTabChange={setActiveTopTab} />
+      <ExplorerTopbar
+        activeTab={activeTopTab}
+        onTabChange={setActiveTopTab}
+        zoom={zoom}
+        onZoomChange={setZoom}
+      />
       <div className="content">
         <ExplorerSidebar
           groups={filteredGroups}
           search={componentSearch}
           onSearchChange={setComponentSearch}
           expandedGroups={expandedGroups}
-          onToggleGroup={(title) =>
-            setExpandedGroups((current) => ({ ...current, [title]: !current[title] }))
-          }
-          activeComponent={activeComponent}
+          onToggleGroup={toggleGroup}
+          activeComponent={showIntro ? "" : activeComponent}
           activeStory={activeStory}
           onSelectStory={selectStory}
+          introActive={showIntro}
+          onSelectIntro={() => {
+            if (pathname !== INTRO_PATH) router.push(INTRO_PATH, { scroll: false });
+          }}
         />
         <main className="canvas">
-          {activeTopTab === "docs" ? (
+          {showIntro ? (
+            <ExplorerIntro
+              groups={navGroups}
+              onSelectStory={(component, story) => {
+                setExpandedGroups((current) => ({ ...current, [component]: true }));
+                selectStory(component, story);
+              }}
+            />
+          ) : activeTopTab === "docs" ? (
             <ExplorerDocs
               component={activeDefinition}
               code={codeDraft}
@@ -362,13 +396,16 @@ export function ExplorerPage() {
             />
           ) : (
             <>
-              <div className="stage">
+              <div className="stage" id="preview-fullscreen-target">
                 {showLayoutToggle ? (
                   <div className="stage-toolbar">
                     <LayoutToggle layout={previewLayout} onChange={setPreviewLayout} />
                   </div>
                 ) : null}
-                <div className={`button-preview${activeComponent === "Button" && fullWidth ? " button-preview-full" : ""}`}>
+                <div
+                  className={`button-preview${activeComponent === "Button" && fullWidth ? " button-preview-full" : ""}`}
+                  style={{ zoom: zoom / 100 }}
+                >
                   {activeComponent === "Button" ? (
                     <ButtonPreview
                       variant={variant}

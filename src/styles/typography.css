@@ -47,4 +47,12 @@
   --line-height-tight: 1.2;
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.7;
+
+  --font-size-2xs: 10px;
+  --font-size-5xl: 68px;
+
+  --font-weight-extrabold: 800;
+
+  --line-height-none: 1;
+  --line-height-display: 1.05;
 }

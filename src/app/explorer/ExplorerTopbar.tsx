@@ -1,26 +1,80 @@
+import { useEffect, useState } from "react";
+import "./explorer.css";
+import Link from "next/link";
+
 type Props = {
   activeTab: "canvas" | "docs";
   onTabChange: (tab: "canvas" | "docs") => void;
+  zoom: number;
+  onZoomChange: (zoom: number) => void;
 };
 
-export function ExplorerTopbar({ activeTab, onTabChange }: Props) {
+const MIN_ZOOM = 30;
+const MAX_ZOOM = 200;
+const ZOOM_STEP = 10;
+const DEFAULT_ZOOM = 100;
+
+export function ExplorerTopbar({
+  activeTab,
+  onTabChange,
+  zoom,
+  onZoomChange,
+}: Props) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const getTarget = () => document.getElementById("preview-fullscreen-target");
+
+  useEffect(() => {
+    const sync = () =>
+      setIsFullscreen(document.fullscreenElement === getTarget());
+    sync();
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await getTarget()?.requestFullscreen();
+      }
+    } catch (error) {
+      console.error("Fullscreen failed:", error);
+    }
+  };
+
+  const zoomOut = () => onZoomChange(Math.max(MIN_ZOOM, zoom - ZOOM_STEP));
+  const zoomIn = () => onZoomChange(Math.min(MAX_ZOOM, zoom + ZOOM_STEP));
+  const previewDisabled = activeTab === "docs";
+
   return (
     <header className="topbar">
-      <div className="brand-region">
+      <Link
+        href="/"
+        className="brand-region"
+        aria-label="Back to home"
+      >
         <img className="brand-mark" src="/involead-logo.jpe" alt="InvoLead" />
         <div>
           <div className="brand-name">InvoLead</div>
           <div className="brand-tag">UI LIBRARY</div>
         </div>
-      </div>
-
+      </Link>
       <nav className="topnav" aria-label="Main navigation">
         <button
           type="button"
           className={activeTab === "canvas" ? "active" : ""}
           onClick={() => onTabChange("canvas")}
         >
-          <svg className="topnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <svg
+            className="topnav-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            aria-hidden="true"
+          >
             <rect x="3.5" y="3.5" width="7" height="7" rx="1" />
             <rect x="13.5" y="3.5" width="7" height="7" rx="1" />
             <rect x="3.5" y="13.5" width="7" height="7" rx="1" />
@@ -33,7 +87,14 @@ export function ExplorerTopbar({ activeTab, onTabChange }: Props) {
           className={activeTab === "docs" ? "active" : ""}
           onClick={() => onTabChange("docs")}
         >
-          <svg className="topnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <svg
+            className="topnav-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            aria-hidden="true"
+          >
             <path d="M5 4.5h10.5A3.5 3.5 0 0 1 19 8v11.5H8.5A3.5 3.5 0 0 1 5 16V4.5Z" />
             <path d="M5 16a3.5 3.5 0 0 1 3.5-3.5H19" />
             <path d="M8.5 8h6.5M8.5 10.5h4.5" strokeLinecap="round" />
@@ -43,33 +104,102 @@ export function ExplorerTopbar({ activeTab, onTabChange }: Props) {
       </nav>
 
       <div className="top-actions" aria-label="Editor toolbar">
-        <button type="button" className="utility" aria-label="Search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="5.5" />
-            <path d="M16 16L21 21" strokeLinecap="round" />
-          </svg>
+        <button
+          type="button"
+          className={`utility${isFullscreen ? " active" : ""}`}
+          aria-label={isFullscreen ? "Exit full screen" : "Enter full screen"}
+          aria-pressed={isFullscreen}
+          title={isFullscreen ? "Exit full screen" : "Enter full screen"}
+          onClick={toggleFullscreen}
+          disabled={previewDisabled}
+        >
+          {isFullscreen ? (
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <path d="M9 4v5H4" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M15 4v5h5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M9 20v-5H4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M15 20v-5h5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <path d="M4 9V4h5" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M20 9V4h-5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M4 15v5h5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M20 15v5h-5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
         </button>
-        <button type="button" className="utility utility-pill">80%</button>
-        <button type="button" className="utility" aria-label="Theme">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M12 3.5v7.2" strokeLinecap="round" />
-            <path d="M12 20.5v-1.6" strokeLinecap="round" />
-            <path d="M18.6 5.4l-5.1 5.1" strokeLinecap="round" />
-            <path d="M10.5 13.5L5.4 18.6" strokeLinecap="round" />
-            <path d="M20.5 12h-7.2" strokeLinecap="round" />
-            <path d="M3.5 12h1.6" strokeLinecap="round" />
-            <circle cx="12" cy="12" r="3.6" />
-          </svg>
-        </button>
-        <button type="button" className="utility utility-pill">White</button>
-        <button type="button" className="utility utility-pill">Responsive</button>
-        <button type="button" className="utility" aria-label="More options">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="5" cy="12" r="1.5" />
-            <circle cx="12" cy="12" r="1.5" />
-            <circle cx="19" cy="12" r="1.5" />
-          </svg>
-        </button>
+
+        <div className="zoom-group" role="group" aria-label="Preview zoom">
+          <button
+            type="button"
+            className="utility zoom-step"
+            aria-label="Zoom out"
+            title="Zoom out"
+            onClick={zoomOut}
+            disabled={previewDisabled || zoom <= MIN_ZOOM}
+          >
+            −
+          </button>
+
+          <button
+            type="button"
+            className="utility utility-pill zoom-value"
+            aria-label="Reset zoom to 100%"
+            title="Reset zoom"
+            onClick={() => onZoomChange(DEFAULT_ZOOM)}
+            disabled={previewDisabled}
+          >
+            {zoom}%
+          </button>
+
+          <button
+            type="button"
+            className="utility zoom-step"
+            aria-label="Zoom in"
+            title="Zoom in"
+            onClick={zoomIn}
+            disabled={previewDisabled || zoom >= MAX_ZOOM}
+          >
+            +
+          </button>
+        </div>
       </div>
     </header>
   );
