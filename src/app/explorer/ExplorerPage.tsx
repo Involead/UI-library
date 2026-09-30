@@ -1,26 +1,25 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { explorerComponents, type ExplorerArgs, type ExplorerValue } from '../explorer-config';
-import { getComponentDefaults, getDropdownOptions, getExplorerComponent } from './args';
+import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
-  formatButtonCode,
-  formatExplorerCode,
-  parseExplorerCode,
-  parseTextChild,
-  readComponentBody,
-} from './code';
-import { ExplorerDocs } from './ExplorerDocs';
-import { ExplorerPanels } from './ExplorerPanels';
-import { ExplorerSidebar } from './ExplorerSidebar';
-import { ExplorerTopbar } from './ExplorerTopbar';
-import { ExplorerIntro } from './ExplorerIntro';
-import { LayoutToggle } from './LayoutToggle';
-import { ButtonPreview } from './previews/ButtonPreview';
-import { CheckboxPreview } from './previews/CheckboxPreview';
-import { DropdownPreview } from './previews/DropdownPreview';
-import { InputPreview } from './previews/InputPreview';
-import { TypographyPreview } from './previews/TypographyPreview';
+  explorerComponents,
+  type ExplorerArgs,
+  type ExplorerValue,
+} from "../explorer-config";
+import { getComponentDefaults, getDropdownOptions, getExplorerComponent } from "./args";
+import { formatButtonCode, formatExplorerCode, parseExplorerCode, parseTextChild, readComponentBody } from "./code";
+import { ExplorerDocs } from "./ExplorerDocs";
+import { ExplorerIntro } from "./ExplorerIntro";
+import { ExplorerPanels } from "./ExplorerPanels";
+import { ExplorerSidebar } from "./ExplorerSidebar";
+import { ExplorerTopbar } from "./ExplorerTopbar";
+import { LayoutToggle } from "./LayoutToggle";
+import { ButtonPreview } from "./previews/ButtonPreview";
+import { CheckboxPreview } from "./previews/CheckboxPreview";
+import { DropdownPreview } from "./previews/DropdownPreview";
+import { InputPreview } from "./previews/InputPreview";
+import { TypographyPreview } from "./previews/TypographyPreview";
 import {
   isChoice,
   type ButtonSize,
@@ -28,176 +27,79 @@ import {
   type ComponentName,
   type Panel,
   type PreviewLayout,
-} from './types';
-import './explorer.css';
-import { usePathname } from 'next/navigation';
+} from "./types";
+import "./explorer.css";
+
+const EXPLORER_PATH = "/explorer";
+const INTRO_PATH = "/explorer/introduction";
 
 const navGroups = explorerComponents.map((component) => ({
   title: component.name,
   items: component.stories.map((story) => story.name),
 }));
 
-const buttonStoryDefaults: Record<
-  string,
-  {
-    children: string;
-    variant: ButtonVariant;
-    size: ButtonSize;
-    loading: boolean;
-    disabled: boolean;
-    fullWidth: boolean;
-  }
-> = {
-  Primary: {
-    children: 'Primary Button',
-    variant: 'primary',
-    size: 'medium',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  Secondary: {
-    children: 'Secondary Button',
-    variant: 'secondary',
-    size: 'medium',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  Outline: {
-    children: 'Outline Button',
-    variant: 'outline',
-    size: 'medium',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  Ghost: {
-    children: 'Ghost Button',
-    variant: 'ghost',
-    size: 'medium',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  Danger: {
-    children: 'Delete',
-    variant: 'danger',
-    size: 'medium',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  Loading: {
-    children: 'Saving',
-    variant: 'primary',
-    size: 'medium',
-    loading: true,
-    disabled: false,
-    fullWidth: false,
-  },
-  Disabled: {
-    children: 'Disabled Button',
-    variant: 'primary',
-    size: 'medium',
-    loading: false,
-    disabled: true,
-    fullWidth: false,
-  },
-  Small: {
-    children: 'Small Button',
-    variant: 'primary',
-    size: 'small',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  Medium: {
-    children: 'Medium Button',
-    variant: 'primary',
-    size: 'medium',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  Large: {
-    children: 'Large Button',
-    variant: 'primary',
-    size: 'large',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  'With Left Icon': {
-    children: 'Download',
-    variant: 'primary',
-    size: 'medium',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  'With Right Icon': {
-    children: 'Next',
-    variant: 'primary',
-    size: 'medium',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  'With Both Icons': {
-    children: 'Continue',
-    variant: 'primary',
-    size: 'medium',
-    loading: false,
-    disabled: false,
-    fullWidth: false,
-  },
-  'Full Width': {
-    children: 'Full Width Button',
-    variant: 'primary',
-    size: 'medium',
-    loading: false,
-    disabled: false,
-    fullWidth: true,
-  },
+const buttonStoryDefaults: Record<string, {
+  children: string;
+  variant: ButtonVariant;
+  size: ButtonSize;
+  loading: boolean;
+  disabled: boolean;
+  fullWidth: boolean;
+}> = {
+  Primary: { children: "Primary Button", variant: "primary", size: "medium", loading: false, disabled: false, fullWidth: false },
+  Secondary: { children: "Secondary Button", variant: "secondary", size: "medium", loading: false, disabled: false, fullWidth: false },
+  Outline: { children: "Outline Button", variant: "outline", size: "medium", loading: false, disabled: false, fullWidth: false },
+  Ghost: { children: "Ghost Button", variant: "ghost", size: "medium", loading: false, disabled: false, fullWidth: false },
+  Danger: { children: "Delete", variant: "danger", size: "medium", loading: false, disabled: false, fullWidth: false },
+  Loading: { children: "Saving", variant: "primary", size: "medium", loading: true, disabled: false, fullWidth: false },
+  Disabled: { children: "Disabled Button", variant: "primary", size: "medium", loading: false, disabled: true, fullWidth: false },
+  Small: { children: "Small Button", variant: "primary", size: "small", loading: false, disabled: false, fullWidth: false },
+  Medium: { children: "Medium Button", variant: "primary", size: "medium", loading: false, disabled: false, fullWidth: false },
+  Large: { children: "Large Button", variant: "primary", size: "large", loading: false, disabled: false, fullWidth: false },
+  "With Left Icon": { children: "Download", variant: "primary", size: "medium", loading: false, disabled: false, fullWidth: false },
+  "With Right Icon": { children: "Next", variant: "primary", size: "medium", loading: false, disabled: false, fullWidth: false },
+  "With Both Icons": { children: "Continue", variant: "primary", size: "medium", loading: false, disabled: false, fullWidth: false },
+  "Full Width": { children: "Full Width Button", variant: "primary", size: "medium", loading: false, disabled: false, fullWidth: true },
 };
 
 function defaultLayoutForStory(
   componentName: string,
   composition?: string,
-  args?: ExplorerArgs
+  args?: ExplorerArgs,
 ): PreviewLayout {
-  if (args?.orientation === 'vertical') return 'vertical';
-  if (args?.orientation === 'horizontal') return 'horizontal';
-  if ((componentName === 'Checkbox' || componentName === "Dropdown") && composition) return 'horizontal';
-  return 'vertical';
+  if (args?.orientation === "vertical") return "vertical";
+  if (args?.orientation === "horizontal") return "horizontal";
+  if ((componentName === "Checkbox" || componentName === "Dropdown") && composition) return "horizontal";
+  return "vertical";
 }
 
 export function ExplorerPage() {
+  const router = useRouter();
   const pathname = usePathname();
-  const showIntro = pathname === '/explorer/introduction';
-  const [activeTopTab, setActiveTopTab] = useState<'canvas' | 'docs'>('canvas');
-  const [componentSearch, setComponentSearch] = useState('');
+  const showIntro = pathname === INTRO_PATH;
+
+  const [activeTopTab, setActiveTopTab] = useState<"canvas" | "docs">("canvas");
+  const [zoom, setZoom] = useState(100);
+  const [componentSearch, setComponentSearch] = useState("");
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-  const [activeComponent, setActiveComponent] = useState<ComponentName>('Button');
-  const [activeStory, setActiveStory] = useState('Primary');
+  const [activeComponent, setActiveComponent] = useState<ComponentName>("Button");
+  const [activeStory, setActiveStory] = useState("Primary");
   const [componentArgs, setComponentArgs] = useState<ExplorerArgs>({});
-  const [children, setChildren] = useState('Primary Button');
+  const [children, setChildren] = useState("Primary Button");
   const [buttonLeftIcon, setButtonLeftIcon] = useState(false);
   const [buttonRightIcon, setButtonRightIcon] = useState(false);
-  const [variant, setVariant] = useState<ButtonVariant>('primary');
-  const [size, setSize] = useState<ButtonSize>('medium');
+  const [variant, setVariant] = useState<ButtonVariant>("primary");
+  const [size, setSize] = useState<ButtonSize>("medium");
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [fullWidth, setFullWidth] = useState(false);
   const [codeDraft, setCodeDraft] = useState(() =>
-    formatButtonCode('Primary Button', 'primary', 'medium', false, false, false)
+    formatButtonCode("Primary Button", "primary", "medium", false, false, false),
   );
   const [buttonClickCount, setButtonClickCount] = useState(0);
-  const [activePanel, setActivePanel] = useState<Panel>('controls');
+  const [activePanel, setActivePanel] = useState<Panel>("controls");
   const [actionLog, setActionLog] = useState<string[]>([]);
-  const [codeError, setCodeError] = useState('');
-  const [zoom, setZoom] = useState(100);
+  const [codeError, setCodeError] = useState("");
 
   const normalizedSearch = componentSearch.trim().toLowerCase();
   const filteredGroups = navGroups
@@ -211,7 +113,7 @@ export function ExplorerPage() {
       (group) =>
         group.title.toLowerCase().includes(normalizedSearch) ||
         group.items.length > 0 ||
-        normalizedSearch === ''
+        normalizedSearch === "",
     );
 
   function recordAction(action: string) {
@@ -224,18 +126,13 @@ export function ExplorerPage() {
     if (!selectedStory) {
       throw new Error(`Unknown ${componentName} story "${story}".`);
     }
+    if (pathname !== EXPLORER_PATH) router.push(EXPLORER_PATH, { scroll: false });
     setActiveComponent(componentName as ComponentName);
-    if (window.location.pathname !== '/explorer') {
-      window.history.pushState(null, '', '/explorer');
-    }
-    if (window.location.pathname !== '/explorer') {
-      window.history.pushState(null, '', '/explorer');
-    }
     setActiveStory(story);
     setActionLog([]);
-    setCodeError('');
+    setCodeError("");
 
-    if (componentName !== 'Button') {
+    if (componentName !== "Button") {
       setButtonLeftIcon(false);
       setButtonRightIcon(false);
       const nextArgs = {
@@ -244,7 +141,7 @@ export function ExplorerPage() {
         orientation: defaultLayoutForStory(
           componentName,
           selectedStory.composition,
-          selectedStory.args
+          selectedStory.args,
         ),
       };
       setComponentArgs(nextArgs);
@@ -261,8 +158,8 @@ export function ExplorerPage() {
     setLoading(next.loading);
     setDisabled(next.disabled);
     setFullWidth(next.fullWidth);
-    setButtonLeftIcon(story === 'With Left Icon' || story === 'With Both Icons');
-    setButtonRightIcon(story === 'With Right Icon' || story === 'With Both Icons');
+    setButtonLeftIcon(story === "With Left Icon" || story === "With Both Icons");
+    setButtonRightIcon(story === "With Right Icon" || story === "With Both Icons");
     setCodeDraft(
       formatButtonCode(
         next.children,
@@ -271,9 +168,9 @@ export function ExplorerPage() {
         next.loading,
         next.disabled,
         next.fullWidth,
-        story === 'With Left Icon' || story === 'With Both Icons',
-        story === 'With Right Icon' || story === 'With Both Icons'
-      )
+        story === "With Left Icon" || story === "With Both Icons",
+        story === "With Right Icon" || story === "With Both Icons",
+      ),
     );
     setButtonClickCount(0);
   }
@@ -289,90 +186,82 @@ export function ExplorerPage() {
   }
 
   function applyCodeDraft() {
-    if (activeComponent !== 'Button') {
+    if (activeComponent !== "Button") {
       const component = getExplorerComponent(activeComponent);
       const nextArgs = parseExplorerCode(codeDraft, component);
       if (!nextArgs) {
         setCodeError(`Code must contain a valid <${activeComponent}> example.`);
         return;
       }
-      setCodeError('');
+      setCodeError("");
       setComponentArgs(nextArgs);
-      setActiveStory('Custom');
+      setActiveStory("Custom");
       recordAction(`${activeComponent.toLowerCase()}: code applied`);
       return;
     }
-    const nextChildren = readComponentBody(codeDraft, 'Button');
-    const nextVariant = codeDraft.match(
-      /variant=["'](primary|secondary|outline|ghost|danger)["']/
-    )?.[1];
+    const nextChildren = readComponentBody(codeDraft, "Button");
+    const nextVariant = codeDraft.match(/variant=["'](primary|secondary|outline|ghost|danger)["']/)?.[1];
     const nextSize = codeDraft.match(/size=["'](small|medium|large)["']/)?.[1];
     const nextLoading = codeDraft.match(/loading=\{(true|false)\}/)?.[1];
     const nextDisabled = codeDraft.match(/disabled=\{(true|false)\}/)?.[1];
     const nextFullWidth = codeDraft.match(/fullWidth=\{(true|false)\}/)?.[1];
 
     if (nextChildren !== null) setChildren(parseTextChild(nextChildren));
-    if (
-      nextVariant &&
-      isChoice(nextVariant, ['primary', 'secondary', 'outline', 'ghost', 'danger'])
-    ) {
+    if (nextVariant && isChoice(nextVariant, ["primary", "secondary", "outline", "ghost", "danger"])) {
       setVariant(nextVariant);
     }
-    if (nextSize && isChoice(nextSize, ['small', 'medium', 'large'])) setSize(nextSize);
-    if (nextLoading) setLoading(nextLoading === 'true');
-    if (nextDisabled) setDisabled(nextDisabled === 'true');
-    if (nextFullWidth) setFullWidth(nextFullWidth === 'true');
+    if (nextSize && isChoice(nextSize, ["small", "medium", "large"])) setSize(nextSize);
+    if (nextLoading) setLoading(nextLoading === "true");
+    if (nextDisabled) setDisabled(nextDisabled === "true");
+    if (nextFullWidth) setFullWidth(nextFullWidth === "true");
     setButtonLeftIcon(/\bleftIcon\s*=/.test(codeDraft));
     setButtonRightIcon(/\brightIcon\s*=/.test(codeDraft));
-    setActiveStory('Custom');
-    setCodeError('');
-    recordAction('code: applied changes');
+    setActiveStory("Custom");
+    setCodeError("");
+    recordAction("code: applied changes");
   }
 
   const activeDefinition = getExplorerComponent(activeComponent);
   const selectedExplorerStory = activeDefinition.stories.find(
-    (story) => story.name === activeStory
+    (story) => story.name === activeStory,
   );
   const composition = selectedExplorerStory?.composition;
   const previewLayout: PreviewLayout =
-    componentArgs.orientation === 'horizontal' ? 'horizontal' : 'vertical';
+    componentArgs.orientation === "horizontal" ? "horizontal" : "vertical";
   const showLayoutToggle = Boolean(composition);
 
   function updateComponentArg(name: string, value: ExplorerValue) {
     let nextValue = value;
-    if (activeComponent === 'Dropdown' && name === 'multiple') {
+    if (activeComponent === "Dropdown" && name === "multiple") {
       const currentValue = componentArgs.value;
-      nextValue =
-        value === true
-          ? typeof currentValue === 'string'
-            ? [currentValue]
-            : []
-          : Array.isArray(currentValue)
-            ? (currentValue[0] ?? null)
-            : currentValue;
+      nextValue = value === true
+        ? typeof currentValue === "string" ? [currentValue] : []
+        : Array.isArray(currentValue) ? currentValue[0] ?? null : currentValue;
     }
     const nextArgs = { ...componentArgs, [name]: nextValue };
     setComponentArgs(nextArgs);
-    setCodeDraft(formatExplorerCode(activeComponent, nextArgs, selectedExplorerStory?.composition));
+    setCodeDraft(
+      formatExplorerCode(activeComponent, nextArgs, selectedExplorerStory?.composition),
+    );
   }
 
   function setPreviewLayout(layout: PreviewLayout) {
-    updateComponentArg('orientation', layout);
+    updateComponentArg("orientation", layout);
   }
 
   function renderOtherPreview() {
-    if (activeComponent === 'Input') {
+    if (activeComponent === "Input") {
       return (
         <InputPreview
           args={componentArgs}
           onChange={(value) => {
-            updateComponentArg('value', value);
-            recordAction('input: change');
+            updateComponentArg("value", value);
+            recordAction("input: change");
           }}
         />
       );
     }
-    if (activeComponent === 'Dropdown') {
+    if (activeComponent === "Dropdown") {
       return (
         <DropdownPreview
           args={componentArgs}
@@ -384,27 +273,31 @@ export function ExplorerPage() {
             recordAction(`dropdown: selection changed (${JSON.stringify(next)})`);
           }}
           onOpenChange={(isOpen) => {
-            if (isOpen) recordAction('dropdown: opened');
+            if (isOpen) recordAction("dropdown: opened");
           }}
         />
       );
     }
-    if (activeComponent === 'Checkbox') {
+    if (activeComponent === "Checkbox") {
       return (
         <CheckboxPreview
           args={componentArgs}
           composition={composition}
           layout={previewLayout}
           onChange={(event) => {
-            updateComponentArg('checked', event.currentTarget.checked);
-            recordAction('checkbox: change');
+            updateComponentArg("checked", event.currentTarget.checked);
+            recordAction("checkbox: change");
           }}
         />
       );
     }
-    if (activeComponent === 'Typography') {
+    if (activeComponent === "Typography") {
       return (
-        <TypographyPreview args={componentArgs} composition={composition} layout={previewLayout} />
+        <TypographyPreview
+          args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
+        />
       );
     }
     return null;
@@ -417,35 +310,27 @@ export function ExplorerPage() {
     let nextLoading = loading;
     let nextDisabled = disabled;
     let nextFullWidth = fullWidth;
-    if (name === 'children' && typeof value === 'string') {
+    if (name === "children" && typeof value === "string") {
       nextChildren = value;
       setChildren(value);
     }
-    if (
-      name === 'variant' &&
-      typeof value === 'string' &&
-      isChoice(value, ['primary', 'secondary', 'outline', 'ghost', 'danger'])
-    ) {
+    if (name === "variant" && typeof value === "string" && isChoice(value, ["primary", "secondary", "outline", "ghost", "danger"])) {
       nextVariant = value;
       setVariant(value);
     }
-    if (
-      name === 'size' &&
-      typeof value === 'string' &&
-      isChoice(value, ['small', 'medium', 'large'])
-    ) {
+    if (name === "size" && typeof value === "string" && isChoice(value, ["small", "medium", "large"])) {
       nextSize = value;
       setSize(value);
     }
-    if (name === 'loading' && typeof value === 'boolean') {
+    if (name === "loading" && typeof value === "boolean") {
       nextLoading = value;
       setLoading(value);
     }
-    if (name === 'disabled' && typeof value === 'boolean') {
+    if (name === "disabled" && typeof value === "boolean") {
       nextDisabled = value;
       setDisabled(value);
     }
-    if (name === 'fullWidth' && typeof value === 'boolean') {
+    if (name === "fullWidth" && typeof value === "boolean") {
       nextFullWidth = value;
       setFullWidth(value);
     }
@@ -458,21 +343,21 @@ export function ExplorerPage() {
         nextDisabled,
         nextFullWidth,
         buttonLeftIcon,
-        buttonRightIcon
-      )
+        buttonRightIcon,
+      ),
     );
   }
 
   function resetSelectedStory() {
-    const resetStory =
-      activeDefinition.stories.find((story) => story.name === activeStory) ??
-      activeDefinition.stories[0];
+    const resetStory = activeDefinition.stories.find(
+      (story) => story.name === activeStory,
+    ) ?? activeDefinition.stories[0];
     selectStory(activeComponent, resetStory.name);
-    setActivePanel('controls');
+    setActivePanel("controls");
   }
 
   return (
-    <div className={`storybook-page${activeTopTab === 'docs' ? ' docs-mode' : ''}`}>
+    <div className={`storybook-page${activeTopTab === "docs" ? " docs-mode" : ""}`}>
       <ExplorerTopbar
         activeTab={activeTopTab}
         onTabChange={setActiveTopTab}
@@ -486,14 +371,12 @@ export function ExplorerPage() {
           onSearchChange={setComponentSearch}
           expandedGroups={expandedGroups}
           onToggleGroup={toggleGroup}
-          activeComponent={showIntro ? '' : activeComponent}
+          activeComponent={showIntro ? "" : activeComponent}
           activeStory={activeStory}
           onSelectStory={selectStory}
           introActive={showIntro}
           onSelectIntro={() => {
-            if (window.location.pathname !== '/explorer/introduction') {
-              window.history.pushState(null, '', '/explorer/introduction');
-            }
+            if (pathname !== INTRO_PATH) router.push(INTRO_PATH, { scroll: false });
           }}
         />
         <main className="canvas">
@@ -505,7 +388,7 @@ export function ExplorerPage() {
                 selectStory(component, story);
               }}
             />
-          ) : activeTopTab === 'docs' ? (
+          ) : activeTopTab === "docs" ? (
             <ExplorerDocs
               component={activeDefinition}
               code={codeDraft}
@@ -516,17 +399,17 @@ export function ExplorerPage() {
             />
           ) : (
             <>
-              <div className="stage preview-fullscreen" id="preview-fullscreen-target">
+              <div className="stage" id="preview-fullscreen-target">
                 {showLayoutToggle ? (
                   <div className="stage-toolbar">
                     <LayoutToggle layout={previewLayout} onChange={setPreviewLayout} />
                   </div>
                 ) : null}
                 <div
-                  className={`button-preview${activeComponent === 'Button' && fullWidth ? ' button-preview-full' : ''}`}
+                  className={`button-preview${activeComponent === "Button" && fullWidth ? " button-preview-full" : ""}`}
                   style={{ zoom: zoom / 100 }}
                 >
-                  {activeComponent === 'Button' ? (
+                  {activeComponent === "Button" ? (
                     <ButtonPreview
                       variant={variant}
                       size={size}
@@ -537,14 +420,14 @@ export function ExplorerPage() {
                       rightIcon={buttonRightIcon}
                       clickCount={buttonClickCount}
                       onClick={() => setButtonClickCount((count) => count + 1)}
-                      onMouseDown={() => recordAction('button: mouse down')}
+                      onMouseDown={() => recordAction("button: mouse down")}
                     >
                       {children}
                     </ButtonPreview>
                   ) : (
                     <>
                       {renderOtherPreview()}
-                      {activeComponent === 'Dropdown' && !getDropdownOptions(componentArgs) ? (
+                      {activeComponent === "Dropdown" && !getDropdownOptions(componentArgs) ? (
                         <span className="button-preview-status" role="alert">
                           Fix the options JSON in Controls before using this preview.
                         </span>
@@ -564,14 +447,7 @@ export function ExplorerPage() {
                 component={activeDefinition}
                 selectedStory={selectedExplorerStory}
                 args={componentArgs}
-                button={{
-                  children,
-                  variant,
-                  size,
-                  loading,
-                  disabled,
-                  fullWidth,
-                }}
+                button={{ children, variant, size, loading, disabled, fullWidth }}
                 actionLog={actionLog}
                 codeDraft={codeDraft}
                 codeError={codeError}
