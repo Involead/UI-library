@@ -39,6 +39,14 @@ const meta = {
       control: "boolean",
     },
 
+    labelPosition: {
+      control: "radio",
+      options: [
+        "right",
+        "left",
+      ],
+    },
+
     error: {
       control: "text",
     },
@@ -122,6 +130,17 @@ export const LabelNotClickable: Story = {
   args: {
     labelClickable: false,
     helperText: "Only the circle selects this option.",
+  },
+};
+
+/* =========================
+   LABEL POSITION
+   ========================= */
+
+export const LabelLeft: Story = {
+  args: {
+    labelPosition: "left",
+    helperText: "The label sits to the left of the circle.",
   },
 };
 

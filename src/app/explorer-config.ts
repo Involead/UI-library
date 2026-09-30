@@ -218,6 +218,7 @@ export const explorerComponents: ExplorerComponent[] = [
       text("helperText", "Supporting guidance"),
       text("error", "Validation error message"),
       select("size", "Radio size", ["small", "medium", "large"]),
+      select("labelPosition", "Which side of the radio the label sits on", ["right", "left"]),
       select("orientation", "Arrange examples in a row or stacked like Storybook", ["horizontal", "vertical"]),
       boolean("checked", "Checked state"),
       boolean("disabled", "Disables the radio"),

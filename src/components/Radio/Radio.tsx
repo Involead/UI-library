@@ -11,6 +11,7 @@ import { cx } from "@/utils";
 import styles from "./Radio.module.css";
 
 type RadioSize = "small" | "medium" | "large";
+type RadioLabelPosition = "right" | "left";
 
 export interface RadioProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "type"> {
@@ -21,6 +22,8 @@ export interface RadioProps
   size?: RadioSize;
   /** When false, only the radio circle toggles selection — clicking the label does nothing. */
   labelClickable?: boolean;
+  /** Which side of the radio circle the label sits on. */
+  labelPosition?: RadioLabelPosition;
 }
 
 export function Radio({
@@ -29,6 +32,7 @@ export function Radio({
   error,
   size = "medium",
   labelClickable = true,
+  labelPosition = "right",
   disabled,
   id,
   className = "",
@@ -45,6 +49,7 @@ export function Radio({
   const rootClasses = cx(
     styles.root,
     styles[size],
+    labelPosition === "left" && styles.labelLeft,
     hasError && styles.error,
     disabled && styles.disabled,
     className,

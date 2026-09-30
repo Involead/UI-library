@@ -45,6 +45,12 @@ label.row {
   cursor: pointer;
 }
 
+/* Label on the left: flip visually, keeping the input first in the DOM. */
+.labelLeft .row {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
 /* =========================
    CONTROL
    ========================= */
@@ -182,6 +188,11 @@ label.row {
   padding-left: calc(var(--radio-size) + var(--spacing-sm));
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+}
+
+/* The label already starts at the left edge. */
+.labelLeft .helperText {
+  padding-left: 0;
 }
 
 .errorText {

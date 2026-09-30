@@ -2,7 +2,7 @@ import { useState, type ChangeEvent } from "react";
 import { Radio } from "@/index";
 import type { ExplorerArgs } from "../../explorer-config";
 import { getBooleanArg, getStringArg } from "../args";
-import type { PreviewLayout, RadioSize } from "../types";
+import type { PreviewLayout, RadioLabelPosition, RadioSize } from "../types";
 import { isChoice, radioGroupOptions } from "../types";
 
 type Props = {
@@ -18,9 +18,14 @@ export function RadioPreview({ args, composition, layout, onChange }: Props) {
   const size: RadioSize = isChoice(selectedSize, ["small", "medium", "large"])
     ? selectedSize
     : "medium";
+  const selectedLabelPosition = getStringArg(args, "labelPosition", "right");
+  const labelPosition: RadioLabelPosition = isChoice(selectedLabelPosition, ["right", "left"])
+    ? selectedLabelPosition
+    : "right";
   const checked = getBooleanArg(args, "checked");
   const commonProps = {
     size,
+    labelPosition,
     disabled: getBooleanArg(args, "disabled"),
     labelClickable: getBooleanArg(args, "labelClickable", true),
     onChange,
