@@ -759,6 +759,32 @@ body:has(.storybook-page) {
   gap: var(--spacing-6);
 }
 
+/* Pasted svg markup sits one level below the Icon wrapper; size and color it
+   like Icon does for a direct <svg> child, whatever width/height it declares. */
+.icon-markup,
+.icon-markup > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.icon-markup > svg:not([fill]) {
+  fill: currentColor;
+}
+
+.icon-markup-error {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px dashed var(--color-error);
+  border-radius: var(--radius-sm);
+  color: var(--color-error);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
 .icon-inherit {
   display: flex;
   align-items: center;

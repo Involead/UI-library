@@ -321,6 +321,7 @@ export function ExplorerPage() {
           args={componentArgs}
           composition={composition}
           layout={previewLayout}
+          onClick={() => recordAction("icon: click")}
         />
       );
     }

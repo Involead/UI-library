@@ -1,5 +1,5 @@
 import { icons } from "@/icons";
-import { iconColors, type ExplorerArgs, type ExplorerComponent } from "../explorer-config";
+import { iconColors, type ExplorerArgs, type ExplorerComponent, type ExplorerValue } from "../explorer-config";
 import { getComponentDefaults } from "./args";
 import { iconSizes, radioGroupOptions, typographyColors, typographyVariants, type TypographyVariant } from "./types";
 
@@ -214,10 +214,20 @@ export function formatExplorerCode(
     return `${imports}\n\n<div style={${wrapperStyle}}>\n${examples.map(componentCode).join("\n")}\n</div>`;
   }
 
+  // Icon: `svg` holds custom markup rendered as children (so `name` is unused),
+  // and `clickable` stands in for an onClick handler.
+  const iconSvg = component === "Icon" && typeof args.svg === "string" ? args.svg.trim() : "";
+  const isIconOnlyArg = (key: string, value: ExplorerValue) =>
+    component === "Icon" &&
+    (key === "svg" ||
+      key === "clickable" ||
+      (key === "name" && iconSvg !== "") ||
+      (key === "disabled" && value === false));
   const props = Object.entries(args)
     .filter(([key, value]) =>
       key !== "children" &&
       key !== "orientation" &&
+      !isIconOnlyArg(key, value) &&
       value !== null &&
       value !== ""
     )
@@ -246,9 +256,14 @@ export function formatExplorerCode(
       return `  ${key}=${JSON.stringify(value)}`;
     });
   const children = typeof args.children === "string" ? args.children : "";
-  const body = children
-    ? `>\n  {${JSON.stringify(children)}}\n</${component}>`
-    : " />";
+  if (component === "Icon" && args.clickable === true) {
+    props.push('  onClick={() => console.log("icon clicked")}');
+  }
+  const body = iconSvg
+    ? `>\n${iconSvg.split("\n").map((line) => `  ${line}`).join("\n")}\n</${component}>`
+    : children
+      ? `>\n  {${JSON.stringify(children)}}\n</${component}>`
+      : " />";
   return `import { ${component} } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<${component}${props.length ? `\n${props.join("\n")}\n` : ""}${body}`;
 }
 
@@ -333,7 +348,23 @@ export function parseExplorerCode(code: string, component: ExplorerComponent): E
   if (component.name === "Checkbox" && /\bicon\s*=\s*\{\s*<svg\b/.test(attributes)) {
     args.icon = "star";
   }
+  if (component.name === "Icon") {
+    args.clickable = /\bonClick\s*=/.test(attributes);
+    // A custom <svg> child: keep its markup so the preview draws it.
+    const body = readComponentBody(code, "Icon");
+    args.svg = body && /^<svg\b/.test(body) ? dedent(body) : null;
+  }
   return args;
+}
+
+function dedent(text: string) {
+  const lines = text.split("\n");
+  const indent = Math.min(
+    ...lines.slice(1).filter((line) => line.trim()).map((line) => line.match(/^\s*/)![0].length),
+  );
+  return Number.isFinite(indent)
+    ? [lines[0], ...lines.slice(1).map((line) => line.slice(indent))].join("\n")
+    : text;
 }
 
 export function readComponentBody(code: string, component: string): string | null {
