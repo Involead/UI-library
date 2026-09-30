@@ -18,6 +18,12 @@
   cursor: pointer;
 }
 
+/* Label on the left: flip visually, keeping the input first in the DOM. */
+.labelLeft .field {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
 /* Label not clickable: only the control shows the pointer */
 .labelStatic {
   cursor: default;
@@ -194,6 +200,11 @@
 
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+}
+
+/* The label already starts at the left edge. */
+.labelLeft .helperText {
+  padding-left: 0;
 }
 
 .error .helperText {

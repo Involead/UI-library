@@ -21,6 +21,7 @@ export type InputType =
   | "color"
   | "file";
 export type CheckboxSize = "small" | "medium" | "large";
+export type CheckboxLabelPosition = "right" | "left";
 export type RadioSize = "small" | "medium" | "large";
 export type RadioLabelPosition = "right" | "left";
 export type DropdownSize = "small" | "medium" | "large";
