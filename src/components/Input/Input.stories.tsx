@@ -56,6 +56,15 @@ const meta = {
     fullWidth: {
       control: "boolean",
     },
+
+    labelPosition: {
+      control: "radio",
+      options: [
+        "top",
+        "left",
+        "right",
+      ],
+    },
   },
 } satisfies Meta<typeof Input>;
 
@@ -88,6 +97,32 @@ export const WithHelperText: Story = {
     placeholder: "jane_doe",
     helperText: "This will be visible to other users.",
   },
+};
+
+/* =========================
+   LABEL POSITION
+   ========================= */
+
+export const LabelPositions: Story = {
+  argTypes: {
+    labelPosition: {
+      control: false,
+    },
+  },
+
+  render: (args) => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-xl)" }}>
+      <Input {...args} labelPosition="top" label="Label on top" placeholder="you@example.com" />
+      <Input {...args} labelPosition="left" label="Label on left" placeholder="you@example.com" />
+      <Input
+        {...args}
+        labelPosition="right"
+        label="Label on right"
+        placeholder="you@example.com"
+        helperText="Helper text stays under the input."
+      />
+    </div>
+  ),
 };
 
 /* =========================

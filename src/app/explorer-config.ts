@@ -107,6 +107,7 @@ export const explorerComponents: ExplorerComponent[] = [
     ],
     controls: [
       text("label", "Visible field label"),
+      select("labelPosition", "Where the label sits relative to the input", ["top", "left", "right"]),
       text("value", "Current field value"),
       text("placeholder", "Placeholder text"),
       select("type", "Native input type", ["text", "password", "email", "number", "tel", "url", "search", "date", "datetime-local", "time", "month", "week", "color", "file"]),
