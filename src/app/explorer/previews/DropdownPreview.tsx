@@ -1,7 +1,7 @@
 import { Dropdown } from "@/index";
 import type { ExplorerArgs } from "../../explorer-config";
 import { getBooleanArg, getDropdownOptions, getStringArg } from "../args";
-import { isChoice, type DropdownSize, type PreviewLayout } from "../types";
+import { isChoice, type DropdownLabelPosition, type DropdownSize, type PreviewLayout } from "../types";
 
 type Props = {
   args: ExplorerArgs;
@@ -25,9 +25,13 @@ export function DropdownPreview({ args, composition, layout, onChange, onOpenCha
   const size: DropdownSize = isChoice(selectedSize, ["small", "medium", "large"])
     ? selectedSize
     : "medium";
+  const selectedLabelPosition = getStringArg(args, "labelPosition", "top");
+  const labelPosition: DropdownLabelPosition = isChoice(selectedLabelPosition, ["top", "left", "right"])
+    ? selectedLabelPosition
+    : "top";
   const stackClass = `preview-stack${layout === "horizontal" ? " horizontal" : ""}`;
   // Composition examples are uncontrolled (defaultValue), like the Storybook stories.
-  const exampleProps = { options, onChange, onOpenChange };
+  const exampleProps = { options, labelPosition, onChange, onOpenChange };
 
   if (composition === "states") {
     const stateProps = {
@@ -77,6 +81,7 @@ export function DropdownPreview({ args, composition, layout, onChange, onOpenCha
   const commonProps = {
     options,
     label: getStringArg(args, "label"),
+    labelPosition,
     helperText: getStringArg(args, "helperText"),
     error: getStringArg(args, "error"),
     placeholder: getStringArg(args, "placeholder", "Select…"),

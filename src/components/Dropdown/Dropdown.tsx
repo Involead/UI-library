@@ -16,6 +16,7 @@ import { cx } from "@/utils";
 import styles from "./Dropdown.module.css";
 
 type DropdownSize = "small" | "medium" | "large";
+type DropdownLabelPosition = "top" | "left" | "right";
 
 export interface DropdownOption {
   label: string;
@@ -26,6 +27,8 @@ export interface DropdownOption {
 interface DropdownBaseProps {
   options: DropdownOption[];
   label?: string;
+  /** Where the label sits relative to the dropdown. */
+  labelPosition?: DropdownLabelPosition;
   helperText?: string;
   error?: string;
   placeholder?: string;
@@ -94,6 +97,7 @@ export function Dropdown(props: DropdownProps) {
   const {
     options,
     label,
+    labelPosition = "top",
     helperText,
     error,
     placeholder = "Select…",
@@ -358,10 +362,24 @@ export function Dropdown(props: DropdownProps) {
     }
   }
 
-  const wrapperClasses = cx(styles.wrapper, fullWidth && styles.fullWidth);
+  const wrapperClasses = cx(
+    styles.wrapper,
+    fullWidth && styles.fullWidth,
+    labelPosition === "left" && styles.labelLeft,
+    labelPosition === "right" && styles.labelRight,
+  );
+
+  // With a side label, `width` sizes the dropdown column rather than the whole
+  // wrapper, so the label never eats into the dropdown's width.
+  const sideLabel = labelPosition === "left" || labelPosition === "right";
+  const cssWidth = typeof width === "number" ? `${width}px` : width;
 
   const wrapperStyle: CSSProperties | undefined =
-    width !== undefined ? { width, ...style } : style;
+    width === undefined
+      ? style
+      : sideLabel
+        ? ({ "--dropdown-width": cssWidth, ...style } as CSSProperties)
+        : { width, ...style };
 
   const triggerClasses = cx(
     styles.trigger,

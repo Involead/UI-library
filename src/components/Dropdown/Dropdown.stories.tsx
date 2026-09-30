@@ -59,6 +59,15 @@ const meta = {
       control: "text",
     },
 
+    labelPosition: {
+      control: "radio",
+      options: [
+        "top",
+        "left",
+        "right",
+      ],
+    },
+
     placeholder: {
       control: "text",
     },
@@ -173,6 +182,30 @@ export const Clearable: Story = {
     clearable: true,
     defaultValue: "banana",
   },
+};
+
+/* =========================
+   LABEL POSITION
+   ========================= */
+
+export const LabelPositions: Story = {
+  argTypes: {
+    labelPosition: { control: false },
+  },
+
+  render: (args) => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-xl)" }}>
+      <Dropdown {...args} labelPosition="top" label="Label on top" placeholder="Select a fruit" />
+      <Dropdown {...args} labelPosition="left" label="Label on left" placeholder="Select a fruit" />
+      <Dropdown
+        {...args}
+        labelPosition="right"
+        label="Label on right"
+        placeholder="Select a fruit"
+        helperText="Helper text stays under the dropdown."
+      />
+    </div>
+  ),
 };
 
 /* =========================

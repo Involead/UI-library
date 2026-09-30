@@ -144,6 +144,7 @@ export const explorerComponents: ExplorerComponent[] = [
     ],
     controls: [
       text("label", "Visible dropdown label"),
+      select("labelPosition", "Where the label sits relative to the dropdown", ["top", "left", "right"]),
       text("placeholder", "Empty-state prompt"),
       select("size", "Dropdown size", ["small", "medium", "large"]),
       { name: "options", description: "Options as a JSON array", kind: "json" },
