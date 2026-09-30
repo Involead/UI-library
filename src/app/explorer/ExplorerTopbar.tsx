@@ -50,6 +50,7 @@ export function ExplorerTopbar({
   const zoomOut = () => onZoomChange(Math.max(MIN_ZOOM, zoom - ZOOM_STEP));
   const zoomIn = () => onZoomChange(Math.min(MAX_ZOOM, zoom + ZOOM_STEP));
   const previewDisabled = activeTab === "docs";
+  const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   return (
     <header className="topbar">
@@ -58,7 +59,7 @@ export function ExplorerTopbar({
         className="brand-region"
         aria-label="Back to home"
       >
-        <img className="brand-mark" src="/involead-logo.jpe" alt="InvoLead" />
+        <img className="brand-mark" src={`${base}/involead-logo.jpe`} alt="InvoLead" />
         <div>
           <div className="brand-name">InvoLead</div>
           <div className="brand-tag">UI LIBRARY</div>
