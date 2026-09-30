@@ -13,7 +13,7 @@ export default function Home() {
 
       <section className="landing-hero">
         <TransitionLink href="/explorer" className="landing-badge">
-          5 components ready to explore
+          Accessible components, ready to use
           <svg
             viewBox="0 0 24 24"
             fill="none"
