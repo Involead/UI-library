@@ -368,7 +368,10 @@ body:has(.storybook-page) {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* Docs and Introduction pages render straight into the canvas and scroll
+     here; in canvas mode the stage and controls panel fit, so nothing does. */
+  overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--color-surface-secondary);
 }
@@ -376,8 +379,8 @@ body:has(.storybook-page) {
 .stage {
   flex: 1 1 auto;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
+  /* Both axes, so zoomed-in or wide previews can be scrolled to. */
+  overflow: auto;
   scrollbar-gutter: stable;
   padding: var(--spacing-3) var(--spacing-6) 0;
   border-bottom: 1px solid var(--color-border);
@@ -680,8 +683,10 @@ body:has(.storybook-page) {
 .button-preview {
   min-height: 180px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* `safe`: content larger than the stage starts at the edge instead of
+     overflowing both sides, where the left/top part can't be scrolled to. */
+  align-items: safe center;
+  justify-content: safe center;
   flex-direction: column;
   gap: var(--spacing-4);
 }
@@ -801,6 +806,9 @@ body:has(.storybook-page) {
 /* ---------- Docs / Introduction ---------- */
 
 .docs-page {
+  flex-shrink: 0; /* keep full height so the canvas scrolls instead */
+  box-sizing: border-box;
+  width: 100%;
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--spacing-8) var(--spacing-10) var(--spacing-16);
