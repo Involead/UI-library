@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./explorer.css";
 import Link from "next/link";
+import Image from "next/image";
 
 type Props = {
   activeTab: "canvas" | "docs";
@@ -28,8 +29,7 @@ export function ExplorerTopbar({
   const getTarget = () => document.getElementById("preview-fullscreen-target");
 
   useEffect(() => {
-    const sync = () =>
-      setIsFullscreen(document.fullscreenElement === getTarget());
+    const sync = () => setIsFullscreen(document.fullscreenElement === getTarget());
     sync();
     document.addEventListener("fullscreenchange", sync);
     return () => document.removeEventListener("fullscreenchange", sync);
@@ -54,12 +54,15 @@ export function ExplorerTopbar({
 
   return (
     <header className="topbar">
-      <Link
-        href="/"
-        className="brand-region"
-        aria-label="Back to home"
-      >
-        <img className="brand-mark" src={`${base}/involead-logo.jpe`} alt="InvoLead" />
+      <Link href="/" className="brand-region" aria-label="Back to home">
+        <Image
+          className="brand-mark"
+          src="/involead-logo.jpe"
+          alt="InvoLead"
+          width={67}
+          height={36}
+          priority
+        />{" "}
         <div>
           <div className="brand-name">InvoLead</div>
           <div className="brand-tag">UI LIBRARY</div>
@@ -129,21 +132,9 @@ export function ExplorerTopbar({
                   aria-hidden="true"
                 >
                   <path d="M9 4v5H4" strokeLinecap="round" strokeLinejoin="round" />
-                  <path
-                    d="M15 4v5h5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M9 20v-5H4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M15 20v-5h5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d="M15 4v5h5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M9 20v-5H4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M15 20v-5h5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               ) : (
                 <svg
@@ -154,21 +145,9 @@ export function ExplorerTopbar({
                   aria-hidden="true"
                 >
                   <path d="M4 9V4h5" strokeLinecap="round" strokeLinejoin="round" />
-                  <path
-                    d="M20 9V4h-5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M4 15v5h5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M20 15v5h-5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+                  <path d="M20 9V4h-5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M4 15v5h5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M20 15v5h-5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </button>

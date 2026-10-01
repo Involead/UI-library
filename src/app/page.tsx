@@ -1,6 +1,6 @@
-﻿import { TransitionLink } from './TransitionLink';
-import './landing.css';
-
+﻿import { TransitionLink } from "./TransitionLink";
+import "./landing.css";
+import Image from "next/image";
 
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 export default function Home() {
@@ -8,7 +8,14 @@ export default function Home() {
     <main className="landing">
       <header className="landing-nav">
         <div className="landing-brand">
-          <img src={`${base}/involead-logo.jpe`} alt="" className="landing-logo" />
+          <Image
+            src="/involead-logo.jpe"
+            alt=""
+            className="landing-logo"
+            width={67}
+            height={36}
+            priority
+          />
           <span>InvoLead</span>
         </div>
       </header>
