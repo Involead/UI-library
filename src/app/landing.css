@@ -1,179 +1,382 @@
+/* Every value comes from src/styles/token.css or typography.css. */
+
 .landing {
-    --landing-faded: color-mix(in srgb, var(--color-text-primary) 78%, var(--color-white));
-  
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    color: var(--color-text-primary);
-    background:
-      radial-gradient(60% 50% at 50% 0%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 70%),
-      radial-gradient(40% 40% at 90% 90%, color-mix(in srgb, var(--color-primary) 6%, transparent), transparent 70%),
-      var(--color-background);
-      transition:
-      opacity var(--transition-slow) ease,
-      transform var(--transition-slow) ease;
-    }
-  
-  .landing.landing-leaving {
-    opacity: 0;
-    transform: scale(0.985);
-  }
-  
-  .landing-nav {
-    display: flex;
-    align-items: center;
-    padding: var(--spacing-5) var(--spacing-8);
-  }
-  
-  .landing-brand {
-    display: flex;
-    align-items: center;
-    color: var(--landing-faded);
-    font-size: 19px;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1;
-  }
-  
-  .landing-logo {
-    display: block;
-    height: 36px;
-    width: auto;
-    object-fit: contain;
-    border-radius: 0;
-    mix-blend-mode: multiply;
-  }
-  
-  .landing-hero {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: var(--spacing-6) var(--spacing-6) 96px;
-    animation: landing-rise 0.6s ease both;
-  }
-  
-  .landing-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border: 1px solid color-mix(in srgb, var(--color-primary) 22%, var(--color-white));
-    border-radius: var(--radius-full);
-    background: color-mix(in srgb, var(--color-primary) 7%, var(--color-white));
-    color: var(--color-primary);
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition:
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--color-text-primary);
+  background:
+    radial-gradient(60% 50% at 50% 0%, var(--color-primary-alpha-md), transparent 70%),
+    radial-gradient(40% 40% at 90% 90%, var(--color-primary-alpha-sm), transparent 70%),
+    var(--color-background);
+  transition:
+    opacity var(--transition-slow) ease,
+    transform var(--transition-slow) ease;
+}
+
+/* Faint grid behind the hero, faded out towards the edges. */
+.landing::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--color-primary-alpha-sm) var(--border-width-sm), transparent var(--border-width-sm)),
+    linear-gradient(90deg, var(--color-primary-alpha-sm) var(--border-width-sm), transparent var(--border-width-sm));
+  background-size: var(--pattern-grid-size) var(--pattern-grid-size);
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 42%, var(--color-black) 20%, transparent 75%);
+  pointer-events: none;
+}
+
+.landing.landing-leaving {
+  opacity: 0;
+  transform: scale(var(--motion-scale-exit));
+}
+
+/* ---------- Nav ---------- */
+
+.landing-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-6);
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: var(--spacing-5) var(--spacing-8);
+}
+
+.landing-brand {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-faded);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tighter);
+  line-height: var(--line-height-none);
+}
+
+.landing-logo {
+  display: block;
+  height: var(--control-height-xl);
+  width: auto;
+  object-fit: contain;
+  border-radius: 0;
+  mix-blend-mode: multiply;
+}
+
+.landing-links {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.landing-links a {
+  display: inline-flex;
+  align-items: center;
+  height: var(--control-height-xl);
+  padding: 0 var(--spacing-3);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.landing-links a:hover {
+  background: var(--color-primary-alpha-sm);
+  color: var(--color-text-primary);
+}
+
+.landing-links svg {
+  width: var(--icon-size-lg);
+  height: var(--icon-size-lg);
+}
+
+/* ---------- Hero ---------- */
+
+.landing-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-6) var(--spacing-6) var(--spacing-20);
+  animation: landing-rise var(--transition-entrance) ease both;
+}
+
+.landing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-1) var(--spacing-4) var(--spacing-1) var(--spacing-1);
+  border: var(--border-width-sm) solid var(--color-primary-border);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-tint);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition:
     background var(--transition-fast),
     border-color var(--transition-fast);
-  }
-  
-  .landing-badge:hover {
-    background: color-mix(in srgb, var(--color-primary) 12%, var(--color-white));
-    border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-white));
-  }
-  
-  .landing-badge svg {
-    width: 14px;
-    height: 14px;
-  }
-  
-  .landing-title {
-    max-width: 860px;
-    margin: var(--spacing-6) 0 0;
-    font-size: clamp(38px, 6.5vw, 68px);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.04em;
-    color: var(--landing-faded);
-  }
-  
-  .landing-title span {
-    font-size: 0.85em;
-    background: linear-gradient(
-      90deg,
-      var(--color-primary),
-      color-mix(in srgb, var(--color-primary) 70%, var(--color-white))
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  
-  .landing-subtitle {
-    max-width: 620px;
-    margin: 22px 0 0;
-    font-size: clamp(16px, 2vw, 19px);
-    line-height: 1.6;
-    color: var(--color-text-secondary);
-  }
-  
-  .landing-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--spacing-md);
-    margin-top: 34px;
-  }
-  
-  .landing-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 44px;
-    padding: 0 var(--spacing-xl);
-    border-radius: var(--radius-full);
-    font-size: 15px;
-    font-weight: 600;
-    text-decoration: none;
-    transition:
+}
+
+.landing-badge:hover {
+  background: var(--color-primary-tint-hover);
+  border-color: var(--color-primary-border-hover);
+}
+
+.landing-badge-tag {
+  padding: 0 var(--spacing-2);
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  font-variant-numeric: tabular-nums;
+}
+
+.landing-badge svg {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  transition: transform var(--transition-fast);
+}
+
+.landing-badge:hover svg {
+  transform: translateX(var(--motion-offset-xs));
+}
+
+.landing-title {
+  max-width: var(--hero-title-max-width);
+  margin: var(--spacing-6) 0 0;
+  color: var(--color-text-primary);
+  font-size: clamp(var(--font-size-4xl), 6.2vw, var(--font-size-5xl));
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-display);
+  letter-spacing: var(--letter-spacing-display);
+  text-wrap: balance;
+}
+
+.landing-title span {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landing-subtitle {
+  max-width: var(--hero-text-max-width);
+  margin: var(--spacing-5) 0 0;
+  color: var(--color-text-secondary);
+  font-size: clamp(var(--font-size-md), 2vw, var(--font-size-lg));
+  line-height: var(--line-height-relaxed);
+  text-wrap: pretty;
+}
+
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-8);
+}
+
+.landing-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  height: var(--control-height-2xl);
+  padding: 0 var(--spacing-6);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition:
     background var(--transition-fast),
     border-color var(--transition-fast),
     transform var(--transition-fast),
     box-shadow var(--transition-fast);
+}
+
+.landing-btn:hover {
+  transform: translateY(calc(var(--motion-offset-xs) * -1));
+}
+
+.landing-btn svg {
+  width: var(--icon-size-md);
+  height: var(--icon-size-md);
+  transition: transform var(--transition-fast);
+}
+
+.landing-btn:hover svg {
+  transform: translateX(var(--motion-offset-xs));
+}
+
+.landing-btn-primary {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-primary);
+}
+
+.landing-btn-primary:hover {
+  /* --color-primary-hover is identical to primary, so use the darker shade. */
+  background: var(--color-primary-strong);
+}
+
+.landing-btn-secondary {
+  border: var(--border-width-sm) solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.landing-btn-secondary:hover {
+  border-color: var(--color-border-hover);
+  background: var(--color-surface-secondary);
+}
+
+/* ---------- Install command ---------- */
+
+.landing-command {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-6);
+  padding: var(--spacing-1) var(--spacing-1) var(--spacing-1) var(--spacing-4);
+  border: var(--border-width-sm) solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-translucent);
+  backdrop-filter: blur(var(--blur-sm));
+  font-size: var(--font-size-xs);
+}
+
+.landing-command code {
+  color: var(--color-text-primary);
+  font-family: var(--font-family-mono);
+  white-space: nowrap;
+}
+
+.landing-command code span {
+  color: var(--color-text-tertiary);
+  user-select: none;
+}
+
+.landing-command button {
+  display: grid;
+  place-items: center;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.landing-command button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+.landing-command svg {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+}
+
+/* ---------- Footer ---------- */
+
+.landing-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-6);
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+}
+
+/* ---------- Shared ---------- */
+
+.landing a:focus-visible,
+.landing button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Visually hidden, still announced by screen readers. */
+.landing-sr-only {
+  position: absolute;
+  width: var(--border-width-sm);
+  height: var(--border-width-sm);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-offset-md));
   }
-  
-  .landing-btn:hover {
-    transform: translateY(-1px);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .landing-btn:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--color-border-focus) 35%, transparent);
-    outline-offset: 2px;
+}
+
+/* CSS variables can't be used in media queries, so the breakpoint is a literal. */
+@media (max-width: 640px) {
+  .landing-nav {
+    padding: var(--spacing-4);
   }
-  
-  .landing-btn-primary {
-    background: var(--color-primary);
-    color: var(--color-text-inverse);
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--color-primary) 28%, transparent);
+
+  .landing-links a {
+    padding: 0 var(--spacing-2);
   }
-  
-  .landing-btn-primary:hover {
-    /* --color-primary-hover is identical to primary, so darken slightly here */
-    background: color-mix(in srgb, var(--color-primary) 88%, var(--color-black));
+
+  .landing-hero {
+    padding: var(--spacing-8) var(--spacing-4) var(--spacing-12);
   }
-  
-  .landing-btn-secondary {
-    background: var(--color-surface);
-    color: var(--color-primary);
-    border: 1px solid color-mix(in srgb, var(--color-primary) 22%, var(--color-white));
+
+  .landing-title {
+    font-size: var(--font-size-3xl);
   }
-  
-  .landing-btn-secondary:hover {
-    background: color-mix(in srgb, var(--color-primary) 5%, var(--color-white));
-    border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-white));
+
+  .landing-actions {
+    flex-direction: column;
+    align-self: stretch;
   }
-  
-  @keyframes landing-rise {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
+
+  .landing-footer {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-1);
   }
-  
-  @media (prefers-reduced-motion: reduce) {
-    .landing-hero { animation: none; }
-    .landing-btn:hover { transform: none; }
+
+  .landing-footer span[aria-hidden="true"] {
+    display: none;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero {
+    animation: none;
+  }
+
+  .landing-btn:hover,
+  .landing-btn:hover svg,
+  .landing-badge:hover svg {
+    transform: none;
+  }
+}

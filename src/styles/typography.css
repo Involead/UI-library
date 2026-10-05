@@ -55,4 +55,14 @@
 
   --line-height-none: 1;
   --line-height-display: 1.05;
+
+  /* =========================
+     LETTER SPACING
+     ========================= */
+
+  --letter-spacing-display: -0.04em;
+  --letter-spacing-tighter: -0.03em;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-wide: 0.08em;
+  --letter-spacing-wider: 0.12em;
 }
