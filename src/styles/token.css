@@ -7,6 +7,14 @@
   --color-primary-hover: rgb(11, 65, 205);
   --color-primary-active: rgb(11, 65, 205);
 
+  /* Primary shades, derived from --color-primary */
+  --color-primary-border: color-mix(in srgb, var(--color-primary) 20%, var(--color-white));
+  --color-primary-border-hover: color-mix(in srgb, var(--color-primary) 35%, var(--color-white));
+
+  /* Translucent primary, for overlays and glows */
+  --color-primary-alpha-sm: color-mix(in srgb, var(--color-primary) 6%, transparent);
+  --color-primary-alpha-md: color-mix(in srgb, var(--color-primary) 12%, transparent);
+
   --color-secondary: #64748b;
   --color-secondary-hover: #475569;
 
@@ -18,6 +26,14 @@
   --color-surface: #ffffff;
   --color-surface-secondary: #f8fafc;
   --color-surface-hover: #f1f5f9;
+
+  /* Code blocks (dark) */
+  --color-code-background: #0f172a;
+  --color-code-text: #e2e8f0;
+  --color-code-muted: #94a3b8;
+  --color-code-accent: #93c5fd;
+  --color-code-border: color-mix(in srgb, var(--color-code-muted) 24%, transparent);
+  --color-code-hover: color-mix(in srgb, var(--color-code-muted) 18%, transparent);
 
   /* =========================
      TEXT
@@ -37,6 +53,12 @@
   --color-border-hover: #d1d5db;
   --color-border-focus: rgb(11, 65, 205);
   --color-border-error: #dc2626;
+  --color-focus-ring: color-mix(in srgb, var(--color-border-focus) 35%, transparent);
+
+  --border-width-sm: 1px;
+  --border-width-md: 2px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
 
   /* =========================
      STATUS
@@ -67,6 +89,7 @@
 
   /* Numeric spacing scale */
 
+  --spacing-0-5: 2px;
   --spacing-1: 4px;
   --spacing-2: 8px;
   --spacing-3: 12px;
@@ -77,6 +100,7 @@
   --spacing-10: 40px;
   --spacing-12: 48px;
   --spacing-16: 64px;
+  --spacing-24: 96px;
 
   /* =========================
      BORDER RADIUS
@@ -113,6 +137,7 @@
      --control-height-sm: 28px;
      --control-height-md: 30px;
      --control-height-lg: 32px;
+     --control-height-xl: 36px;
      --menu-item-height: 30px;
    
      --icon-size-sm: 14px;
@@ -122,10 +147,15 @@
      --sidebar-width: 228px;
      --content-max-width: 980px;
      --control-max-width: 260px;
+     --docs-max-width: 1120px;
+     --hero-text-max-width: 600px;
      --multi-select-max-height: calc(var(--spacing-10) * 3); /* 120px */
    
    
      --transition-fast: 150ms;
      --transition-normal: 160ms;
      --transition-slow: 220ms;
+
+     /* Small movement for hover nudges and entrance animations */
+     --motion-offset-xs: 2px;
 }
