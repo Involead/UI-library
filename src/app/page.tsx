@@ -9,10 +9,10 @@ export default function Home() {
       <header className="landing-nav">
         <div className="landing-brand">
           <Image
-            src="/involead-logo.jpe"
+            src={`${base}/involead-logo.jpe`}
             alt=""
             className="landing-logo"
-            width={67}
+            width={65}
             height={36}
             priority
           />
