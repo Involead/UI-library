@@ -28,8 +28,8 @@ const NPM_URL = "https://www.npmjs.com/package/@involead/ui";
 
 const installCommands = {
   npm: "npm install @involead/ui",
-  pnpm: "pnpm add @involead/ui",
-  yarn: "yarn add @involead/ui",
+  // pnpm: "pnpm add @involead/ui",
+  // yarn: "yarn add @involead/ui",
 } as const;
 
 type PackageManager = keyof typeof installCommands;
