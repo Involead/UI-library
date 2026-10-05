@@ -29,6 +29,7 @@ import {
   contactProfileColumns,
   contacts,
   CustomRowsFooter,
+  editableColumns,
   employees,
   errorMessage,
   filteringColumns,
@@ -459,6 +460,103 @@ export const CustomRows: Story = {
     caption: "Custom row classes and props: suspended members are dimmed",
     getRowProps: getDimmedRowProps,
     footer: <CustomRowsFooter />,
+  },
+};
+
+/* =========================
+   EDITABLE CELLS
+   ========================= */
+
+function EditableDemo(args: Story["args"]) {
+  const [rows, setRows] = useState(() => employees.slice(0, 6));
+  const [lastEdit, setLastEdit] = useState("");
+
+  return (
+    <Table
+      {...args}
+      data={rows}
+      columns={editableColumns}
+      caption="Double-click a cell, or use its edit button. Enter saves, Escape cancels."
+      onDataChange={setRows}
+      onCellEdit={(edit) =>
+        setLastEdit(`${edit.columnId}: ${String(edit.previousValue)} → ${String(edit.value)}`)
+      }
+      toolbar={
+        <span style={{ fontSize: "var(--font-size-sm)", color: "var(--color-text-secondary)" }}>
+          {lastEdit ? `Last edit: ${lastEdit}` : "No edits yet"}
+        </span>
+      }
+    />
+  );
+}
+
+export const EditableCells: Story = {
+  name: "Editable Cells",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Set a column's `editable` to edit its cells. `validate` rejects bad values, " +
+          "`renderEditor` swaps in a custom editor (Department uses a select), and " +
+          "`onCellEdit` / `onDataChange` report each saved change. Status isn't editable.",
+      },
+    },
+  },
+  render: (args) => <EditableDemo {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // Edit a text cell with the keyboard.
+    await userEvent.click(canvas.getAllByRole("button", { name: "Edit Role" })[0]);
+    const input = canvas.getByRole("textbox", { name: "Edit Role" });
+    await userEvent.clear(input);
+    await userEvent.type(input, "Staff Engineer{Enter}");
+    await expect(canvas.getByText("Staff Engineer")).toBeInTheDocument();
+
+    // A rejected value keeps the editor open with its message.
+    await userEvent.click(canvas.getAllByRole("button", { name: "Edit Salary" })[0]);
+    const salary = canvas.getByRole("spinbutton", { name: "Edit Salary" });
+    await userEvent.clear(salary);
+    await userEvent.type(salary, "-5{Enter}");
+    await expect(canvas.getByRole("alert")).toHaveTextContent("Enter a salary of 0 or more.");
+    await userEvent.keyboard("{Escape}");
+  },
+};
+
+/* =========================
+   ROW REORDERING
+   ========================= */
+
+export const RowReordering: Story = {
+  name: "Row Reordering",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`reorderableRows` adds a drag handle to each row: drag it, or focus it and press " +
+          "the up and down arrow keys. `onRowReorder` and `onDataChange` report the new order. " +
+          "Reordering pauses while the table is sorted, searched, or filtered.",
+      },
+    },
+  },
+  args: {
+    data: employees.slice(0, 6),
+    reorderableRows: true,
+    sortable: true,
+    caption: "Drag a row by its handle, or focus the handle and use the arrow keys",
+    onRowReorder: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const firstName = () => canvas.getAllByRole("rowheader")[0].textContent;
+    const before = firstName();
+
+    canvas.getAllByRole("button", { name: /^Move row/ })[0].focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(firstName()).not.toBe(before);
+    await expect(args.onRowReorder).toHaveBeenCalledWith(
+      expect.objectContaining({ fromIndex: 0, toIndex: 1 }),
+    );
   },
 };
 

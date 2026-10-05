@@ -239,6 +239,63 @@ export const linkColumns: TableColumn<Employee>[] = [
   { ...baseColumns[4] },
 ];
 
+const editorSelectStyle = {
+  width: "100%",
+  height: "var(--control-height-md)",
+  font: "inherit",
+  border: "var(--border-width-sm) solid var(--color-border-focus)",
+  borderRadius: "var(--radius-md)",
+  background: "var(--color-surface)",
+  boxShadow: "0 0 0 var(--focus-ring-width) var(--color-focus-ring)",
+} as const;
+
+/** Columns for the editing story: text, select, and number editors with validation. */
+export const editableColumns: TableColumn<Employee>[] = [
+  {
+    id: "name",
+    header: "Name",
+    rowHeader: true,
+    editable: true,
+    validate: (value) => (String(value ?? "").trim() ? undefined : "Name is required."),
+  },
+  { id: "role", header: "Role", editable: true },
+  {
+    id: "department",
+    header: "Department",
+    editable: true,
+    // A custom editor: saves as soon as an option is picked.
+    renderEditor: ({ value, onCommit, onCancel, label }) => (
+      <select
+        autoFocus
+        aria-label={label}
+        defaultValue={String(value)}
+        onChange={(event) => onCommit(event.target.value)}
+        onBlur={() => onCancel()}
+        onKeyDown={(event) => event.key === "Escape" && onCancel()}
+        style={editorSelectStyle}
+      >
+        {DEPARTMENTS.map((department) => (
+          <option key={department}>{department}</option>
+        ))}
+      </select>
+    ),
+  },
+  {
+    id: "status",
+    header: "Status",
+    cell: ({ row }) => <StatusBadge status={row.status} />,
+  },
+  {
+    id: "salary",
+    header: "Salary",
+    align: "right",
+    editable: true,
+    cell: ({ row }) => currency.format(row.salary),
+    validate: (value) =>
+      typeof value === "number" && value >= 0 ? undefined : "Enter a salary of 0 or more.",
+  },
+];
+
 export function renderEmployeeDetails(row: Employee) {
   return (
     <dl

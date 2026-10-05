@@ -623,6 +623,181 @@
   transform: rotate(90deg);
 }
 
+/* =========================
+   ROW REORDERING
+   ========================= */
+
+.dragHandle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-6);
+  height: var(--spacing-6);
+  padding: 0;
+
+  color: var(--color-text-tertiary);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  touch-action: none;
+
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.dragHandle:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.dragHandle:focus-visible {
+  outline: var(--border-width-md) solid var(--color-border-focus);
+  outline-offset: var(--border-width-sm);
+}
+
+.dragHandle[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dragHandle[aria-disabled="true"]:hover {
+  color: var(--color-text-tertiary);
+  background: none;
+}
+
+.tbody > .tr[data-dragging] {
+  opacity: 0.45;
+}
+
+/* A line where the dragged row will land. */
+.tbody > .tr[data-drop="before"] > * {
+  box-shadow: inset 0 var(--border-width-md) 0 var(--color-primary);
+}
+
+.tbody > .tr[data-drop="after"] > * {
+  box-shadow: inset 0 calc(var(--border-width-md) * -1) 0 var(--color-primary);
+}
+
+/* =========================
+   EDITABLE CELLS
+   ========================= */
+
+.editableContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.editableValue {
+  flex: 1;
+  min-width: 0;
+}
+
+.alignRight .editableContent {
+  flex-direction: row-reverse;
+}
+
+.alignCenter .editableContent {
+  justify-content: center;
+}
+
+.alignCenter .editableValue {
+  flex: 0 1 auto;
+}
+
+/* Hidden until the row is hovered or the button is focused. */
+.editButton {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-6);
+  height: var(--spacing-6);
+  padding: 0;
+
+  color: var(--color-text-tertiary);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0;
+
+  transition:
+    opacity var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.tr:hover .editButton,
+.editButton:focus-visible {
+  opacity: 1;
+}
+
+.editButton:hover {
+  color: var(--color-primary);
+  background: var(--color-surface-hover);
+}
+
+.editButton:focus-visible {
+  outline: var(--border-width-md) solid var(--color-border-focus);
+  outline-offset: var(--border-width-sm);
+}
+
+.editableCell {
+  cursor: text;
+}
+
+.editingCell {
+  padding-block: calc(var(--table-cell-py) / 2);
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.editorInput {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: calc(var(--spacing-16) + var(--spacing-8));
+  height: var(--control-height-md);
+  padding: 0 var(--spacing-sm);
+
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: inherit;
+  background: var(--color-surface);
+  border: var(--border-width-sm) solid var(--color-border-focus);
+  border-radius: var(--radius-md);
+  outline: none;
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--color-focus-ring);
+}
+
+.editorInputInvalid {
+  border-color: var(--color-border-error);
+  box-shadow: 0 0 0 var(--focus-ring-width) color-mix(in srgb, var(--color-error) 20%, transparent);
+}
+
+.editorError {
+  color: var(--color-error);
+  font-size: var(--font-size-xs);
+  white-space: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dragHandle,
+  .editButton {
+    transition: none;
+  }
+}
+
 .detailCell,
 .stateCell,
 .footerCell {

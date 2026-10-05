@@ -89,6 +89,47 @@ export interface TableFilterRenderProps<T> {
   label: string;
 }
 
+export interface TableEditorProps<T> {
+  /** The value being edited. */
+  value: unknown;
+  /** Update the value while editing. */
+  onChange: (value: unknown) => void;
+  /** Save. Pass a value to save that instead of the current one. */
+  onCommit: (value?: unknown) => void;
+  /** Discard the edit. */
+  onCancel: () => void;
+  row: T;
+  column: TableColumn<T>;
+  /** Accessible name to put on the editor control. */
+  label: string;
+  /** Validation message for the current value, if any. */
+  error?: string;
+}
+
+/** A saved cell edit, passed to `onCellEdit`. */
+export interface TableCellEdit<T> {
+  /** The row after the edit. */
+  row: T;
+  previousRow: T;
+  rowKey: TableRowKey;
+  /** Index of the row in `data`. */
+  rowIndex: number;
+  columnId: string;
+  value: unknown;
+  previousValue: unknown;
+}
+
+/** A row move, passed to `onRowReorder`. */
+export interface TableRowReorder<T> {
+  rowKey: TableRowKey;
+  /** Index in `data` before the move. */
+  fromIndex: number;
+  /** Index in `data` after the move. */
+  toIndex: number;
+  /** The data in its new order. */
+  data: T[];
+}
+
 export interface TableColumn<T> {
   /** Unique, stable id. Also the default accessor when `accessor` is unset. */
   id: string;
@@ -176,6 +217,22 @@ export interface TableColumn<T> {
   /** Overrides the table-level `resizableColumns` for this column. */
   resizable?: boolean;
 
+  /* Editing */
+  /**
+   * Lets users edit this column's cells: double-click a cell, or use its edit
+   * button. Pass a function to lock some rows. Needs `setValue` when
+   * `accessor` is a function.
+   */
+  editable?: boolean | ((row: T, index: number) => boolean);
+  /** Input type of the built-in editor. Defaults to `"number"` for numeric values. */
+  editorType?: "text" | "number";
+  /** Custom editor (e.g. a select). Replaces the built-in input. */
+  renderEditor?: (props: TableEditorProps<T>) => ReactNode;
+  /** Writes an edited value into a row. Defaults to `{ ...row, [accessor ?? id]: value }`. */
+  setValue?: (row: T, value: unknown) => T;
+  /** Return a message to reject a value; the editor stays open and shows it. */
+  validate?: (value: unknown, row: T) => string | undefined;
+
   /* Custom props */
   className?: string;
   headerClassName?: string;
@@ -233,6 +290,17 @@ export interface TableLabels {
   nextPage: string;
   lastPage: string;
   download: string;
+  editCell: (column: string) => string;
+  /** Shown when the built-in number editor gets text that isn't a number. */
+  invalidNumber: string;
+  moveRow: (rowKey: TableRowKey) => string;
+  /** Hint on the drag handle while sorting, search, or filters hide the real order. */
+  reorderUnavailable: string;
+  /** Screen-reader name of the drag-handle column header. */
+  reorder: string;
+  /** Read with each drag handle: how to move a row from the keyboard. */
+  reorderInstructions: string;
+  rowMoved: (position: number, total: number) => string;
   page: (page: number) => string;
   range: (from: number, to: number, total: number) => string;
   pagination: string;
@@ -360,6 +428,21 @@ export interface TableProps<T> {
   emptyState?: ReactNode;
   /** Shown when search/filters match nothing. */
   noResultsState?: ReactNode;
+
+  /* Editing & reordering */
+  /** Called after a cell edit is saved (see the column's `editable`). */
+  onCellEdit?: (edit: TableCellEdit<T>) => void;
+  /**
+   * Show a drag handle to reorder rows (drag, or focus it and use the arrow
+   * keys). Paused while sorting, search, or filters are active.
+   */
+  reorderableRows?: boolean;
+  onRowReorder?: (move: TableRowReorder<T>) => void;
+  /**
+   * Called with the full updated data after an edit or a row move. Without
+   * it the table keeps the changes itself until `data` changes.
+   */
+  onDataChange?: (data: T[]) => void;
 
   /* Rows */
   rowClassName?: string | ((row: T, index: number) => string | undefined);

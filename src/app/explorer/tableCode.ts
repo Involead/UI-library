@@ -493,6 +493,46 @@ function Badge({ children, tone = "solid" }: { children: string; tone?: "solid" 
   { id: "invitations", header: "No. of invitations", width: 100, align: "right" },
 ];`,
 
+  editableColumns: `const editableColumns: TableColumn<Employee>[] = [
+  {
+    id: "name",
+    header: "Name",
+    rowHeader: true,
+    editable: true,
+    validate: (value) => (String(value ?? "").trim() ? undefined : "Name is required."),
+  },
+  { id: "role", header: "Role", editable: true },
+  {
+    id: "department",
+    header: "Department",
+    editable: true,
+    // A custom editor: saves as soon as an option is picked.
+    renderEditor: ({ value, onCommit, onCancel, label }) => (
+      <select
+        autoFocus
+        aria-label={label}
+        defaultValue={String(value)}
+        onChange={(event) => onCommit(event.target.value)}
+        onBlur={() => onCancel()}
+      >
+        {DEPARTMENTS.map((department) => (
+          <option key={department}>{department}</option>
+        ))}
+      </select>
+    ),
+  },
+  { id: "status", header: "Status", cell: ({ row }) => <StatusBadge status={row.status} /> },
+  {
+    id: "salary",
+    header: "Salary",
+    align: "right",
+    editable: true,
+    cell: ({ row }) => currency.format(row.salary),
+    validate: (value) =>
+      typeof value === "number" && value >= 0 ? undefined : "Enter a salary of 0 or more.",
+  },
+];`,
+
   rowClick: `const handleRowClick = (row: Employee) => console.log("row clicked", row.name);`,
 
   hasDetails: `// Invited members have no details yet.
@@ -516,6 +556,7 @@ const snippetDependencies: Partial<Record<SnippetId, SnippetId[]>> = {
   employeeSummary: ["employees"],
   customRows: ["employees"],
   rowClick: ["employees"],
+  editableColumns: ["employees"],
   hasDetails: ["employees"],
   canSelect: ["employees"],
   contactIdentity: ["contacts"],
@@ -570,6 +611,7 @@ const booleanProps = [
   "showColumnFilters",
   "showColumnSettings",
   "resizableColumns",
+  "reorderableRows",
   "wrapHeaders",
   "loading",
 ];
@@ -707,6 +749,7 @@ const singleSamples: Record<string, CodeSample> = {
     snippets: ["baseColumns", "customRows"],
     props: ["getRowProps={getDimmedRowProps}", "footer={<CustomRowsFooter />}"],
   },
+  "table-reordering": { ...employeeSample, data: "employees.slice(0, 6)" },
   "table-header-descriptions": contactSample,
   "table-download": contactSample,
   "table-custom-cells": {
@@ -787,6 +830,27 @@ ${stack(args, [tableTag(multiple, "      "), tableTag(single, "      ")], "    "
   );
 }`;
       return file([...baseSnippets, "canSelect"], body, { state: true });
+    }
+    case "table-editable": {
+      const sample: CodeSample = {
+        ...employeeSample,
+        snippets: ["editableColumns"],
+        data: "rows",
+        columns: "editableColumns",
+        props: [
+          "onDataChange={setRows}",
+          "onCellEdit={(edit) => console.log(edit.columnId, edit.previousValue, edit.value)}",
+        ],
+      };
+      const body = `function EditableTable() {
+  // The table reports the full updated data after each saved edit.
+  const [rows, setRows] = useState(() => employees.slice(0, 6));
+
+  return (
+${tableTag(tableProps(args, sample), "    ")}
+  );
+}`;
+      return file(sampleSnippets(args, sample), body, { state: true });
     }
     case "table-pagination": {
       const tables = [

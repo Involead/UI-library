@@ -4,9 +4,11 @@ export type {
   SortRule,
   TableAlign,
   TableCellContext,
+  TableCellEdit,
   TableColumn,
   TableColumnSizing,
   TableColumnVisibility,
+  TableEditorProps,
   TableExportOptions,
   TableFilterRenderProps,
   TableFilters,
@@ -17,5 +19,6 @@ export type {
   TableProps,
   TableRow,
   TableRowKey,
+  TableRowReorder,
   TableSize,
 } from "./Table.types";

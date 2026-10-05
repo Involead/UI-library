@@ -1,12 +1,14 @@
 "use client";
 
 import {
+  useEffect,
   useId,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type CSSProperties,
+  type DragEvent,
   type KeyboardEvent,
   type MouseEvent,
   type PointerEvent,
@@ -25,6 +27,7 @@ import type {
   TableColumn,
   TableColumnSizing,
   TableColumnVisibility,
+  TableEditorProps,
   TableFilters,
   TableLabels,
   TableProps,
@@ -85,6 +88,13 @@ const DEFAULT_LABELS: TableLabels = {
   nextPage: "Next page",
   lastPage: "Last page",
   download: "Download data",
+  editCell: (column) => `Edit ${column}`,
+  invalidNumber: "Enter a number.",
+  moveRow: (rowKey) => `Move row ${rowKey}`,
+  reorder: "Reorder",
+  reorderInstructions: "Drag, or press the up and down arrow keys, to move the row.",
+  reorderUnavailable: "Clear sorting, search, and filters to reorder rows",
+  rowMoved: (position, total) => `Row moved to position ${position} of ${total}`,
   page: (page) => `Page ${page}`,
   range: (from, to, total) => `${from}–${to} of ${total}`,
   pagination: "Pagination",
@@ -99,6 +109,7 @@ const DEFAULT_TRUNCATE_WIDTH = 240;
 const DEFAULT_EXPORT_FILE = "table-data.csv";
 const SELECT_COLUMN = "__select";
 const EXPAND_COLUMN = "__expand";
+const REORDER_COLUMN = "__reorder";
 
 const ALIGN_CLASS: Record<TableAlign, string | undefined> = {
   left: undefined,
@@ -116,6 +127,32 @@ function toDomId(value: TableRowKey) {
 }
 
 /** Up/down arrow pair; CSS highlights the arrow matching the sort direction. */
+function GripIcon() {
+  return (
+    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true">
+      <circle cx="6" cy="4" r="1.25" />
+      <circle cx="10" cy="4" r="1.25" />
+      <circle cx="6" cy="8" r="1.25" />
+      <circle cx="10" cy="8" r="1.25" />
+      <circle cx="6" cy="12" r="1.25" />
+      <circle cx="10" cy="12" r="1.25" />
+    </svg>
+  );
+}
+
+/** Same rows in the same order (shallow), even if the array itself is new. */
+function sameRows<T>(a: T[], b: T[]) {
+  return a.length === b.length && a.every((row, index) => row === b[index]);
+}
+
+/** The built-in editor only handles plain text and numbers. */
+function isPlainValue(value: unknown) {
+  return value == null || typeof value === "string" || typeof value === "number";
+}
+
+type EditingCell = { rowKey: TableRowKey; columnId: string };
+type DropTarget = { rowKey: TableRowKey; position: "before" | "after" };
+
 function SortIcon() {
   return (
     <svg
@@ -225,6 +262,11 @@ export function Table<T>({
   emptyState,
   noResultsState,
 
+  onCellEdit,
+  reorderableRows = false,
+  onRowReorder,
+  onDataChange,
+
   rowClassName,
   getRowProps,
   onRowClick,
@@ -252,6 +294,16 @@ export function Table<T>({
   /* =========================
      STATE
      ========================= */
+
+  // Edits and row moves change a local copy of `data`; new `data` (e.g. the
+  // consumer saving `onDataChange`) replaces it. Compare the rows, not the
+  // array, so an inline `data={items.slice(0, 5)}` doesn't undo every edit.
+  const [rowData, setRowData] = useState(data);
+  const [syncedData, setSyncedData] = useState(data);
+  if (data !== syncedData) {
+    setSyncedData(data);
+    if (!sameRows(data, syncedData)) setRowData(data);
+  }
 
   const [sort, setSort] = useControllableState<SortRule[]>(
     sortProp,
@@ -286,7 +338,7 @@ export function Table<T>({
       const keySet = new Set(keys);
       onSelectionChange(
         keys,
-        data.filter((row, index) => keySet.has(getRowKey(row, index, rowKey))),
+        rowData.filter((row, index) => keySet.has(getRowKey(row, index, rowKey))),
       );
     },
   );
@@ -333,6 +385,7 @@ export function Table<T>({
   );
 
   const controlIds = [
+    ...(reorderableRows ? [REORDER_COLUMN] : []),
     ...(selectionEnabled ? [SELECT_COLUMN] : []),
     ...(expandable ? [EXPAND_COLUMN] : []),
   ];
@@ -344,13 +397,13 @@ export function Table<T>({
 
   const allRows = useMemo<TableRow<T>[]>(
     () =>
-      data.map((original, index) => ({
+      rowData.map((original, index) => ({
         key: getRowKey(original, index, rowKey),
         original,
         index,
         depth: 0,
       })),
-    [data, rowKey],
+    [rowData, rowKey],
   );
 
   const filteredRows = useMemo(
@@ -367,7 +420,7 @@ export function Table<T>({
   );
 
   const totalRows = manualPagination
-    ? (totalRowsProp ?? data.length)
+    ? (totalRowsProp ?? rowData.length)
     : sortedRows.length;
   const pageCount = paginated ? Math.max(1, Math.ceil(totalRows / pageSize)) : 1;
   const currentPage = Math.min(Math.max(1, page), pageCount);
@@ -471,6 +524,268 @@ export function Table<T>({
     if (from === -1 || to < 0 || to >= ids.length) return;
     [ids[from], ids[to]] = [ids[to], ids[from]];
     setOrder(ids);
+  }
+
+  /* =========================
+     EDITING
+     ========================= */
+
+  const [editing, setEditing] = useState<EditingCell | null>(null);
+  const [draft, setDraft] = useState<unknown>(undefined);
+  const [editError, setEditError] = useState<string>();
+  // Guards against a second commit (e.g. blur right after Enter).
+  const editingRef = useRef<EditingCell | null>(null);
+
+  const editButtonId = (key: TableRowKey, columnId: string) =>
+    `${tableId}-edit-${toDomId(key)}-${toDomId(columnId)}`;
+
+  function canEditCell(row: TableRow<T>, column: TableColumn<T>) {
+    if (!column.editable) return false;
+    // A computed value can't be written back without `setValue`.
+    if (typeof column.accessor === "function" && !column.setValue) return false;
+    if (!column.renderEditor && !isPlainValue(getCellValue(column, row.original, row.index))) {
+      return false;
+    }
+    return typeof column.editable === "function"
+      ? column.editable(row.original, row.index)
+      : true;
+  }
+
+  function isEditingCell(row: TableRow<T>, column: TableColumn<T>) {
+    return editing?.rowKey === row.key && editing.columnId === column.id;
+  }
+
+  function isNumericEditor(row: TableRow<T>, column: TableColumn<T>) {
+    return column.editorType
+      ? column.editorType === "number"
+      : typeof getCellValue(column, row.original, row.index) === "number";
+  }
+
+  function startEdit(row: TableRow<T>, column: TableColumn<T>) {
+    if (!canEditCell(row, column)) return;
+    const cell = { rowKey: row.key, columnId: column.id };
+    const value = getCellValue(column, row.original, row.index);
+    editingRef.current = cell;
+    setEditing(cell);
+    // The built-in input edits text; numbers are parsed back on save.
+    setDraft(column.renderEditor ? value : value == null ? "" : String(value));
+    setEditError(undefined);
+  }
+
+  function finishEdit(row: TableRow<T>, column: TableColumn<T>, refocus: boolean) {
+    editingRef.current = null;
+    setEditing(null);
+    setEditError(undefined);
+    if (refocus) {
+      // Put keyboard focus back on the cell's edit button.
+      const id = editButtonId(row.key, column.id);
+      requestAnimationFrame(() => document.getElementById(id)?.focus());
+    }
+  }
+
+  function cancelEdit(row: TableRow<T>, column: TableColumn<T>, refocus = false) {
+    if (!editingRef.current) return;
+    finishEdit(row, column, refocus);
+  }
+
+  function commitEdit(
+    row: TableRow<T>,
+    column: TableColumn<T>,
+    value: unknown = draft,
+    refocus = false,
+  ) {
+    if (!editingRef.current) return;
+    const previousValue = getCellValue(column, row.original, row.index);
+
+    let nextValue = value;
+    if (!column.renderEditor && isNumericEditor(row, column)) {
+      const text = String(value ?? "").trim();
+      nextValue = text === "" ? null : Number(text);
+      if (Number.isNaN(nextValue)) {
+        setEditError(labels.invalidNumber);
+        return;
+      }
+    }
+
+    const message = column.validate?.(nextValue, row.original);
+    if (message) {
+      setEditError(message);
+      return;
+    }
+
+    finishEdit(row, column, refocus);
+    if (Object.is(nextValue, previousValue)) return;
+
+    const key = (column.accessor ?? column.id) as keyof T;
+    const updated = column.setValue
+      ? column.setValue(row.original, nextValue)
+      : ({ ...row.original, [key]: nextValue } as T);
+    const nextData = rowData.map((item, index) => (index === row.index ? updated : item));
+
+    setRowData(nextData);
+    onCellEdit?.({
+      row: updated,
+      previousRow: row.original,
+      rowKey: row.key,
+      rowIndex: row.index,
+      columnId: column.id,
+      value: nextValue,
+      previousValue,
+    });
+    onDataChange?.(nextData);
+  }
+
+  function renderEditor(row: TableRow<T>, column: TableColumn<T>) {
+    const label = labels.editCell(getColumnLabel(column));
+    const errorId = `${editButtonId(row.key, column.id)}-error`;
+
+    if (column.renderEditor) {
+      const props: TableEditorProps<T> = {
+        value: draft,
+        onChange: setDraft,
+        onCommit: (value) => commitEdit(row, column, value === undefined ? draft : value),
+        onCancel: () => cancelEdit(row, column, true),
+        row: row.original,
+        column,
+        label,
+        error: editError,
+      };
+      return <div className={styles.editor}>{column.renderEditor(props)}</div>;
+    }
+
+    return (
+      <div className={styles.editor}>
+        <input
+          // Focus the editor as soon as it opens.
+          autoFocus
+          className={cx(styles.editorInput, editError && styles.editorInputInvalid)}
+          type={isNumericEditor(row, column) ? "number" : "text"}
+          value={String(draft ?? "")}
+          aria-label={label}
+          aria-invalid={editError ? true : undefined}
+          aria-describedby={editError ? errorId : undefined}
+          onChange={(event) => {
+            setDraft(event.target.value);
+            setEditError(undefined);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              commitEdit(row, column, draft, true);
+            } else if (event.key === "Escape") {
+              event.preventDefault();
+              cancelEdit(row, column, true);
+            }
+          }}
+          onBlur={() => commitEdit(row, column)}
+        />
+        {editError && (
+          <span id={errorId} className={styles.editorError} role="alert">
+            {editError}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  /* =========================
+     ROW REORDERING
+     ========================= */
+
+  const hasActiveFilters = Object.values(filters).some((value) => value.trim() !== "");
+  // Moving rows only makes sense when the table shows the real `data` order.
+  const canReorder =
+    reorderableRows && sort.length === 0 && search.trim() === "" && !hasActiveFilters;
+
+  const [armedRowKey, setArmedRowKey] = useState<TableRowKey | null>(null);
+  const [draggingKey, setDraggingKey] = useState<TableRowKey | null>(null);
+  const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
+  const [announcement, setAnnouncement] = useState("");
+  const [focusHandleKey, setFocusHandleKey] = useState<TableRowKey | null>(null);
+
+  const handleId = (key: TableRowKey) => `${tableId}-handle-${toDomId(key)}`;
+  const reorderHintId = `${tableId}-reorder-hint`;
+
+  // After a keyboard move, keep focus on the moved row's handle.
+  useEffect(() => {
+    if (focusHandleKey == null) return;
+    document.getElementById(handleId(focusHandleKey))?.focus();
+    setFocusHandleKey(null);
+  });
+
+  // A press on a handle that never turns into a drag disarms the row.
+  useEffect(() => {
+    if (armedRowKey == null) return;
+    const disarm = () => setArmedRowKey(null);
+    window.addEventListener("pointerup", disarm);
+    return () => window.removeEventListener("pointerup", disarm);
+  }, [armedRowKey]);
+
+  function moveRow(fromIndex: number, toIndex: number, focus: boolean) {
+    if (toIndex < 0 || toIndex >= rowData.length || fromIndex === toIndex) return;
+
+    const nextData = [...rowData];
+    const [moved] = nextData.splice(fromIndex, 1);
+    nextData.splice(toIndex, 0, moved);
+    const movedKey = getRowKey(moved, toIndex, rowKey);
+
+    setRowData(nextData);
+    setAnnouncement(labels.rowMoved(toIndex + 1, nextData.length));
+    onRowReorder?.({ rowKey: movedKey, fromIndex, toIndex, data: nextData });
+    onDataChange?.(nextData);
+
+    // Follow the row to its new page.
+    if (paginated && !manualPagination) {
+      const nextPage = Math.floor(toIndex / pageSize) + 1;
+      if (nextPage !== currentPage) setPage(nextPage);
+    }
+    if (focus) setFocusHandleKey(movedKey);
+  }
+
+  function handleHandleKeyDown(event: KeyboardEvent<HTMLButtonElement>, row: TableRow<T>) {
+    if (!canReorder) return;
+    const offset = event.key === "ArrowUp" ? -1 : event.key === "ArrowDown" ? 1 : 0;
+    if (offset === 0) return;
+    event.preventDefault();
+    moveRow(row.index, row.index + offset, true);
+  }
+
+  function handleDragStart(event: DragEvent<HTMLTableRowElement>, row: TableRow<T>) {
+    if (!canReorder || armedRowKey !== row.key) {
+      event.preventDefault();
+      return;
+    }
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(row.key));
+    setDraggingKey(row.key);
+  }
+
+  function handleDragOver(event: DragEvent<HTMLTableRowElement>, row: TableRow<T>) {
+    if (draggingKey == null) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    const rect = event.currentTarget.getBoundingClientRect();
+    const position = event.clientY < rect.top + rect.height / 2 ? "before" : "after";
+    if (dropTarget?.rowKey !== row.key || dropTarget.position !== position) {
+      setDropTarget({ rowKey: row.key, position });
+    }
+  }
+
+  function handleDrop(event: DragEvent<HTMLTableRowElement>, row: TableRow<T>) {
+    if (draggingKey == null) return;
+    event.preventDefault();
+    const fromIndex = allRows.findIndex((item) => item.key === draggingKey);
+    const position = dropTarget?.rowKey === row.key ? dropTarget.position : "after";
+    let toIndex = position === "after" ? row.index + 1 : row.index;
+    if (fromIndex < toIndex) toIndex -= 1;
+    if (fromIndex !== -1) moveRow(fromIndex, toIndex, false);
+    handleDragEnd();
+  }
+
+  function handleDragEnd() {
+    setDraggingKey(null);
+    setDropTarget(null);
+    setArmedRowKey(null);
   }
 
   /* =========================
@@ -939,7 +1254,9 @@ export function Table<T>({
 
     return (
       <th key={controlId} {...common} scope="col" className={cx(styles.th, styles.controlCell, sticky.className)}>
-        <span className={styles.srOnly}>{labels.expandRow}</span>
+        <span className={styles.srOnly}>
+          {controlId === REORDER_COLUMN ? labels.reorder : labels.expandRow}
+        </span>
       </th>
     );
   }
@@ -1021,6 +1338,32 @@ export function Table<T>({
 
     const cells: ReactNode[] = [];
 
+    if (reorderableRows) {
+      const sticky = stickyCell(REORDER_COLUMN);
+      cells.push(
+        <td
+          key={REORDER_COLUMN}
+          className={cx(styles.td, styles.controlCell, sticky.className)}
+          style={sticky.style}
+        >
+          <button
+            type="button"
+            id={handleId(row.key)}
+            className={styles.dragHandle}
+            aria-label={labels.moveRow(row.key)}
+            aria-describedby={reorderHintId}
+            // aria-disabled keeps the button focusable so its title explains why.
+            aria-disabled={canReorder ? undefined : true}
+            title={canReorder ? undefined : labels.reorderUnavailable}
+            onPointerDown={() => canReorder && setArmedRowKey(row.key)}
+            onKeyDown={(event) => handleHandleKeyDown(event, row)}
+          >
+            <GripIcon />
+          </button>
+        </td>,
+      );
+    }
+
     if (selectionEnabled) {
       const sticky = stickyCell(SELECT_COLUMN);
       const disabled = !canSelect(row);
@@ -1088,6 +1431,8 @@ export function Table<T>({
       const sticky = stickyCell(column.id, lastColumn.id);
       const extra = column.cellProps?.(context) ?? {};
       const CellTag = column.rowHeader ? "th" : "td";
+      const editable = canEditCell(row, column);
+      const editingThis = editable && isEditingCell(row, column);
 
       cells.push(
         <CellTag
@@ -1102,13 +1447,36 @@ export function Table<T>({
             ALIGN_CLASS[column.align ?? "left"],
             column.wrap && styles.wrap,
             span.rowSpan > 1 && styles.spanned,
+            editable && styles.editableCell,
+            editingThis && styles.editingCell,
             sticky.className,
             column.className,
             extra.className,
           )}
           style={{ ...truncateStyle(column), ...sticky.style, ...extra.style }}
+          onDoubleClick={(event) => {
+            extra.onDoubleClick?.(event as MouseEvent<HTMLTableCellElement>);
+            if (editable && !editingThis) startEdit(row, column);
+          }}
         >
-          {renderCellContent(column, context)}
+          {editingThis ? (
+            renderEditor(row, column)
+          ) : editable ? (
+            <span className={styles.editableContent}>
+              <span className={styles.editableValue}>{renderCellContent(column, context)}</span>
+              <button
+                type="button"
+                id={editButtonId(row.key, column.id)}
+                className={styles.editButton}
+                aria-label={labels.editCell(getColumnLabel(column))}
+                onClick={() => startEdit(row, column)}
+              >
+                <Icon name="edit" size={14} />
+              </button>
+            </span>
+          ) : (
+            renderCellContent(column, context)
+          )}
         </CellTag>,
       );
     });
@@ -1119,6 +1487,15 @@ export function Table<T>({
         tabIndex={onRowClick ? 0 : undefined}
         data-selected={selected || undefined}
         data-expanded={expanded || undefined}
+        // Only a press on the drag handle makes the row draggable, so text in
+        // the cells can still be selected.
+        draggable={canReorder && armedRowKey === row.key ? true : undefined}
+        data-dragging={draggingKey === row.key || undefined}
+        data-drop={dropTarget?.rowKey === row.key ? dropTarget.position : undefined}
+        onDragStart={(event) => handleDragStart(event, row)}
+        onDragOver={(event) => handleDragOver(event, row)}
+        onDrop={(event) => handleDrop(event, row)}
+        onDragEnd={handleDragEnd}
         {...rowProps}
         className={cx(
           styles.tr,
@@ -1208,7 +1585,7 @@ export function Table<T>({
 
     if (pageRows.length === 0) {
       return renderStateRow(
-        data.length === 0 ? (emptyState ?? labels.empty) : (noResultsState ?? labels.noResults),
+        rowData.length === 0 ? (emptyState ?? labels.empty) : (noResultsState ?? labels.noResults),
       );
     }
 
@@ -1404,6 +1781,17 @@ export function Table<T>({
           </div>
         )}
       </div>
+
+      {reorderableRows && (
+        <>
+          <span id={reorderHintId} className={styles.srOnly}>
+            {labels.reorderInstructions}
+          </span>
+          <div className={styles.srOnly} role="status" aria-live="polite">
+            {announcement}
+          </div>
+        </>
+      )}
 
       {paginated && !error && (
         <TablePagination

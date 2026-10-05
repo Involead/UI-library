@@ -18,6 +18,7 @@ import {
   contactProfileColumns,
   contacts,
   CustomRowsFooter,
+  editableColumns,
   employees,
   errorMessage,
   filteringColumns,
@@ -132,6 +133,10 @@ function getTableProps<T>(
     showColumnFilters: getBooleanArg(args, "showColumnFilters"),
     showColumnSettings: getBooleanArg(args, "showColumnSettings"),
     resizableColumns: getBooleanArg(args, "resizableColumns"),
+    reorderableRows: getBooleanArg(args, "reorderableRows"),
+    onRowReorder: (move) => onAction(`table: row moved (${move.fromIndex + 1} → ${move.toIndex + 1})`),
+    onCellEdit: (edit) =>
+      onAction(`table: ${edit.columnId} edited (${String(edit.previousValue)} → ${String(edit.value)})`),
     selectionMode,
     renderExpandedRow: getBooleanArg(args, "expandable") ? sample.renderExpandedRow : undefined,
     pagination,
@@ -395,6 +400,18 @@ export function TablePreview({ args, composition, layout, onAction }: Props) {
             <Table {...getTableProps(args, { ...employeeSample, columns: stickyColumns }, onAction)} />
           </div>
         </div>
+      );
+    case "table-editable":
+      return (
+        <SingleTable
+          args={args}
+          onAction={onAction}
+          sample={{ ...employeeSample, data: employees.slice(0, 6), columns: editableColumns }}
+        />
+      );
+    case "table-reordering":
+      return (
+        <SingleTable args={args} onAction={onAction} sample={{ ...employeeSample, data: employees.slice(0, 6) }} />
       );
     case "table-custom-rows":
       return (

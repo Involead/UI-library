@@ -33,6 +33,8 @@ export type TableComposition =
   | "table-sticky-header"
   | "table-sticky-columns"
   | "table-custom-rows"
+  | "table-editable"
+  | "table-reordering"
   | "table-header-descriptions"
   | "table-custom-cells"
   | "table-links"
@@ -366,6 +368,7 @@ export const explorerComponents: ExplorerComponent[] = [
       boolean("showColumnFilters", "Shows a filter row for filterable columns"),
       boolean("showColumnSettings", "Shows the column visibility and order menu"),
       boolean("resizableColumns", "Drag a header edge to resize a column"),
+      boolean("reorderableRows", "Drag handle to reorder rows (paused while sorted, searched, or filtered)"),
       boolean("expandable", "Rows expand to show details (renderExpandedRow)"),
       boolean("pagination", "Splits rows into pages"),
       boolean("stickyHeader", "Keeps the header in view while scrolling"),
@@ -398,6 +401,8 @@ export const explorerComponents: ExplorerComponent[] = [
       { name: "Sticky Header", description: "Scroll inside the table; the header stays in place", args: { caption: "Scroll inside the table — the header stays in place", stickyHeader: true, striped: true }, composition: "table-sticky-header" },
       { name: "Sticky Columns & Resizing", description: "Sticky first and last columns, with resizable column widths", args: { caption: "Scroll horizontally; drag (or focus and use arrow keys on) a header edge to resize", resizableColumns: true, selectionMode: "multiple" }, composition: "table-sticky-columns" },
       { name: "Custom Rows", description: "Custom row props dim suspended members; a full-width footer row", args: { caption: "Custom row classes and props: suspended members are dimmed" }, composition: "table-custom-rows" },
+      { name: "Editable Cells", description: "Double-click a cell or use its edit button; text, number, and select editors with validation", args: { caption: "Double-click a cell, or use its edit button. Enter saves, Escape cancels." }, composition: "table-editable" },
+      { name: "Row Reordering", description: "Drag a row by its handle, or use the arrow keys on the handle", args: { caption: "Drag a row by its handle, or focus the handle and use the arrow keys", reorderableRows: true, sortable: true }, composition: "table-reordering" },
       { name: "Header Descriptions", description: "A description line under each header, beside grouped sub-headers", args: { ...contactArgs }, composition: "table-header-descriptions" },
       { name: "Custom Cells", description: "Cells with links, badges, and lists; empty cells show a placeholder", args: { ...contactArgs }, composition: "table-custom-cells" },
       { name: "Links", description: "Column href turns cells into links; some rows stay unlinked", args: { caption: "Team members with profile and email links", hoverable: true }, composition: "table-links" },
