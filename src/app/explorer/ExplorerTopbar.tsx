@@ -57,7 +57,7 @@ export function ExplorerTopbar({
       <Link href="/" className="brand-region" aria-label="Back to home">
         <Image
           className="brand-mark"
-          src="/involead-logo.jpe"
+          src={`${base}/involead-logo.jpe`}
           alt="InvoLead"
           width={67}
           height={36}
