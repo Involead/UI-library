@@ -78,8 +78,8 @@ function defaultLayoutForStory(
 
 export function ExplorerPage() {
   const router = useRouter();
-  const pathname = usePathname();
-  const showIntro = pathname === INTRO_PATH;
+  const pathname = usePathname().replace(/\/+$/, "") || "/";
+  const showIntro = pathname.endsWith(INTRO_PATH);
 
   const [activeTopTab, setActiveTopTab] = useState<"canvas" | "docs">("canvas");
   const [zoom, setZoom] = useState(100);
