@@ -1,0 +1,967 @@
+.root {
+  --table-header-bg: var(--color-surface-secondary);
+  --table-row-bg: var(--color-surface);
+  --table-row-hover-bg: var(--color-surface-hover);
+  --table-row-selected-bg: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
+  --table-stripe-bg: var(--color-surface-secondary);
+  --table-border: var(--color-border);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  min-width: 0;
+
+  font-family: var(--font-family-primary);
+  font-size: var(--table-font-size);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+/* =========================
+   SIZES
+   ========================= */
+
+.small {
+  --table-font-size: var(--font-size-xs);
+  --table-cell-py: var(--spacing-sm);
+  --table-cell-px: var(--spacing-md);
+}
+
+.medium {
+  --table-font-size: var(--font-size-sm);
+  --table-cell-py: var(--spacing-md);
+  --table-cell-px: var(--spacing-lg);
+}
+
+.large {
+  --table-font-size: var(--font-size-md);
+  --table-cell-py: var(--spacing-lg);
+  --table-cell-px: var(--spacing-5);
+}
+
+.compact {
+  --table-cell-py: calc(var(--spacing-xs) / 2);
+}
+
+.medium.compact {
+  --table-cell-py: var(--spacing-xs);
+}
+
+.large.compact {
+  --table-cell-py: var(--spacing-sm);
+}
+
+/* =========================
+   CONTAINER & SCROLL
+   ========================= */
+
+.container {
+  position: relative;
+  overflow: hidden;
+
+  background: var(--color-surface);
+  border: 1px solid var(--table-border);
+  border-radius: var(--radius-lg);
+}
+
+/* Horizontal (and, with maxHeight, vertical) scrolling. */
+.scroll {
+  overflow: auto;
+  overscroll-behavior-x: contain;
+}
+
+.scroll:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+/* =========================
+   TABLE
+   ========================= */
+
+.table {
+  width: 100%;
+  min-width: 100%;
+
+  /* `separate` keeps borders attached to sticky cells while scrolling. */
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.fixed {
+  table-layout: fixed;
+}
+
+.caption {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+  color: var(--color-text-primary);
+
+  border-bottom: 1px solid var(--table-border);
+}
+
+/* Keeps the caption in view while the table scrolls horizontally. */
+.captionContent {
+  position: sticky;
+  left: 0;
+  box-sizing: border-box;
+  width: var(--table-viewport-width, auto);
+  padding: var(--spacing-md) var(--table-cell-px);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* =========================
+   CELLS
+   ========================= */
+
+.th,
+.td {
+  box-sizing: border-box;
+  padding: var(--table-cell-py) var(--table-cell-px);
+
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+
+  background: var(--table-row-bg);
+  border-bottom: 1px solid var(--table-border);
+
+  transition: background-color var(--transition-fast) ease;
+}
+
+.th {
+  position: relative;
+
+  font-size: var(--table-font-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+
+  background: var(--table-header-bg);
+}
+
+.groupTh {
+  color: var(--color-text-primary);
+}
+
+.td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rowHeader {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.alignCenter {
+  text-align: center;
+}
+
+/* Column `href`: link styling from the design system's primary colour. */
+.link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.alignRight {
+  text-align: right;
+}
+
+.wrap {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.spanned {
+  vertical-align: top;
+}
+
+.tbody > .tr:last-child > .td,
+.tbody > .tr:last-child > .th,
+.tbody > .stateRow:last-child > .stateCell,
+.tbody > .detailRow:last-child > .detailCell {
+  border-bottom: 0;
+}
+
+/* Control columns: selection + expand */
+.controlCell {
+  width: 44px;
+  min-width: 44px;
+  padding-inline: 0;
+  text-align: center;
+}
+
+/* =========================
+   BORDERED
+   ========================= */
+
+.bordered .th,
+.bordered .td {
+  border-right: 1px solid var(--table-border);
+}
+
+.bordered tr > :last-child {
+  border-right: 0;
+}
+
+.bordered .groupTh {
+  border-bottom: 1px solid var(--table-border);
+}
+
+/* =========================
+   ROW STATES
+   ========================= */
+
+.striped .tbody > .tr:nth-child(even of .tr) {
+  --table-row-bg: var(--table-stripe-bg);
+}
+
+.hoverable .tbody > .tr:hover {
+  --table-row-bg: var(--table-row-hover-bg);
+}
+
+.tbody > .tr.selected {
+  --table-row-bg: var(--table-row-selected-bg);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+/* =========================
+   STICKY
+   ========================= */
+
+.stickyHeader .thead {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.sticky {
+  position: sticky;
+  z-index: 1;
+}
+
+.thead .sticky {
+  z-index: 2;
+}
+
+.stickyLeft.stickyEdge {
+  box-shadow: 6px 0 6px -6px rgba(0, 0, 0, 0.16);
+}
+
+.stickyRight.stickyEdge {
+  box-shadow: -6px 0 6px -6px rgba(0, 0, 0, 0.16);
+}
+
+.bordered .stickyRight.stickyEdge {
+  border-left: 1px solid var(--table-border);
+}
+
+/* =========================
+   HEADER: SORTING
+   ========================= */
+
+.headerLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fills the header: label first, sort icon pinned to the far edge. */
+.sortButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.sortButton:hover {
+  color: var(--color-text-primary);
+}
+
+.sortButton:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Right-aligned headers: label and icon packed to the right, over the numbers. */
+.alignRight .sortButton {
+  justify-content: flex-end;
+}
+
+.alignCenter .sortButton {
+  justify-content: center;
+}
+
+/* Always visible: both arrows muted, the active direction highlighted. */
+.sortIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+}
+
+.sortIcon g {
+  transition:
+    color var(--transition-fast) ease,
+    opacity var(--transition-fast) ease;
+}
+
+.sortButton:hover .sortIcon {
+  color: var(--color-text-secondary);
+}
+
+.sortIcon[data-direction] g {
+  opacity: 0.35;
+}
+
+.sortIcon[data-direction="asc"] g[data-arrow="up"],
+.sortIcon[data-direction="desc"] g[data-arrow="down"] {
+  color: var(--color-primary);
+  opacity: 1;
+}
+
+/* =========================
+   HEADER: DESCRIPTIONS, WRAPPING, TRUNCATION
+   ========================= */
+
+.descriptionTh {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-secondary);
+}
+
+/* Wraps between words only, and never narrower than a readable minimum
+   (a column's own minWidth/width overrides it). */
+.headerWrap {
+  min-width: var(--table-wrap-min-width, 96px);
+  white-space: normal;
+}
+
+.headerWrap .headerLabel {
+  min-width: auto;
+  overflow: visible;
+}
+
+/* Cell content cut at the column's truncate width, full text in the tooltip. */
+.truncate {
+  display: block;
+  max-width: var(--table-truncate-width, 240px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.truncateHeader {
+  display: block;
+  max-width: calc(var(--table-truncate-width, 240px) - 22px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sortIndex {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 var(--spacing-xs);
+  box-sizing: border-box;
+
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-inverse);
+
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+/* =========================
+   HEADER: RESIZING
+   ========================= */
+
+.resizableTh {
+  padding-right: calc(var(--table-cell-px) + var(--spacing-xs));
+}
+
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 8px;
+
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.resizeHandle::after {
+  content: "";
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  right: 3px;
+  width: 2px;
+
+  background: var(--color-border-hover);
+  border-radius: var(--radius-full);
+  opacity: 0;
+  transition: opacity var(--transition-fast) ease;
+}
+
+.th:hover .resizeHandle::after,
+.resizeHandle:focus-visible::after,
+.resizeHandleActive::after {
+  opacity: 1;
+}
+
+.resizeHandle:focus-visible,
+.resizeHandleActive {
+  outline: none;
+}
+
+.resizeHandle:focus-visible::after,
+.resizeHandleActive::after {
+  top: 0;
+  bottom: 0;
+  background: var(--color-primary);
+}
+
+.resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* =========================
+   FILTER ROW
+   ========================= */
+
+.filterRow .td {
+  padding-block: var(--spacing-xs);
+  overflow: visible;
+  background: var(--table-header-bg);
+}
+
+.filterCell {
+  min-width: 120px;
+}
+
+/* =========================
+   SELECTION CONTROL
+   ========================= */
+
+.checkbox {
+  appearance: none;
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  vertical-align: middle;
+
+  background: var(--color-surface);
+  border: 1px solid var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  transition:
+    background-color var(--transition-fast) ease,
+    border-color var(--transition-fast) ease;
+}
+
+.radio {
+  border-radius: var(--radius-full);
+}
+
+.checkbox:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+
+.checkbox:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.checkbox:checked,
+.checkbox:indeterminate {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Checkmark */
+.checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 4.5px;
+  top: 1.5px;
+  width: 4px;
+  height: 8px;
+
+  border: solid var(--color-white);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Indeterminate dash */
+.checkbox:indeterminate::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: calc(50% - 1px);
+  height: 2px;
+
+  background: var(--color-white);
+  border-radius: 1px;
+}
+
+/* Radio dot */
+.radio:checked::after {
+  left: 4px;
+  top: 4px;
+  width: 6px;
+  height: 6px;
+
+  background: var(--color-white);
+  border: 0;
+  border-radius: var(--radius-full);
+  transform: none;
+}
+
+.checkbox:disabled {
+  background: var(--color-surface-secondary);
+  border-color: var(--color-border-hover);
+  cursor: not-allowed;
+}
+
+.checkbox:disabled:checked {
+  background: var(--color-text-disabled);
+  border-color: var(--color-text-disabled);
+}
+
+/* =========================
+   EXPANDABLE ROWS
+   ========================= */
+
+.expandButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+
+  color: var(--color-text-secondary);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  transition:
+    background-color var(--transition-fast) ease,
+    color var(--transition-fast) ease;
+}
+
+.expandButton:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+}
+
+.expandButton:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+.expandIcon {
+  display: inline-flex;
+  transition: transform var(--transition-normal) ease;
+}
+
+.expandIconOpen {
+  transform: rotate(90deg);
+}
+
+.detailCell,
+.stateCell,
+.footerCell {
+  padding: 0;
+  border-bottom: 1px solid var(--table-border);
+}
+
+.detailCell {
+  background: var(--color-surface-secondary);
+}
+
+/* Full-width content (details, states, footer) stays in view while the
+   table scrolls horizontally. */
+.viewportContent {
+  position: sticky;
+  left: 0;
+  box-sizing: border-box;
+  width: var(--table-viewport-width, auto);
+  padding: var(--table-cell-py) var(--table-cell-px);
+  white-space: normal;
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+.tfoot .td,
+.tfoot .footerCell {
+  font-weight: var(--font-weight-semibold);
+  background: var(--table-header-bg);
+  border-top: 1px solid var(--table-border);
+  border-bottom: 0;
+}
+
+.tfoot tr + tr > * {
+  border-top-color: var(--table-border);
+}
+
+/* =========================
+   EMPTY / ERROR STATES
+   ========================= */
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  min-height: 120px;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.stateError {
+  color: var(--color-error);
+}
+
+.stateError > span:not(:first-child) {
+  color: var(--color-text-primary);
+}
+
+/* =========================
+   LOADING
+   ========================= */
+
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+}
+
+.loadingOverlayQuiet {
+  background: transparent;
+  pointer-events: none;
+}
+
+.spinner {
+  display: inline-flex;
+  animation: table-spin 0.8s linear infinite;
+}
+
+.skeleton {
+  display: inline-block;
+  max-width: 100%;
+  height: 0.75em;
+  vertical-align: middle;
+
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-hover) 25%,
+    var(--color-border) 37%,
+    var(--color-surface-hover) 63%
+  );
+  background-size: 400% 100%;
+  border-radius: var(--radius-sm);
+  animation: table-shimmer 1.4s ease infinite;
+}
+
+.skeletonControl {
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes table-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes table-shimmer {
+  from {
+    background-position: 100% 50%;
+  }
+  to {
+    background-position: 0 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner,
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* =========================
+   TOOLBAR
+   ========================= */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.toolbarSearch {
+  flex: 1 1 200px;
+  max-width: 320px;
+}
+
+.toolbarContent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Pushes everything after it to the right edge. */
+.toolbarSpacer {
+  flex: 1 1 0;
+}
+
+.columnSettings {
+  position: relative;
+}
+
+.linkButton {
+  padding: var(--spacing-xs);
+
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.linkButton:hover {
+  text-decoration: underline;
+}
+
+.linkButton:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.downloadButton {
+  padding: var(--spacing-xs);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+}
+
+.downloadButton:hover {
+  background: var(--color-surface-hover);
+}
+
+.columnPanel {
+  position: absolute;
+  top: calc(100% + var(--spacing-xs));
+  right: 0;
+  z-index: var(--z-dropdown);
+
+  min-width: 220px;
+  max-height: 320px;
+  overflow: auto;
+  padding: var(--spacing-xs);
+
+  background: var(--color-surface);
+  border: 1px solid var(--table-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.columnList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.columnItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+
+  border-radius: var(--radius-md);
+}
+
+.columnItem:hover {
+  background: var(--color-surface-hover);
+}
+
+.columnMove {
+  display: inline-flex;
+  gap: 2px;
+  color: var(--color-text-secondary);
+}
+
+/* =========================
+   PAGINATION
+   ========================= */
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md) var(--spacing-lg);
+
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.paginationRange {
+  margin-right: auto;
+}
+
+.paginationControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md) var(--spacing-lg);
+}
+
+/* Range on the left, page size + pages centred in the remaining width. */
+.paginationCenter {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.paginationCenter .paginationRange {
+  margin-right: 0;
+}
+
+@media (max-width: 640px) {
+  .paginationCenter {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pageButtonIcon {
+  padding: 0;
+}
+
+.pageNav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.pageButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--control-height-md);
+  height: var(--control-height-md);
+  padding: 0 var(--spacing-sm);
+  box-sizing: border-box;
+
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+
+  background: var(--color-surface);
+  border: 1px solid var(--table-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+
+  transition:
+    background-color var(--transition-fast) ease,
+    border-color var(--transition-fast) ease;
+}
+
+.pageButton:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
+}
+
+.pageButton:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.pageButton:disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.pageButtonCurrent,
+.pageButtonCurrent:hover:not(:disabled) {
+  color: var(--color-text-inverse);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.pageEllipsis {
+  min-width: var(--control-height-md);
+  text-align: center;
+}

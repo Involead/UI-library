@@ -23,6 +23,28 @@ export type { TypographyProps } from "./components/Typography";
 
 export * from "./components/Icon";
 
+export { Table } from "./components/Table";
+export type {
+  SortDirection,
+  SortRule,
+  TableAlign,
+  TableCellContext,
+  TableColumn,
+  TableColumnSizing,
+  TableColumnVisibility,
+  TableExportOptions,
+  TableFilterRenderProps,
+  TableFilters,
+  TableFooterContext,
+  TableHeaderContext,
+  TableLabels,
+  TablePaginationOptions,
+  TableProps,
+  TableRow,
+  TableRowKey,
+  TableSize,
+} from "./components/Table";
+
 export { cx } from "./utils";
 export type { ClassValue } from "./utils";
 

@@ -714,6 +714,23 @@ body:has(.storybook-page) {
   align-items: flex-start;
 }
 
+/* Table previews: tables fill the stage instead of centring at content width. */
+
+.table-preview {
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+.preview-stack.table-preview {
+  align-items: stretch;
+}
+
+.preview-stack.horizontal.table-preview > * {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
 /* Icon previews */
 
 .icon-gallery-shell {

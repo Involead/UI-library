@@ -15,8 +15,32 @@ export type ExplorerStory = {
   name: string;
   description: string;
   args: ExplorerArgs;
-  composition?: "all" | "sizes" | "states" | "headings" | "colors" | "label-clickable" | "group" | "gallery";
+  composition?: "all" | "sizes" | "states" | "headings" | "colors" | "label-clickable" | "group" | "gallery" | "column-spanning" | "row-spanning" | TableComposition;
 };
+
+/** Table stories that need more than the base sample table; see TablePreview. */
+export type TableComposition =
+  | "table-sizes"
+  | "table-borders"
+  | "table-hoverable"
+  | "table-sorting"
+  | "table-filtering"
+  | "table-selection"
+  | "table-expandable"
+  | "table-pagination"
+  | "table-loading"
+  | "table-empty"
+  | "table-sticky-header"
+  | "table-sticky-columns"
+  | "table-custom-rows"
+  | "table-header-descriptions"
+  | "table-custom-cells"
+  | "table-links"
+  | "table-truncation"
+  | "table-download"
+  | "table-toolbar"
+  | "table-contact-directory"
+  | "table-all-features";
 
 export type ExplorerComponent = {
   name: string;
@@ -40,6 +64,17 @@ const fruitOptions = JSON.stringify(
   ],
   null,
 );
+
+/** Control values shared by the Table stories built on the contact sample. */
+const contactArgs: ExplorerArgs = {
+  caption: "Engagement summary",
+  sortable: true,
+  striped: true,
+  wrapHeaders: true,
+  emptyCellValue: "-",
+  pagination: true,
+  paginationAlign: "center",
+};
 
 export const iconColors = [
   "var(--color-text-primary)",
@@ -304,6 +339,95 @@ export const explorerComponents: ExplorerComponent[] = [
       { name: "Disabled", description: "Muted, with hover and clicks blocked", args: { name: "settings", size: "32", strokeWidth: "2", color: "currentColor", hoverColor: "var(--color-primary)", disabled: true, clickable: true, title: "Settings" } },
       { name: "Clickable", description: "Renders as a keyboard-accessible button", args: { name: "plus", size: "24", strokeWidth: "2", color: "currentColor", hoverColor: "var(--color-primary)", clickable: true, title: "Add" } },
       { name: "Custom SVG", description: "Any svg passed as children, scaled and colored by the wrapper", args: { size: "32", color: "var(--color-success)", hoverColor: "var(--color-primary)", title: "Home", svg: customIconSvg } },
+    ],
+  },
+  {
+    name: "Table",
+    description: "Generic, accessible data table with sorting, search, filters, selection, expandable rows, pagination, and column controls.",
+    accessibility: [
+      "Built on semantic table, thead, tbody, tfoot, th, and td elements, with scope on every header.",
+      "Sortable headers are buttons; the primary sorted column exposes aria-sort, and multi-sort order is announced.",
+      "Row selection uses labelled native checkboxes (or radios), and select all shows a mixed state.",
+      "Expand toggles expose aria-expanded and point to their detail row with aria-controls.",
+      "The scroll area is focusable and labelled by the caption; loading and error states are announced.",
+    ],
+    controls: [
+      text("caption", "Table caption, also its accessible name"),
+      select("size", "Table size", ["small", "medium", "large"]),
+      select("selectionMode", "Row selection", ["none", "single", "multiple"]),
+      select("dataState", "Sample data, no data, or a load error", ["data", "empty", "error"]),
+      boolean("bordered", "Borders between every cell"),
+      boolean("striped", "Alternating row backgrounds"),
+      boolean("hoverable", "Highlights the row under the pointer"),
+      boolean("compact", "Reduces vertical cell padding"),
+      boolean("sortable", "Sorts by clicking a column header"),
+      boolean("multiSort", "Shift+click a header to add a secondary sort"),
+      boolean("searchable", "Shows a search field above the table"),
+      boolean("showColumnFilters", "Shows a filter row for filterable columns"),
+      boolean("showColumnSettings", "Shows the column visibility and order menu"),
+      boolean("resizableColumns", "Drag a header edge to resize a column"),
+      boolean("expandable", "Rows expand to show details (renderExpandedRow)"),
+      boolean("pagination", "Splits rows into pages"),
+      boolean("stickyHeader", "Keeps the header in view while scrolling"),
+      boolean("loading", "Shows a loading state"),
+      boolean("hideCaption", "Keeps the caption for screen readers only"),
+      boolean("wrapHeaders", "Lets long header text wrap onto several lines"),
+      text("emptyCellValue", "Placeholder for empty cells, e.g. -"),
+      boolean("exportable", "Shows a button that downloads the rows as CSV"),
+      select("searchPlacement", "Where the search field sits in the toolbar", ["start", "end"]),
+      select("columnSettingsTrigger", "Column menu trigger style", ["button", "link"]),
+      select("paginationAlign", "Pagination layout (pagination.align)", ["between", "center"]),
+    ],
+    // Mirrors Table.stories.tsx: same stories, order, and sample data (Table.samples.tsx).
+    stories: [
+      { name: "Basic Table", description: "Columns and data with a caption", args: { caption: "Team members" } },
+      { name: "Sizes", description: "Small, medium, and large, plus compact", args: { caption: "Team members", orientation: "vertical" }, composition: "table-sizes" },
+      { name: "Borders", description: "Row dividers (default) and borders between every cell", args: { caption: "Team members", orientation: "vertical" }, composition: "table-borders" },
+      { name: "Striped", description: "Alternating row backgrounds", args: { caption: "Team members", striped: true } },
+      { name: "Hoverable", description: "Highlights the row under the pointer; with onRowClick, rows are focusable and activate with Enter", args: { caption: "Team members", hoverable: true }, composition: "table-hoverable" },
+      { name: "Sorting", description: "Click a header to sort; Shift+click to add a secondary sort", args: { caption: "Click a header to sort; Shift+click to add a secondary sort", sortable: true, multiSort: true }, composition: "table-sorting" },
+      { name: "Filtering / Search", description: "Search across columns, or filter a single column", args: { caption: "Search across columns, or filter a single column", searchable: true, showColumnFilters: true, pagination: true }, composition: "table-filtering" },
+      { name: "Row Selection", description: "Multiple selection with a disabled row, and single selection", args: { caption: "Team members", orientation: "vertical" }, composition: "table-selection" },
+      { name: "Expandable Rows", description: "Rows reveal a detail panel; invited members have no details", args: { caption: "Expandable rows (invited members have no details yet)", expandable: true }, composition: "table-expandable" },
+      { name: "Pagination", description: "Default pagination, and centred controls without the page-size label", args: { caption: "Team members", orientation: "vertical" }, composition: "table-pagination" },
+      { name: "Loading", description: "Skeleton rows on first load, and refreshing existing data", args: { caption: "Team members", orientation: "vertical" }, composition: "table-loading" },
+      { name: "Empty State", description: "Default and custom empty states", args: { caption: "Team members", orientation: "vertical" }, composition: "table-empty" },
+      { name: "Error State", description: "Load error with a retry action", args: { caption: "Team members", dataState: "error" } },
+      { name: "Column Spanning", description: "Grouped headers and a body cell spanning four columns", args: { caption: "Grouped headers and a body cell spanning four columns", bordered: true }, composition: "column-spanning" },
+      { name: "Row Spanning", description: "Conference schedule: day cells span their sessions", args: { caption: "Conference schedule — day cells span their sessions", bordered: true }, composition: "row-spanning" },
+      { name: "Sticky Header", description: "Scroll inside the table; the header stays in place", args: { caption: "Scroll inside the table — the header stays in place", stickyHeader: true, striped: true }, composition: "table-sticky-header" },
+      { name: "Sticky Columns & Resizing", description: "Sticky first and last columns, with resizable column widths", args: { caption: "Scroll horizontally; drag (or focus and use arrow keys on) a header edge to resize", resizableColumns: true, selectionMode: "multiple" }, composition: "table-sticky-columns" },
+      { name: "Custom Rows", description: "Custom row props dim suspended members; a full-width footer row", args: { caption: "Custom row classes and props: suspended members are dimmed" }, composition: "table-custom-rows" },
+      { name: "Header Descriptions", description: "A description line under each header, beside grouped sub-headers", args: { ...contactArgs }, composition: "table-header-descriptions" },
+      { name: "Custom Cells", description: "Cells with links, badges, and lists; empty cells show a placeholder", args: { ...contactArgs }, composition: "table-custom-cells" },
+      { name: "Links", description: "Column href turns cells into links; some rows stay unlinked", args: { caption: "Team members with profile and email links", hoverable: true }, composition: "table-links" },
+      { name: "Truncation & Wrapping", description: "Truncated cells and headers, with wrapping headers", args: { caption: "Long content", sortable: true, wrapHeaders: true, emptyCellValue: "-" }, composition: "table-truncation" },
+      { name: "Download Data", description: "Exports the searched, filtered and sorted rows as CSV", args: { ...contactArgs, searchable: true, searchPlacement: "end", exportable: true }, composition: "table-download" },
+      { name: "Toolbar Layout", description: "Search on the right and a text-link column menu", args: { caption: "Collaborators", sortable: true, searchable: true, searchPlacement: "end", showColumnSettings: true, columnSettingsTrigger: "link" }, composition: "table-toolbar" },
+      { name: "Contact Directory", description: "Fixed columns, header descriptions, grouped headers, custom cells, CSV download, and centred pagination", args: { ...contactArgs, searchable: true, searchPlacement: "end", showColumnSettings: true, columnSettingsTrigger: "link", exportable: true }, composition: "table-contact-directory" },
+      {
+        name: "All Features",
+        description: "Search, filters, sorting, selection, expansion, pagination, and column controls together",
+        args: {
+          caption: "Team directory",
+          hideCaption: true,
+          selectionMode: "multiple",
+          hoverable: true,
+          striped: true,
+          stickyHeader: true,
+          sortable: true,
+          multiSort: true,
+          searchable: true,
+          showColumnFilters: true,
+          showColumnSettings: true,
+          resizableColumns: true,
+          exportable: true,
+          emptyCellValue: "-",
+          expandable: true,
+          pagination: true,
+        },
+        composition: "table-all-features",
+      },
     ],
   },
 ];

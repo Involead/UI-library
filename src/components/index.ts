@@ -22,3 +22,25 @@ export { Typography } from "./Typography";
 export type { TypographyProps } from "./Typography";
 
 export * from "./Icon";
+
+export { Table } from "./Table";
+export type {
+  SortDirection,
+  SortRule,
+  TableAlign,
+  TableCellContext,
+  TableColumn,
+  TableColumnSizing,
+  TableColumnVisibility,
+  TableExportOptions,
+  TableFilterRenderProps,
+  TableFilters,
+  TableFooterContext,
+  TableHeaderContext,
+  TableLabels,
+  TablePaginationOptions,
+  TableProps,
+  TableRow,
+  TableRowKey,
+  TableSize,
+} from "./Table";
