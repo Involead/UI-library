@@ -35,8 +35,6 @@ export function ExplorerSidebar({
       <label className="sidebar-search">
         <svg
           viewBox="0 0 24 24"
-          width="12"
-          height="12"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -46,12 +44,14 @@ export function ExplorerSidebar({
           <path d="M16 16L21 21" strokeLinecap="round" />
         </svg>
         <input
+          type="search"
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Find components"
           aria-label="Find components"
         />
       </label>
+      <div className="sidebar-section-title">Getting started</div>
       <button
         type="button"
         className={`menu-item intro${introActive ? " active" : ""}`}
@@ -65,6 +65,7 @@ export function ExplorerSidebar({
         Introduction
       </button>
 
+      <div className="sidebar-section-title">Components</div>
 
       {groups.map((group) => {
         // while searching, show matching stories even if the group is collapsed
