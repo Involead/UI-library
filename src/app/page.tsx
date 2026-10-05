@@ -12,7 +12,7 @@ export default function Home() {
             src={`${base}/involead-logo.jpe`}
             alt=""
             className="landing-logo"
-            width={67}
+            width={65}
             height={36}
             priority
           />
