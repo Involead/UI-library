@@ -1,6 +1,7 @@
 import { icons } from "@/icons";
 import { iconColors, type ExplorerArgs, type ExplorerComponent, type ExplorerValue } from "../explorer-config";
 import { getComponentDefaults } from "./args";
+import { formatTableCode } from "./tableCode";
 import { iconSizes, radioGroupOptions, typographyColors, typographyVariants, type TypographyVariant } from "./types";
 
 export function formatExplorerCode(
@@ -8,6 +9,7 @@ export function formatExplorerCode(
   args: ExplorerArgs,
   composition?: ExplorerComponent["stories"][number]["composition"],
 ): string {
+  if (component === "Table") return formatTableCode(args, composition);
   const componentCode = (nextArgs: ExplorerArgs): string =>
     formatExplorerCode(component, nextArgs).split("\n\n").slice(1).join("\n\n");
   if (component === "Dropdown" && composition) {
@@ -315,7 +317,20 @@ export function parseExplorerCode(code: string, component: ExplorerComponent): E
     } else {
       return null;
     }
+    // Table: `pagination` may be an options object instead of a boolean.
+    if (component.name === "Table" && control.name === "pagination" && raw.startsWith("{")) {
+      args.pagination = true;
+      args.paginationAlign = /\balign\s*:\s*["']center["']/.test(raw) ? "center" : "between";
+      continue;
+    }
+    // Table: `exportable` may be an options object (`{ fileName }`).
+    if (component.name === "Table" && control.name === "exportable" && raw.startsWith("{")) {
+      args.exportable = true;
+      continue;
+    }
     if (control.kind === "boolean") {
+      // Table: a state variable (e.g. `loading={refreshing}`) keeps the default value.
+      if (component.name === "Table" && /^[A-Za-z_$][\w$]*$/.test(raw)) continue;
       if (raw !== "true" && raw !== "false") return null;
       args[control.name] = raw === "true";
     } else if (control.kind === "json" || control.kind === "multi-select") {
@@ -348,6 +363,17 @@ export function parseExplorerCode(code: string, component: ExplorerComponent): E
   }
   if (component.name === "Checkbox" && /\bicon\s*=\s*\{\s*<svg\b/.test(attributes)) {
     args.icon = "star";
+  }
+  if (component.name === "Table") {
+    // Not props: they map to `renderExpandedRow`, and `error` / `data={[]}`.
+    args.expandable = /\brenderExpandedRow\s*=/.test(attributes);
+    const errorMessage = attributes.match(/\berror\s*=\s*(["'])(.*?)\1/)?.[2];
+    args.errorMessage = errorMessage ?? null;
+    args.dataState = /\berror\s*=/.test(attributes)
+      ? "error"
+      : /\bdata\s*=\s*\{\s*\[\s*\]\s*\}/.test(attributes)
+        ? "empty"
+        : "data";
   }
   if (component.name === "Icon") {
     args.clickable = /\bonClick\s*=/.test(attributes);

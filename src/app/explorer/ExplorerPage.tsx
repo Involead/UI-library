@@ -21,6 +21,7 @@ import { DropdownPreview } from "./previews/DropdownPreview";
 import { IconPreview } from "./previews/IconPreview";
 import { InputPreview } from "./previews/InputPreview";
 import { RadioPreview } from "./previews/RadioPreview";
+import { TablePreview, tableStackCompositions } from "./previews/TablePreview";
 import { TypographyPreview } from "./previews/TypographyPreview";
 import {
   isChoice,
@@ -230,7 +231,11 @@ export function ExplorerPage() {
   const composition = selectedExplorerStory?.composition;
   const previewLayout: PreviewLayout =
     componentArgs.orientation === "horizontal" ? "horizontal" : "vertical";
-  const showLayoutToggle = Boolean(composition);
+  // Most Table stories render a single table, so there is nothing to arrange.
+  const showLayoutToggle =
+    activeComponent === "Table"
+      ? tableStackCompositions.includes(composition ?? "")
+      : Boolean(composition);
 
   function updateComponentArg(name: string, value: ExplorerValue) {
     let nextValue = value;
@@ -312,6 +317,16 @@ export function ExplorerPage() {
           args={componentArgs}
           composition={composition}
           layout={previewLayout}
+        />
+      );
+    }
+    if (activeComponent === "Table") {
+      return (
+        <TablePreview
+          args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
+          onAction={recordAction}
         />
       );
     }

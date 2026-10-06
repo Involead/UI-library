@@ -6,8 +6,10 @@ import {
   Icon,
   Input,
   Radio,
+  Table,
   Typography,
   type IconName,
+  type TableColumn,
 } from "@/index";
 import Image from "next/image";
 import packageJson from "../../../package.json";
@@ -115,6 +117,18 @@ const roleOptions = [
   { label: "Viewer", value: "viewer" },
 ];
 
+type PreviewMember = { id: number; name: string; role: string };
+
+const previewMembers: PreviewMember[] = [
+  { id: 1, name: "Subarna", role: "Admin" },
+  { id: 2, name: "Leo Kim", role: "Editor" },
+  { id: 3, name: "Mia Chen", role: "Viewer" },
+];
+
+const previewMemberColumns: TableColumn<PreviewMember>[] = [
+  { id: "name", header: "Name" },
+  { id: "role", header: "Role" },
+];
 
 /** Small, non-interactive previews for the component catalog. */
 const componentPreviews: Record<string, ReactNode> = {
@@ -150,6 +164,16 @@ const componentPreviews: Record<string, ReactNode> = {
         <Icon key={name} name={name} size={20} />
       ))}
     </div>
+  ),
+  Table: (
+    <Table
+      size="small"
+      compact
+      bordered
+      ariaLabel="Team members"
+      data={previewMembers}
+      columns={previewMemberColumns}
+    />
   ),
 };
 
