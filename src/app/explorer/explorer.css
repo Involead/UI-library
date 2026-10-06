@@ -214,8 +214,45 @@ body:has(.storybook-page) {
   overscroll-behavior: contain;
   background: var(--color-surface-secondary);
   border-right: 1px solid var(--color-border);
-  padding: var(--spacing-3) var(--spacing-2) var(--spacing-3) 0;
+  padding: var(--spacing-3) var(--spacing-2) 0 0;
   scrollbar-gutter: stable;
+  display: flex;
+  flex-direction: column;
+}
+
+/* pinned to the bottom; sticks while the nav list scrolls */
+.sidebar-footer {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding: var(--spacing-3) var(--spacing-3) var(--spacing-3) var(--spacing-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  background: var(--color-surface-secondary);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-xs);
+}
+
+.sidebar-version {
+  padding: 0 var(--spacing-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.sidebar-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+}
+
+.sidebar-footer a:hover {
+  color: var(--color-text-primary);
 }
 
 .sidebar-search {

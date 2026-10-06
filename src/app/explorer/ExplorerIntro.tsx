@@ -24,7 +24,7 @@ type Props = {
 };
 
 const REPOSITORY_URL = "https://github.com/Involead/UI-library";
-const NPM_URL = "https://www.npmjs.com/package/@involead/ui";
+export const NPM_URL = "https://www.npmjs.com/package/@involead/ui";
 
 const installCommands = {
   npm: "npm install @involead/ui",
