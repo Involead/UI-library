@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon, Input, type IconName } from "@/index";
 import { icons } from "@/icons";
 import { iconColors, type ExplorerArgs } from "../../explorer-config";
@@ -32,6 +32,21 @@ const normalize = (value: string) => value.toLowerCase().replace(/[\s-]/g, "");
 
 export function IconPreview({ args, composition, layout, onClick }: Props) {
   const [query, setQuery] = useState("");
+  const [copiedName, setCopiedName] = useState<IconName | null>(null);
+  const copyTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => () => window.clearTimeout(copyTimer.current), []);
+
+  const copyIcon = async (item: IconName) => {
+    try {
+      await navigator.clipboard.writeText(`<Icon name="${item}" />`);
+      setCopiedName(item);
+      window.clearTimeout(copyTimer.current);
+      copyTimer.current = window.setTimeout(() => setCopiedName(null), 1600);
+    } catch {
+      // Clipboard unavailable (plain http) or permission denied; leave the tile unchanged.
+    }
+  };
 
   const selectedName = getStringArg(args, "name", "search");
   const name: IconName = isChoice(selectedName, iconNames) ? selectedName : "search";
@@ -66,15 +81,26 @@ export function IconPreview({ args, composition, layout, onClick }: Props) {
         {filteredNames.length > 0 ? (
           <div className={layout === "horizontal" ? "icon-gallery" : "icon-gallery vertical"}>
             {filteredNames.map((item) => (
-              <div key={item} className="icon-tile">
+              <button
+                key={item}
+                type="button"
+                className="icon-tile"
+                title={`Copy <Icon name="${item}" />`}
+                aria-label={`Copy ${item} icon code`}
+                onClick={() => void copyIcon(item)}
+              >
                 <Icon name={item} size={size} strokeWidth={strokeWidth} color={color} {...stateProps} />
-                <span className="icon-tile-name">{item}</span>
-              </div>
+                <span className="icon-tile-name">{copiedName === item ? "Copied!" : item}</span>
+              </button>
             ))}
           </div>
         ) : (
           <p className="icon-tile-name">No icons match &ldquo;{query}&rdquo;.</p>
         )}
+        {/* One shared live region so screen readers announce only the latest copy. */}
+        <span role="status" className="visually-hidden">
+          {copiedName ? `Copied ${copiedName} icon code` : ""}
+        </span>
       </div>
     );
   }
