@@ -437,6 +437,11 @@ export function ExplorerPage() {
               layout={previewLayout}
               onLayoutChange={setPreviewLayout}
               showLayoutToggle={showLayoutToggle}
+              activeStory={activeStory}
+              onOpenStory={(story) => {
+                selectStory(activeComponent, story);
+                setActiveTopTab("canvas");
+              }}
             />
           ) : (
             <>

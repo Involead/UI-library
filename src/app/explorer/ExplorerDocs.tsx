@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
-import { Button } from "@/index";
-import type { ExplorerComponent, ExplorerValue } from "../explorer-config";
+import { useState, type ReactNode } from "react";
+import { Button, Icon } from "@/index";
+import type { ExplorerComponent, ExplorerControl, ExplorerValue } from "../explorer-config";
+import { getComponentDefaults } from "./args";
 import type { PreviewLayout } from "./types";
 import { LayoutToggle } from "./LayoutToggle";
 
@@ -11,7 +12,57 @@ type Props = {
   layout?: PreviewLayout;
   onLayoutChange?: (layout: PreviewLayout) => void;
   showLayoutToggle?: boolean;
+  /** Story currently selected in the sidebar, highlighted in the stories grid. */
+  activeStory?: string;
+  /** Opens a story on the Canvas tab. */
+  onOpenStory?: (story: string) => void;
 };
+
+type PropRow = { name: string; type: string; defaultValue: string; description: string };
+
+const buttonProps: PropRow[] = [
+  { name: "children", type: "ReactNode", defaultValue: "—", description: "Content displayed inside the button." },
+  { name: "variant", type: '"primary" | "secondary" | "outline" | "ghost" | "danger"', defaultValue: "primary", description: "Controls the visual style." },
+  { name: "size", type: '"small" | "medium" | "large"', defaultValue: "medium", description: "Controls the button dimensions and typography." },
+  { name: "loading", type: "boolean", defaultValue: "false", description: "Shows a spinner and disables the button." },
+  { name: "disabled", type: "boolean", defaultValue: "false", description: "Prevents interaction and applies disabled styling." },
+  { name: "fullWidth", type: "boolean", defaultValue: "false", description: "Expands the button to the available width." },
+  { name: "leftIcon / rightIcon", type: "ReactNode", defaultValue: "—", description: "Optional icons rendered beside the content." },
+];
+
+const buttonUsageCode = `<Button variant="primary">
+  Primary Button
+</Button>`;
+
+const buttonExamplesCode = `<Button variant="secondary" size="small">Secondary</Button>
+<Button variant="outline" size="medium">Outline</Button>
+<Button variant="danger" size="large">Delete</Button>`;
+
+/** How a control's value reads in the props table's Type column. */
+function controlType(control: ExplorerControl) {
+  if (control.kind === "select" && control.options?.length) {
+    return control.options.map((option) => `"${option}"`).join(" | ");
+  }
+  if (control.kind === "multi-select") return "string[]";
+  if (control.kind === "json") return "object[]";
+  return control.kind === "boolean" ? "boolean" : "string";
+}
+
+function formatDefault(value: ExplorerValue | undefined) {
+  if (value === undefined || value === null || value === "") return "—";
+  if (Array.isArray(value)) return value.length ? value.join(", ") : "—";
+  return String(value);
+}
+
+function controlRows(component: ExplorerComponent): PropRow[] {
+  const defaults = getComponentDefaults(component);
+  return component.controls.map((control) => ({
+    name: control.name,
+    type: controlType(control),
+    defaultValue: formatDefault(defaults[control.name]),
+    description: control.description,
+  }));
+}
 
 export function ExplorerDocs({
   component,
@@ -20,176 +71,207 @@ export function ExplorerDocs({
   layout,
   onLayoutChange,
   showLayoutToggle,
+  activeStory,
+  onOpenStory,
 }: Props) {
-  if (component.name === "Button") {
-    return (
-      <article className="docs-page">
-        <div className="docs-eyebrow">Components / Button</div>
-        <h1>Button</h1>
-        <p>
-          Buttons communicate actions that users can take. This documentation
-          mirrors the Button Storybook autodocs page and uses the same
-          component implementation.
-        </p>
-
-        <h2>Import</h2>
-        <pre className="docs-code">{`import { Button } from "@involead/ui";
-import "@involead/ui/ui.css";`}</pre>
-
-        <h2>Basic usage</h2>
-        <div className="docs-example">
-          <Button variant="primary">Primary Button</Button>
-        </div>
-        <pre className="docs-code">{`<Button variant="primary">
-  Primary Button
-</Button>`}</pre>
-
-        <h2>Props</h2>
-        <table className="docs-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Default</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>children</td>
-              <td>ReactNode</td>
-              <td>—</td>
-              <td>Content displayed inside the button.</td>
-            </tr>
-            <tr>
-              <td>variant</td>
-              <td>primary | secondary | outline | ghost | danger</td>
-              <td>primary</td>
-              <td>Controls the visual style.</td>
-            </tr>
-            <tr>
-              <td>size</td>
-              <td>small | medium | large</td>
-              <td>medium</td>
-              <td>Controls the button dimensions and typography.</td>
-            </tr>
-            <tr>
-              <td>loading</td>
-              <td>boolean</td>
-              <td>false</td>
-              <td>Shows a spinner and disables the button.</td>
-            </tr>
-            <tr>
-              <td>disabled</td>
-              <td>boolean</td>
-              <td>false</td>
-              <td>Prevents interaction and applies disabled styling.</td>
-            </tr>
-            <tr>
-              <td>fullWidth</td>
-              <td>boolean</td>
-              <td>false</td>
-              <td>Expands the button to the available width.</td>
-            </tr>
-            <tr>
-              <td>leftIcon / rightIcon</td>
-              <td>ReactNode</td>
-              <td>undefined</td>
-              <td>Optional icons rendered beside the content.</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <StoriesSection stories={component.stories} />
-        <AccessibilitySection guidelines={component.accessibility} />
-
-        <h2>Examples</h2>
-        <div className="docs-example">
-          <Button variant="secondary" size="small">Secondary</Button>
-          <Button variant="outline" size="medium">Outline</Button>
-          <Button variant="danger" size="large">Delete</Button>
-        </div>
-      </article>
-    );
-  }
+  const isButton = component.name === "Button";
+  const importCode = `import { ${component.name} } from "@involead/ui";
+import "@involead/ui/ui.css";`;
 
   return (
     <article className="docs-page">
-      <div className="docs-eyebrow">Components / {component.name}</div>
-      <h1>{component.name}</h1>
-      <p>{component.description}</p>
-
-      <h2>Import</h2>
-      <pre className="docs-code">{`import { ${component.name} } from "@involead/ui";
-import "@involead/ui/ui.css";`}</pre>
-
-      <h2>Live example</h2>
-      {showLayoutToggle && layout && onLayoutChange ? (
-        <div className="stage-toolbar">
-          <LayoutToggle layout={layout} onChange={onLayoutChange} />
+      <header className="docs-header">
+        <div className="docs-eyebrow">Components / {component.name}</div>
+        <h1>{component.name}</h1>
+        <p className="docs-lead">{component.description}</p>
+        <div className="docs-meta">
+          <span>
+            <Icon name="star" size={12} />
+            {component.stories.length} stories
+          </span>
+          <span>
+            <Icon name="check-circle" size={12} />
+            Accessible
+          </span>
+          <span>
+            <Icon name="edit" size={12} />
+            TypeScript
+          </span>
         </div>
-      ) : null}
-      <div className="docs-example">{preview}</div>
-      <pre className="docs-code">{code}</pre>
+      </header>
 
-      <h2>Props and controls</h2>
-      <table className="docs-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Control</th>
-            <th>Options</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {component.controls.map((control) => (
-            <tr key={control.name}>
-              <td>{control.name}</td>
-              <td>{control.kind}</td>
-              <td>{control.options?.join(" | ") ?? "—"}</td>
-              <td>{control.description}</td>
-            </tr>
+      <section className="docs-section" aria-labelledby="docs-import">
+        <h2 id="docs-import">Import</h2>
+        <CodeBlock title="Import" code={importCode} />
+      </section>
+
+      <section className="docs-section" aria-labelledby="docs-example">
+        <h2 id="docs-example">{isButton ? "Basic usage" : "Live example"}</h2>
+        <ExampleCard
+          code={isButton ? buttonUsageCode : code}
+          toolbar={
+            !isButton && showLayoutToggle && layout && onLayoutChange ? (
+              <LayoutToggle layout={layout} onChange={onLayoutChange} />
+            ) : null
+          }
+        >
+          {isButton ? <Button variant="primary">Primary Button</Button> : preview}
+        </ExampleCard>
+      </section>
+
+      <section className="docs-section" aria-labelledby="docs-props">
+        <h2 id="docs-props">Props</h2>
+        <PropsTable rows={isButton ? buttonProps : controlRows(component)} />
+      </section>
+
+      <section className="docs-section" aria-labelledby="docs-stories">
+        <h2 id="docs-stories">Stories</h2>
+        <p className="docs-section-lead">Open a story to try it on the canvas with live controls.</p>
+        <div className="story-grid">
+          {component.stories.map((story) => (
+            <button
+              type="button"
+              className={`story-card${story.name === activeStory ? " active" : ""}`}
+              key={story.name}
+              onClick={() => onOpenStory?.(story.name)}
+            >
+              <span className="story-card-text">
+                <strong>{story.name}</strong>
+                <span>{story.description}</span>
+              </span>
+              <Icon name="arrow-right" size={14} />
+            </button>
           ))}
-        </tbody>
-      </table>
+        </div>
+      </section>
 
-      <StoriesSection stories={component.stories} />
-      <AccessibilitySection guidelines={component.accessibility} />
+      <section className="docs-section" aria-labelledby="docs-a11y">
+        <h2 id="docs-a11y">Accessibility</h2>
+        <ul className="docs-a11y">
+          {component.accessibility.map((guideline) => (
+            <li key={guideline}>
+              <Icon name="check" size={14} />
+              <span>{guideline}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {isButton ? (
+        <section className="docs-section" aria-labelledby="docs-examples">
+          <h2 id="docs-examples">Examples</h2>
+          <ExampleCard code={buttonExamplesCode}>
+            <Button variant="secondary" size="small">Secondary</Button>
+            <Button variant="outline" size="medium">Outline</Button>
+            <Button variant="danger" size="large">Delete</Button>
+          </ExampleCard>
+        </section>
+      ) : null}
     </article>
   );
 }
 
-function StoriesSection({
-  stories,
-}: {
-  stories: { name: string; description: string }[];
-}) {
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
   return (
-    <>
-      <h2>Stories</h2>
-      <div className="story-grid">
-        {stories.map((story) => (
-          <div className="story-card" key={story.name}>
-            <strong>{story.name}</strong>
-            <span>{story.description}</span>
-          </div>
-        ))}
-      </div>
-    </>
+    <button
+      type="button"
+      className="docs-copy"
+      aria-label={copied ? "Copied" : "Copy code"}
+      onClick={() => {
+        void navigator.clipboard?.writeText(text).then(() => {
+          setCopied(true);
+          window.setTimeout(() => setCopied(false), 1600);
+        });
+      }}
+    >
+      <Icon name={copied ? "check" : "copy"} size={12} />
+      {copied ? "Copied" : "Copy"}
+    </button>
   );
 }
 
-function AccessibilitySection({ guidelines }: { guidelines: string[] }) {
+function CodeBlock({ title, code }: { title: string; code: string }) {
   return (
-    <>
-      <h2>Accessibility</h2>
-      <ul>
-        {guidelines.map((guideline) => (
-          <li key={guideline}>{guideline}</li>
-        ))}
-      </ul>
-    </>
+    <figure className="docs-codeblock">
+      <figcaption>
+        <span>{title}</span>
+        <CopyButton text={code} />
+      </figcaption>
+      <pre>
+        <code>{code}</code>
+      </pre>
+    </figure>
+  );
+}
+
+/** A live preview with its code behind a "Show code" toggle. */
+function ExampleCard({
+  code,
+  toolbar,
+  children,
+}: {
+  code: string;
+  toolbar?: ReactNode;
+  children: ReactNode;
+}) {
+  const [showCode, setShowCode] = useState(false);
+
+  return (
+    <div className="docs-example-card">
+      {toolbar ? <div className="docs-example-toolbar">{toolbar}</div> : null}
+      <div className="docs-example">{children}</div>
+      <div className="docs-example-actions">
+        <button type="button" aria-expanded={showCode} onClick={() => setShowCode((value) => !value)}>
+          <Icon name={showCode ? "chevron-up" : "chevron-down"} size={12} />
+          {showCode ? "Hide code" : "Show code"}
+        </button>
+        <CopyButton text={code} />
+      </div>
+      {showCode ? (
+        <pre className="docs-example-code">
+          <code>{code}</code>
+        </pre>
+      ) : null}
+    </div>
+  );
+}
+
+function PropsTable({ rows }: { rows: PropRow[] }) {
+  return (
+    <div className="docs-table-wrap">
+      <table className="docs-table">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Type</th>
+            <th scope="col">Default</th>
+            <th scope="col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.name}>
+              <td>
+                <code className="docs-prop-name">{row.name}</code>
+              </td>
+              <td>
+                <code className="docs-prop-type">{row.type}</code>
+              </td>
+              <td>
+                {row.defaultValue === "—" ? (
+                  <span className="docs-muted">—</span>
+                ) : (
+                  <code className="docs-prop-default">{row.defaultValue}</code>
+                )}
+              </td>
+              <td>{row.description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

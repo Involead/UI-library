@@ -1,3 +1,7 @@
+import { Icon } from "@/index";
+import packageJson from "../../../package.json";
+import { NPM_URL } from "./ExplorerIntro";
+
 type NavGroup = {
   title: string;
   items: string[];
@@ -112,6 +116,13 @@ export function ExplorerSidebar({
       {groups.length === 0 ? (
         <div className="sidebar-empty">No components or stories match “{search}”.</div>
       ) : null}
+
+      <footer className="sidebar-footer">
+        <span className="sidebar-version">v{packageJson.version}</span>
+        <a href={NPM_URL} target="_blank" rel="noreferrer">
+          npm <Icon name="external-link" size={12} />
+        </a>
+      </footer>
     </aside>
   );
 }
