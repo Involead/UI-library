@@ -299,11 +299,12 @@ export function Table<T>({
   // consumer saving `onDataChange`) replaces it. Compare the rows, not the
   // array, so an inline `data={items.slice(0, 5)}` doesn't undo every edit.
   const [rowData, setRowData] = useState(data);
-  const [syncedData, setSyncedData] = useState(data);
-  if (data !== syncedData) {
-    setSyncedData(data);
-    if (!sameRows(data, syncedData)) setRowData(data);
-  }
+  const prevDataRef = useRef(data);
+  useEffect(() => {
+    const prevData = prevDataRef.current;
+    prevDataRef.current = data;
+    if (!sameRows(prevData, data)) setRowData(data);
+  }, [data]);
 
   const [sort, setSort] = useControllableState<SortRule[]>(
     sortProp,
