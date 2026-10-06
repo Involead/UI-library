@@ -303,7 +303,9 @@ export function Table<T>({
   useEffect(() => {
     const prevData = prevDataRef.current;
     prevDataRef.current = data;
-    if (!sameRows(prevData, data)) setRowData(data);
+    if (!sameRows(prevData, data)) {
+      setRowData((current) => (sameRows(current, data) ? current : data));
+    }
   }, [data]);
 
   const [sort, setSort] = useControllableState<SortRule[]>(
