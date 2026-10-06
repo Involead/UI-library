@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
+import type { KeyboardEvent, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type { ExplorerArgs, ExplorerComponent, ExplorerValue } from "../explorer-config";
 import { getComponentDefaults, getDropdownOptions } from "./args";
 import { ExplorerControlField } from "./ExplorerControlField";
@@ -48,6 +48,42 @@ type Props = {
   onReset: () => void;
 };
 
+function ActionIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg
+      className="btn-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+const CopyGlyph = (
+  <ActionIcon>
+    <rect x="9" y="9" width="11" height="11" rx="2" />
+    <path d="M5 15V6a2 2 0 0 1 2-2h9" />
+  </ActionIcon>
+);
+
+const PlayGlyph = (
+  <ActionIcon>
+    <path d="M7 5v14l12-7L7 5Z" />
+  </ActionIcon>
+);
+
+const CheckGlyph = (
+  <ActionIcon>
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </ActionIcon>
+);
+
 export function ExplorerPanels({
   activePanel,
   onPanelChange,
@@ -70,7 +106,47 @@ export function ExplorerPanels({
   const [isDragging, setIsDragging] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startY: number; startHeight: number } | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [applied, setApplied] = useState(false);
+  const copyTimer = useRef<number | undefined>(undefined);
+  const applyTimer = useRef<number | undefined>(undefined);
 
+  const isEmpty = codeDraft.trim() === "";
+  const showApplied = applied && !codeError;
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(copyTimer.current);
+      window.clearTimeout(applyTimer.current);
+    },
+    [],
+  );
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(codeDraft);
+    } catch {
+      // clipboard API needs https or localhost; fall back for plain http
+      const area = document.createElement("textarea");
+      area.value = codeDraft;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      document.body.removeChild(area);
+    }
+    setCopied(true);
+    window.clearTimeout(copyTimer.current);
+    copyTimer.current = window.setTimeout(() => setCopied(false), 1600);
+  };
+
+  const handleApply = () => {
+    onApplyCode();
+    setApplied(true);
+    window.clearTimeout(applyTimer.current);
+    applyTimer.current = window.setTimeout(() => setApplied(false), 1600);
+  };
   const clampHeight = useCallback((value: number) => {
     const canvasHeight =
       panelRef.current?.closest<HTMLElement>(".canvas")?.clientHeight ??
@@ -193,9 +269,13 @@ export function ExplorerPanels({
                               onChange={(event) => onButtonControl(row.name, event.target.value)}
                               aria-label="Button variant"
                             >
-                              {["primary", "secondary", "outline", "ghost", "danger"].map((option) => (
-                                <option key={option} value={option}>{option}</option>
-                              ))}
+                              {["primary", "secondary", "outline", "ghost", "danger"].map(
+                                (option) => (
+                                  <option key={option} value={option}>
+                                    {option}
+                                  </option>
+                                ),
+                              )}
                             </select>
                           ) : row.name === "size" ? (
                             <select
@@ -205,7 +285,9 @@ export function ExplorerPanels({
                               aria-label="Button size"
                             >
                               {["small", "medium", "large"].map((option) => (
-                                <option key={option} value={option}>{option}</option>
+                                <option key={option} value={option}>
+                                  {option}
+                                </option>
                               ))}
                             </select>
                           ) : (
@@ -227,7 +309,9 @@ export function ExplorerPanels({
                       </tr>
                     ))
                   : component.controls
-                      .filter((control) => control.name !== "orientation" || selectedStory?.composition)
+                      .filter(
+                        (control) => control.name !== "orientation" || selectedStory?.composition,
+                      )
                       .map((control) => {
                         const defaultArgs = {
                           ...getComponentDefaults(component),
@@ -277,9 +361,7 @@ export function ExplorerPanels({
                 ))}
               </ul>
             ) : (
-              <div className="panel-empty">
-                Interact with the preview to see events here.
-              </div>
+              <div className="panel-empty">Interact with the preview to see events here.</div>
             )}
           </div>
         ) : null}
@@ -293,23 +375,37 @@ export function ExplorerPanels({
               aria-label={`Editable ${activeComponent} code`}
               spellCheck={false}
             />
-            {codeError ? <div className="code-error" role="alert">{codeError}</div> : null}
-            <div className="code-actions">
-              <button
-                type="button"
-                className="reset-btn"
-                onClick={onApplyCode}
-                disabled={codeDraft?.trim() === ""}
-              >
-                Apply code
-              </button>
-            </div>
+            {codeError ? (
+              <div className="code-error" role="alert">
+                {codeError}
+              </div>
+            ) : null}
           </>
         ) : null}
 
-        <button type="button" className="reset-btn" onClick={onReset}>
-          Reset controls
-        </button>
+        <div className="panel-actions">
+          <button type="button" className="reset-btn" onClick={onReset}>
+            Reset controls
+          </button>
+
+          {activePanel === "code" ? (
+            <div className="panel-actions-end">
+              <button type="button" className="reset-btn" onClick={handleCopy} disabled={isEmpty}>
+                {copied ? CheckGlyph : CopyGlyph}
+                <span aria-live="polite">{copied ? "Copied!" : "Copy code"}</span>
+              </button>
+              <button
+                type="button"
+                className="reset-btn reset-btn-primary"
+                onClick={handleApply}
+                disabled={isEmpty}
+              >
+                {showApplied ? CheckGlyph : PlayGlyph}
+                <span aria-live="polite">{showApplied ? "Applied!" : "Apply code"}</span>
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
