@@ -295,7 +295,12 @@ export function ExplorerPanels({
             />
             {codeError ? <div className="code-error" role="alert">{codeError}</div> : null}
             <div className="code-actions">
-              <button type="button" className="reset-btn" onClick={onApplyCode}>
+              <button
+                type="button"
+                className="reset-btn"
+                onClick={onApplyCode}
+                disabled={codeDraft?.trim() === ""}
+              >
                 Apply code
               </button>
             </div>

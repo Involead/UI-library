@@ -751,6 +751,12 @@ body:has(.storybook-page) {
   cursor: pointer;
 }
 
+.reset-btn:disabled {
+  border-color: var(--color-border);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
 .multi-select-controls {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

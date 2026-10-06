@@ -203,7 +203,8 @@ export function formatExplorerCode(
         .filter((line) => line.startsWith("  "))
         .map((line) => `    ${line}`)
         .join("\n");
-      return `import { Icon, type IconName } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\nconst names: IconName[] = ${JSON.stringify(Object.keys(icons))};\n\n<div style={${wrapperStyle}}>\n  {names.map((name) => (\n    <Icon\n      key={name}\n      name={name}\n${tileProps}\n    />\n  ))}\n</div>`;
+      // Plain JS (no `IconName[]` annotation) so the snippet also pastes into .jsx files.
+      return `${imports}\n\nconst names = ${JSON.stringify(Object.keys(icons))};\n\n<div style={${wrapperStyle}}>\n  {names?.map((name) => (\n    <Icon\n      key={name}\n      name={name}\n${tileProps}\n    />\n  ))}\n</div>`;
     }
     const examples: ExplorerArgs[] =
       composition === "sizes"
