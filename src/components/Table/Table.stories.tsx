@@ -19,7 +19,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { Button } from "@/components/Button";
 
 import { Table } from "./Table";
-import type { TableRowKey } from "./Table.types";
+import type { TableProps, TableRowKey } from "./Table.types";
 import {
   baseColumns,
   centeredRangeLabel,
@@ -56,10 +56,16 @@ import {
    META
    ========================= */
 
+// Pin the row type so story args are typed against the sample data.
+type EmployeeTableComponent = (
+  props: TableProps<Employee>,
+) => ReturnType<typeof Table>;
+
+const EmployeeTable: EmployeeTableComponent = Table;
+
 const meta = {
   title: "Components/Table",
-  // Pin the row type so story args are typed against the sample data.
-  component: Table as typeof Table<Employee>,
+  component: EmployeeTable,
 
   parameters: {
     layout: "padded",
@@ -126,7 +132,7 @@ const meta = {
     footer: { control: false },
     labels: { control: false },
   },
-} satisfies Meta<typeof Table<Employee>>;
+} satisfies Meta<EmployeeTableComponent>;
 
 export default meta;
 
