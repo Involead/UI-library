@@ -385,14 +385,18 @@ export function ExplorerPanels({
                   </button>
                 ))}
               </div>
+              <textarea
+                className="code-panel"
+                value={displayCode}
+                readOnly={language === "jsx"}
+                onChange={(event) => onCodeChange(unformatCode(event.target.value))}
+                aria-label={`${language === "jsx" ? "Read-only" : "Editable"} ${activeComponent} ${language.toUpperCase()} code`}
+                spellCheck={false}
+              />
             </div>
-            <textarea
-              className="code-panel"
-              value={displayCode}
-              onChange={(event) => onCodeChange(unformatCode(event.target.value))}
-              aria-label={`Editable ${activeComponent} ${language.toUpperCase()} code`}
-              spellCheck={false}
-            />
+            {language === "jsx" ? (
+              <p className="code-hint">JSX is a read-only view. Switch to TSX to edit the code.</p>
+            ) : null}
             {codeError ? (
               <div className="code-error" role="alert">
                 {codeError}

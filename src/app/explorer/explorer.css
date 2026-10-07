@@ -2759,13 +2759,26 @@ button.intro-app-item.active:hover {
 }
 
 .code-toolbar {
-  display: flex;
-  justify-content: flex-end;
+  position: relative;
   margin-top: var(--spacing-4);
 }
 
-.code-toolbar + .code-panel {
+.code-toolbar .code-panel {
+  margin-top: 0;
+  padding-top: calc(var(--control-height-sm) + var(--spacing-5)); /* room for the toggle */
+}
+
+.code-toolbar .code-lang {
+  position: absolute;
+  top: var(--spacing-3);
+  right: var(--spacing-5);
+  z-index: 1;
+}
+
+.code-hint {
   margin-top: var(--spacing-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
 }
 
 .code-lang {
