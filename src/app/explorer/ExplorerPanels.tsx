@@ -4,6 +4,7 @@ import type { ExplorerArgs, ExplorerComponent, ExplorerValue } from "../explorer
 import { getComponentDefaults, getDropdownOptions } from "./args";
 import { ExplorerControlField } from "./ExplorerControlField";
 import type { ButtonSize, ButtonVariant, Panel } from "./types";
+import { formatCode, unformatCode, type CodeLanguage } from "./codeFormat";
 
 const MIN_HEIGHT = 160;
 const MAX_VIEWPORT_RATIO = 0.85;
@@ -110,6 +111,8 @@ export function ExplorerPanels({
   const [applied, setApplied] = useState(false);
   const copyTimer = useRef<number | undefined>(undefined);
   const applyTimer = useRef<number | undefined>(undefined);
+  const [language, setLanguage] = useState<CodeLanguage>("jsx");
+  const displayCode = formatCode(codeDraft, language);
 
   const isEmpty = codeDraft.trim() === "";
   const showApplied = applied && !codeError;
@@ -124,11 +127,11 @@ export function ExplorerPanels({
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(codeDraft);
+      await navigator.clipboard.writeText(displayCode);
     } catch {
       // clipboard API needs https or localhost; fall back for plain http
       const area = document.createElement("textarea");
-      area.value = codeDraft;
+      area.value = displayCode;
       area.style.position = "fixed";
       area.style.opacity = "0";
       document.body.appendChild(area);
@@ -368,11 +371,26 @@ export function ExplorerPanels({
 
         {activePanel === "code" ? (
           <>
+            <div className="code-toolbar">
+              <div className="code-lang" role="group" aria-label="Code language">
+                {(["jsx", "tsx"] as CodeLanguage[]).map((lang) => (
+                  <button
+                    key={lang}
+                    type="button"
+                    className={`code-lang-btn${language === lang ? " active" : ""}`}
+                    aria-pressed={language === lang}
+                    onClick={() => setLanguage(lang)}
+                  >
+                    {lang.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
             <textarea
               className="code-panel"
-              value={codeDraft}
-              onChange={(event) => onCodeChange(event.target.value)}
-              aria-label={`Editable ${activeComponent} code`}
+              value={displayCode}
+              onChange={(event) => onCodeChange(unformatCode(event.target.value))}
+              aria-label={`Editable ${activeComponent} ${language.toUpperCase()} code`}
               spellCheck={false}
             />
             {codeError ? (
