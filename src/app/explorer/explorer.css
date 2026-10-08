@@ -916,6 +916,34 @@ body:has(.storybook-page) {
   color: var(--color-text-primary);
 }
 
+/* Native button reset; border, background, padding and color come from .icon-tile above. */
+button.icon-tile {
+  appearance: none;
+  margin: 0;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+button.icon-tile:hover {
+  border-color: var(--color-primary);
+}
+
+button.icon-tile:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .icon-tile.plain {
   padding: 0;
   border: 0;
