@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Tab, TabPanel, type TabItem } from "@/components/Tab";
+import { TabList, TabButton, TabPanel, type TabItem } from "@/components/Tab";
 import type { IconName } from "@/icons";
 
 import type { ExplorerArgs } from "../../explorer-config";
@@ -36,15 +36,15 @@ export function TabPreview({ args, composition, layout, onChange }: Props) {
     getStringArg(args, "value", "tab-1"),
   );
 
-  const selectedSize = getStringArg(args, "size", "medium");
+  const selectedSize = getStringArg(args, "size", "small");
   const size = isChoice(selectedSize, ["small", "medium", "large"])
     ? selectedSize
-    : "medium";
+    : "small";
 
-  const selectedVariant = getStringArg(args, "variant", "line");
+  const selectedVariant = getStringArg(args, "variant", "pill");
   const variant = isChoice(selectedVariant, ["line", "pill"])
     ? selectedVariant
-    : "line";
+    : "pill";
 
   const selectedOrientation = getStringArg(args, "orientation", "horizontal");
   const orientation = isChoice(selectedOrientation, ["horizontal", "vertical"])
@@ -129,9 +129,8 @@ export function TabPreview({ args, composition, layout, onChange }: Props) {
             >
               {tabSize}
             </h3>
-            <Tab
+            <TabList
               id={`${TABS_ID}-${tabSize}`}
-              items={items}
               value={currentValue}
               onChange={handleChange}
               size={tabSize}
@@ -140,7 +139,17 @@ export function TabPreview({ args, composition, layout, onChange }: Props) {
               disabled={disabled}
               iconPosition={iconPosition}
               iconOnly={iconOnly}
-            />
+            >
+              {items.map((item) => (
+                <TabButton
+                  key={item.value}
+                  value={item.value}
+                  label={item.label}
+                  icon={item.icon}
+                  disabled={item.disabled}
+                />
+              ))}
+            </TabList>
             {/* Note: panels are shared across sizes for simplicity in the explorer */}
             {index === 0 && renderPanels()}
           </div>
@@ -155,9 +164,8 @@ export function TabPreview({ args, composition, layout, onChange }: Props) {
       <div className={stackClass}>
         <div>
           <h3 style={headingStyle(true)}>Horizontal</h3>
-          <Tab
+          <TabList
             id={`${TABS_ID}-horizontal`}
-            items={items}
             value={currentValue}
             onChange={handleChange}
             size={size}
@@ -166,15 +174,24 @@ export function TabPreview({ args, composition, layout, onChange }: Props) {
             disabled={disabled}
             iconPosition={iconPosition}
             iconOnly={iconOnly}
-          />
+          >
+            {items.map((item) => (
+              <TabButton
+                key={item.value}
+                value={item.value}
+                label={item.label}
+                icon={item.icon}
+                disabled={item.disabled}
+              />
+            ))}
+          </TabList>
           <div style={{ marginTop: "12px" }}>{renderPanels()}</div>
         </div>
         <div>
           <h3 style={headingStyle(false)}>Vertical</h3>
           <div style={{ display: "flex", gap: "16px" }}>
-            <Tab
+            <TabList
               id={`${TABS_ID}-vertical`}
-              items={items}
               value={currentValue}
               onChange={handleChange}
               size={size}
@@ -183,7 +200,17 @@ export function TabPreview({ args, composition, layout, onChange }: Props) {
               disabled={disabled}
               iconPosition={iconPosition}
               iconOnly={iconOnly}
-            />
+            >
+              {items.map((item) => (
+                <TabButton
+                  key={item.value}
+                  value={item.value}
+                  label={item.label}
+                  icon={item.icon}
+                  disabled={item.disabled}
+                />
+              ))}
+            </TabList>
             <div style={{ minWidth: "200px" }}>{renderPanels()}</div>
           </div>
         </div>
@@ -204,9 +231,8 @@ export function TabPreview({ args, composition, layout, onChange }: Props) {
           : {}),
       }}
     >
-      <Tab
+      <TabList
         id={TABS_ID}
-        items={items}
         value={currentValue}
         onChange={handleChange}
         size={size}
@@ -216,7 +242,17 @@ export function TabPreview({ args, composition, layout, onChange }: Props) {
         scrollable={scrollable}
         iconPosition={iconPosition}
         iconOnly={iconOnly}
-      />
+      >
+        {items.map((item) => (
+          <TabButton
+            key={item.value}
+            value={item.value}
+            label={item.label}
+            icon={item.icon}
+            disabled={item.disabled}
+          />
+        ))}
+      </TabList>
 
       {renderPanels()}
     </div>

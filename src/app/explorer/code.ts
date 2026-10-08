@@ -25,22 +25,26 @@ export function formatExplorerCode(
     formatExplorerCode(component, nextArgs).split("\n\n").slice(1).join("\n\n");
 
   // ────────────────────────────────────────────────
-  // Tab – full example with Tab + TabPanel
+  // Tab – compound: TabList + TabButton + TabPanel
   // ────────────────────────────────────────────────
   if (component === "Tab") {
     const size =
       typeof args.size === "string" && ["small", "medium", "large"].includes(args.size)
         ? args.size
-        : "medium";
+        : "small";
     const variant =
       typeof args.variant === "string" && ["line", "pill"].includes(args.variant)
         ? args.variant
-        : "line";
+        : "pill";
     const orientation = args.orientation === "vertical" ? "vertical" : "horizontal";
     const disabled = args.disabled === true;
     const scrollable = args.scrollable === true;
     const iconOnly = args.iconOnly === true;
     const withIcons = args.withIcons === true || iconOnly;
+    const disabledTab =
+      typeof args.disabledTab === "string" && args.disabledTab !== "none"
+        ? args.disabledTab
+        : null;
     const iconPosition =
       typeof args.iconPosition === "string" &&
       ["start", "end", "top", "bottom"].includes(args.iconPosition)
@@ -48,51 +52,51 @@ export function formatExplorerCode(
         : "start";
     const currentValue = typeof args.value === "string" && args.value ? args.value : "tab-1";
 
-    // Static items so the parser can still read the <Tab> tag
-    const itemsCode = scrollable
-      ? `Array.from({ length: 12 }, (_, i) => ({
-  label: \`Tab \${i + 1}\`,
-  value: \`tab-\${i + 1}\`,${withIcons ? `\n  icon: ["search", "info", "settings"][i % 3],` : ""}
-}))`
-      : `[
-  { label: "Tab 1", value: "tab-1"${withIcons ? ', icon: "search"' : ""} },
-  { label: "Tab 2", value: "tab-2"${withIcons ? ', icon: "info"' : ""} },
-  { label: "Tab 3", value: "tab-3"${withIcons ? ', icon: "settings"' : ""} },
-]`;
-
-    // Static string / explicit boolean props → parseExplorerCode can extract them.
-    // `value` and `onChange` are wired to state below so the snippet is runnable.
-    const tabProps = [
-      `  id={tabsId}`,
-      `  items={items}`,
-      `  value={activeTab}`,
-      `  onChange={setActiveTab}`,
-      `  size="${size}"`,
-      `  variant="${variant}"`,
-      `  orientation="${orientation}"`,
+    const listProps = [
+      `    id={tabsId}`,
+      `    value={activeTab}`,
+      `    onChange={setActiveTab}`,
     ];
-
-    // Always emit explicit boolean form so the parser can read them
-    if (disabled) tabProps.push(`  disabled={true}`);
-    if (scrollable) tabProps.push(`  scrollable={true}`);
-    if (iconOnly) tabProps.push(`  iconOnly={true}`);
+    if (size !== "small") listProps.push(`    size="${size}"`);
+    if (variant !== "pill") listProps.push(`    variant="${variant}"`);
+    if (orientation !== "horizontal") listProps.push(`    orientation="${orientation}"`);
+    if (disabled) listProps.push(`    disabled={true}`);
+    if (scrollable) listProps.push(`    scrollable={true}`);
+    if (iconOnly) listProps.push(`    iconOnly={true}`);
     if (withIcons && iconPosition !== "start") {
-      tabProps.push(`  iconPosition="${iconPosition}"`);
+      listProps.push(`    iconPosition="${iconPosition}"`);
     }
 
+    const iconFor = (i: number) =>
+      withIcons ? ` icon="${["search", "info", "settings"][i % 3]}"` : "";
+
+    const disabledFor = (value: string) =>
+      disabledTab === value ? " disabled={true}" : "";
+
+    const buttons = scrollable
+      ? `    {Array.from({ length: 12 }, (_, i) => (
+      <TabButton
+        key={i}
+        value={\`tab-\${i + 1}\`}
+        label={\`Tab \${i + 1}\`}${withIcons ? `\n        icon={["search", "info", "settings"][i % 3]}` : ""}
+      />
+    ))}`
+      : `    <TabButton value="tab-1" label="Tab 1"${iconFor(0)}${disabledFor("tab-1")} />
+    <TabButton value="tab-2" label="Tab 2"${iconFor(1)}${disabledFor("tab-2")} />
+    <TabButton value="tab-3" label="Tab 3"${iconFor(2)}${disabledFor("tab-3")} />`;
+
     const panels = scrollable
-      ? `Array.from({ length: 12 }, (_, i) => (
-  <TabPanel
-    key={i}
-    tabsId={tabsId}
-    value={\`tab-\${i + 1}\`}
-    activeValue={activeTab}
-  >
-    Content for Tab {i + 1}
-  </TabPanel>
-))`
-      : `<>
-  <TabPanel tabsId={tabsId} value="tab-1" activeValue={activeTab}>
+      ? `  {Array.from({ length: 12 }, (_, i) => (
+    <TabPanel
+      key={i}
+      tabsId={tabsId}
+      value={\`tab-\${i + 1}\`}
+      activeValue={activeTab}
+    >
+      Content for Tab {i + 1}
+    </TabPanel>
+  ))}`
+      : `  <TabPanel tabsId={tabsId} value="tab-1" activeValue={activeTab}>
     Content for Tab 1
   </TabPanel>
   <TabPanel tabsId={tabsId} value="tab-2" activeValue={activeTab}>
@@ -100,8 +104,7 @@ export function formatExplorerCode(
   </TabPanel>
   <TabPanel tabsId={tabsId} value="tab-3" activeValue={activeTab}>
     Content for Tab 3
-  </TabPanel>
-</>`;
+  </TabPanel>`;
 
     const layoutStyle =
       orientation === "vertical"
@@ -109,20 +112,20 @@ export function formatExplorerCode(
         : '{ display: "flex", flexDirection: "column", gap: "16px" }';
 
     return `import { useState } from "react";
-import { Tab, TabPanel } from "@involead/ui";
+import { TabList, TabButton, TabPanel } from "@involead/ui";
 import "@involead/ui/ui.css";
 
-const items = ${itemsCode};
-
-// The same id is shared by <Tab id> and every <TabPanel tabsId>
 const tabsId = "demo-tabs";
 const [activeTab, setActiveTab] = useState("${currentValue}");
 
 <div style={${layoutStyle}}>
-  <Tab
-${tabProps.join("\n")}
-  />
-  ${panels}
+  <TabList
+${listProps.join("\n")}
+  >
+${buttons}
+  </TabList>
+
+${panels}
 </div>`;
   }
 
@@ -537,8 +540,6 @@ ${tabProps.join("\n")}
   // ────────────────────────────────────────────────
   // Generic fallback (unchanged)
   // ────────────────────────────────────────────────
-  // Icon: `svg` holds custom markup rendered as children (so `name` is unused),
-  // and `clickable` stands in for an onClick handler.
   const iconSvg = component === "Icon" && typeof args.svg === "string" ? args.svg.trim() : "";
   const isIconOnlyArg = (key: string, value: ExplorerValue) =>
     component === "Icon" &&
@@ -550,9 +551,7 @@ ${tabProps.join("\n")}
     .filter(
       ([key, value]) =>
         key !== "children" &&
-        // `orientation` is a layout toggle for other components, but a real prop on Tab.
         (key !== "orientation" || component === "Tab") &&
-        // `disabledTab` is an explorer-only control, not a real Tab prop.
         !(component === "Tab" && (key === "disabledTab" || key === "withIcons")) &&
         !isIconOnlyArg(key, value) &&
         value !== null &&
@@ -597,13 +596,40 @@ ${tabProps.join("\n")}
   return `import { ${component} } from "@involead/ui";\nimport "@involead/ui/ui.css";\n\n<${component}${props.length ? `\n${props.join("\n")}\n` : ""}${body}`;
 }
 
-export function parseExplorerCode(code: string, component: ExplorerComponent): ExplorerArgs | null {
-  const componentTag = new RegExp(`<${component.name}\\b([\\s\\S]*?)(?:\\/?>)`);
-  const tag = code.match(componentTag);
-  if (!tag) return null;
+/* ------------------------------------------------------------------ */
+/* Parser                                                              */
+/* ------------------------------------------------------------------ */
 
+/**
+ * Root tags the parser recognizes for each component.
+ * Tab accepts both the array API (<Tab>) and the compound API (<TabList>).
+ */
+const PARSER_ROOT_TAGS: Record<string, string> = {
+  Tab: "(?:Tab|TabList)",
+};
+
+export function parseExplorerCode(code: string, component: ExplorerComponent): ExplorerArgs | null {
+  const rootTag = PARSER_ROOT_TAGS[component.name] ?? component.name;
+  const componentTag = new RegExp(`<${rootTag}\\b([\\s\\S]*?)(?:\\/?>)`);
+  const tag = code.match(componentTag);
+
+  // Fallback: plain component tag (e.g. legacy <Tab … /> snippets).
+  if (!tag) {
+    const plainTag = new RegExp(`<${component.name}\\b([\\s\\S]*?)(?:\\/?>)`);
+    const plainMatch = code.match(plainTag);
+    if (!plainMatch) return null;
+    return parseAttributes(plainMatch[1], component, code);
+  }
+
+  return parseAttributes(tag[1], component, code);
+}
+
+function parseAttributes(
+  attributes: string,
+  component: ExplorerComponent,
+  code: string,
+): ExplorerArgs | null {
   const args = getComponentDefaults(component);
-  const attributes = tag[1];
   for (const control of component.controls) {
     const escapedName = control.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const expression = new RegExp(`\\b${escapedName}\\s*=\\s*`);
@@ -688,7 +714,14 @@ export function parseExplorerCode(code: string, component: ExplorerComponent): E
     const direction = code.match(/flexDirection:\s*["'](row|column)["']/)?.[1];
     if (direction) args.orientation = direction === "row" ? "horizontal" : "vertical";
   }
-  const children = readComponentBody(code, component.name);
+
+  const bodyTag =
+    component.name === "Tab"
+      ? code.includes("<TabList")
+        ? "TabList"
+        : "Tab"
+      : component.name;
+  const children = readComponentBody(code, bodyTag);
   if (children !== null && component.controls.some((control) => control.name === "children")) {
     args.children = parseTextChild(children);
   }
@@ -696,7 +729,6 @@ export function parseExplorerCode(code: string, component: ExplorerComponent): E
     args.icon = "star";
   }
   if (component.name === "Table") {
-    // Not props: they map to `renderExpandedRow`, and `error` / `data={[]}`.
     args.expandable = /\brenderExpandedRow\s*=/.test(attributes);
     const errorMessage = attributes.match(/\berror\s*=\s*(["'])(.*?)\1/)?.[2];
     args.errorMessage = errorMessage ?? null;
@@ -708,10 +740,21 @@ export function parseExplorerCode(code: string, component: ExplorerComponent): E
   }
   if (component.name === "Icon") {
     args.clickable = /\bonClick\s*=/.test(attributes);
-    // A custom <svg> child: keep its markup so the preview draws it.
     const body = readComponentBody(code, "Icon");
     args.svg = body && /^<svg\b/.test(body) ? dedent(body) : null;
   }
+
+  // Tab: a disabled <TabButton> child means "disable that tab", not the list.
+  if (component.name === "Tab") {
+    const disabledButton = code.match(
+      /<TabButton\b[^>]*\bvalue=["']([^"']+)["'][^>]*\bdisabled(?:=\{true\})?/
+    );
+    if (disabledButton) {
+      args.disabledTab = disabledButton[1];
+      args.disabled = false;
+    }
+  }
+
   return args;
 }
 

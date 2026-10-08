@@ -494,17 +494,17 @@ export const explorerComponents: ExplorerComponent[] = [
     ],
     stories: [
       {
-        name: "Default",
-        description: "Basic line tabs",
-        args: { value: "tab-1", variant: "line", size: "medium", orientation: "horizontal" },
-        composition: "default",
-      },
-      {
-        name: "Pill",
-        description: "Pill-style tabs",
-        args: { value: "tab-1", variant: "pill", size: "medium", orientation: "horizontal" },
-        composition: "default",
-      },
+  name: "Default",
+  description: "Pill tabs (default)",
+  args: { value: "tab-1", size: "small", orientation: "horizontal" },
+  composition: "default",
+},
+{
+  name: "Line",
+  description: "Line-style tabs",
+  args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal" },
+  composition: "default",
+},
       {
         name: "Sizes",
         description: "Small, medium, and large tabs",
@@ -514,7 +514,7 @@ export const explorerComponents: ExplorerComponent[] = [
       {
         name: "Orientation",
         description: "Horizontal and vertical layouts",
-        args: { value: "tab-1", variant: "line", size: "medium" },
+        args: { value: "tab-1", variant: "line", size: "small" },
         composition: "orientation",
       },
       {
@@ -523,7 +523,7 @@ export const explorerComponents: ExplorerComponent[] = [
         args: {
           value: "tab-1",
           variant: "line",
-          size: "medium",
+          size: "small",
           orientation: "horizontal",
           disabledTab: "tab-2",
         },
@@ -535,7 +535,7 @@ export const explorerComponents: ExplorerComponent[] = [
         args: {
           value: "tab-1",
           variant: "line",
-          size: "medium",
+          size: "small",
           orientation: "horizontal",
           disabled: true,
         },
@@ -544,49 +544,49 @@ export const explorerComponents: ExplorerComponent[] = [
             {
         name: "Scrollable",
         description: "Many tabs in a narrow container scroll horizontally",
-        args: { value: "tab-1", variant: "line", size: "medium", orientation: "horizontal", scrollable: true },
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", scrollable: true },
         composition: "default",
       },
       {
         name: "Scrollable Pill",
         description: "Pill-style tabs that scroll",
-        args: { value: "tab-1", variant: "pill", size: "medium", orientation: "horizontal", scrollable: true },
+        args: { value: "tab-1", variant: "pill", size: "small", orientation: "horizontal", scrollable: true },
         composition: "default",
       },
       {
         name: "Scrollable Vertical",
         description: "Vertical tabs that scroll inside a fixed height",
-        args: { value: "tab-1", variant: "line", size: "medium", orientation: "vertical", scrollable: true },
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "vertical", scrollable: true },
         composition: "default",
       },
             {
         name: "Icons Start",
         description: "Icon before the label",
-        args: { value: "tab-1", variant: "line", size: "medium", orientation: "horizontal", withIcons: true, iconPosition: "start" },
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", withIcons: true, iconPosition: "start" },
         composition: "default",
       },
       {
         name: "Icons End",
         description: "Icon after the label",
-        args: { value: "tab-1", variant: "line", size: "medium", orientation: "horizontal", withIcons: true, iconPosition: "end" },
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", withIcons: true, iconPosition: "end" },
         composition: "default",
       },
       {
         name: "Icons Top",
         description: "Icon above the label",
-        args: { value: "tab-1", variant: "line", size: "medium", orientation: "horizontal", withIcons: true, iconPosition: "top" },
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", withIcons: true, iconPosition: "top" },
         composition: "default",
       },
       {
         name: "Icons Bottom",
         description: "Icon below the label",
-        args: { value: "tab-1", variant: "line", size: "medium", orientation: "horizontal", withIcons: true, iconPosition: "bottom" },
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", withIcons: true, iconPosition: "bottom" },
         composition: "default",
       },
       {
         name: "Icon Only",
         description: "Icons without visible labels",
-        args: { value: "tab-1", variant: "line", size: "medium", orientation: "horizontal", withIcons: true, iconOnly: true },
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", withIcons: true, iconOnly: true },
         composition: "default",
       },
     ],

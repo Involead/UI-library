@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useId, useState } from "react";
 
-import { Tab, TabPanel } from "./";
-import type { TabItem } from "./"; // adjust if needed
+import { Tab, TabList, TabButton, TabPanel } from "./";
+import type { TabItem } from "./";
 
 const meta = {
   title: "Components/Tab",
@@ -19,8 +19,8 @@ const meta = {
     ],
     value: "tab-1",
     onChange: () => {},
-    variant: "line",
-    size: "medium",
+    variant: "pill",
+    size: "small",
     orientation: "horizontal",
     disabled: false,
     scrollable: false,
@@ -104,8 +104,22 @@ const InteractiveTab = (args: TabArgs) => {
   return <Tab {...args} value={activeTab} onChange={handleChange} />;
 };
 
-const TabsWithPanels = (args: TabArgs) => {
-  const [activeTab, handleChange] = useTabState(args);
+/* Compound-API version used by every story from here on */
+type CompoundArgs = {
+  value: string;
+  onChange: (v: string) => void;
+  items: TabItem[];
+  variant?: TabArgs["variant"];
+  size?: TabArgs["size"];
+  orientation?: TabArgs["orientation"];
+  disabled?: boolean;
+  scrollable?: boolean;
+  iconOnly?: boolean;
+  iconPosition?: TabArgs["iconPosition"];
+};
+
+const CompoundTabsWithPanels = (args: CompoundArgs) => {
+  const [activeTab, setActiveTab] = useState(args.value);
   const tabsId = useId();
   const isVertical = args.orientation === "vertical";
 
@@ -118,7 +132,31 @@ const TabsWithPanels = (args: TabArgs) => {
         gap: isVertical ? "16px" : 0,
       }}
     >
-      <Tab {...args} id={tabsId} value={activeTab} onChange={handleChange} />
+      <TabList
+        id={tabsId}
+        value={activeTab}
+        onChange={(next) => {
+          setActiveTab(next);
+          args.onChange(next);
+        }}
+        variant={args.variant}
+        size={args.size}
+        orientation={args.orientation}
+        disabled={args.disabled}
+        scrollable={args.scrollable}
+        iconOnly={args.iconOnly}
+        iconPosition={args.iconPosition}
+      >
+        {args.items.map((item) => (
+          <TabButton
+            key={item.value}
+            value={item.value}
+            label={item.label}
+            icon={item.icon}
+            disabled={item.disabled}
+          />
+        ))}
+      </TabList>
       <div>
         {args.items.map((item) => (
           <TabPanel
@@ -139,23 +177,21 @@ const TabsWithPanels = (args: TabArgs) => {
   );
 };
 
-/* Helper to generate clean source for stories that use panels */
+/* Helper to generate clean compound-API source for stories with panels */
 function panelsSource(extraProps = "") {
   return `const [activeTab, setActiveTab] = useState("tab-1");
 const tabsId = "demo-tabs";
 
-<Tab
+<TabList
   id={tabsId}
-  items={[
-    { label: "Tab 1", value: "tab-1" },
-    { label: "Tab 2", value: "tab-2" },
-    { label: "Tab 3", value: "tab-3" },
-  ]}
   value={activeTab}
-  onChange={setActiveTab}
-  variant="line"
-  size="medium"${extraProps}
-/>
+  onChange={setActiveTab}${extraProps}
+>
+  <TabButton value="tab-1" label="Tab 1" />
+  <TabButton value="tab-2" label="Tab 2" />
+  <TabButton value="tab-3" label="Tab 3" />
+</TabList>
+
 {/* All panels stay in the DOM; only the active one is visible */}
 <TabPanel tabsId={tabsId} value="tab-1" activeValue={activeTab}>
   Content for Tab 1
@@ -174,14 +210,14 @@ const tabsId = "demo-tabs";
 
 export const Default: Story = {};
 
-export const Pill: Story = {
+export const Line: Story = {
   args: {
-    variant: "pill",
+    variant: "line",
   },
 };
 
 export const WithPanels: Story = {
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
@@ -199,7 +235,7 @@ export const Vertical: Story = {
   args: {
     orientation: "vertical",
   },
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
@@ -250,23 +286,23 @@ export const WithDisabledItem: Story = {
       { label: "Tab 3", value: "tab-3" },
     ],
   },
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
         code: `const [activeTab, setActiveTab] = useState("tab-1");
 const tabsId = "demo-tabs";
 
-<Tab
+<TabList
   id={tabsId}
-  items={[
-    { label: "Tab 1", value: "tab-1" },
-    { label: "Tab 2 (disabled)", value: "tab-2", disabled: true },
-    { label: "Tab 3", value: "tab-3" },
-  ]}
   value={activeTab}
   onChange={setActiveTab}
-/>
+>
+  <TabButton value="tab-1" label="Tab 1" />
+  <TabButton value="tab-2" label="Tab 2 (disabled)" disabled />
+  <TabButton value="tab-3" label="Tab 3" />
+</TabList>
+
 <TabPanel tabsId={tabsId} value="tab-1" activeValue={activeTab}>
   Content for Tab 1
 </TabPanel>
@@ -297,33 +333,38 @@ export const Scrollable: Story = {
       </div>
     ),
   ],
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
         code: `const [activeTab, setActiveTab] = useState("tab-1");
 const tabsId = "demo-tabs";
 
-<Tab
+<TabList
   id={tabsId}
-  items={Array.from({ length: 12 }, (_, i) => ({
-    label: \`Tab \${i + 1}\`,
-    value: \`tab-\${i + 1}\`,
-  }))}
   value={activeTab}
   onChange={setActiveTab}
   scrollable
-/>
+>
+  {Array.from({ length: 12 }, (_, i) => (
+    <TabButton
+      key={i}
+      value={\`tab-\${i + 1}\`}
+      label={\`Tab \${i + 1}\`}
+    />
+  ))}
+</TabList>
+
 {/* + TabPanels for each item */}`,
       },
     },
   },
 };
 
-export const ScrollablePill: Story = {
+export const ScrollableLine: Story = {
   args: {
     items: manyItems,
-    variant: "pill",
+    variant: "line",
     scrollable: true,
   },
   decorators: [
@@ -333,24 +374,29 @@ export const ScrollablePill: Story = {
       </div>
     ),
   ],
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
         code: `const [activeTab, setActiveTab] = useState("tab-1");
 const tabsId = "demo-tabs";
 
-<Tab
+<TabList
   id={tabsId}
-  items={Array.from({ length: 12 }, (_, i) => ({
-    label: \`Tab \${i + 1}\`,
-    value: \`tab-\${i + 1}\`,
-  }))}
   value={activeTab}
   onChange={setActiveTab}
-  variant="pill"
+  variant="line"
   scrollable
-/>
+>
+  {Array.from({ length: 12 }, (_, i) => (
+    <TabButton
+      key={i}
+      value={\`tab-\${i + 1}\`}
+      label={\`Tab \${i + 1}\`}
+    />
+  ))}
+</TabList>
+
 {/* + TabPanels for each item */}`,
       },
     },
@@ -370,24 +416,29 @@ export const ScrollableVertical: Story = {
       </div>
     ),
   ],
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
         code: `const [activeTab, setActiveTab] = useState("tab-1");
 const tabsId = "demo-tabs";
 
-<Tab
+<TabList
   id={tabsId}
-  items={Array.from({ length: 12 }, (_, i) => ({
-    label: \`Tab \${i + 1}\`,
-    value: \`tab-\${i + 1}\`,
-  }))}
   value={activeTab}
   onChange={setActiveTab}
   orientation="vertical"
   scrollable
-/>
+>
+  {Array.from({ length: 12 }, (_, i) => (
+    <TabButton
+      key={i}
+      value={\`tab-\${i + 1}\`}
+      label={\`Tab \${i + 1}\`}
+    />
+  ))}
+</TabList>
+
 {/* + TabPanels for each item */}`,
       },
     },
@@ -407,13 +458,22 @@ export const IconsStart: Story = {
     ]),
     iconPosition: "start",
   },
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
-        code: panelsSource(`
-  iconPosition="start"
-  // items include icon: "search" | "info" | "settings"`),
+        code: `const [activeTab, setActiveTab] = useState("tab-1");
+const tabsId = "demo-tabs";
+
+<TabList
+  id={tabsId}
+  value={activeTab}
+  onChange={setActiveTab}
+>
+  <TabButton value="tab-1" label="Tab 1" icon="search" />
+  <TabButton value="tab-2" label="Tab 2" icon="info" />
+  <TabButton value="tab-3" label="Tab 3" icon="settings" />
+</TabList>`,
       },
     },
   },
@@ -428,13 +488,22 @@ export const IconsEnd: Story = {
     ]),
     iconPosition: "end",
   },
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
         code: panelsSource(`
   iconPosition="end"
-  // items include icon: "search" | "info" | "settings"`),
+`).replace(
+          `  <TabButton value="tab-1" label="Tab 1" />`,
+          `  <TabButton value="tab-1" label="Tab 1" icon="search" />`,
+        ).replace(
+          `  <TabButton value="tab-2" label="Tab 2" />`,
+          `  <TabButton value="tab-2" label="Tab 2" icon="info" />`,
+        ).replace(
+          `  <TabButton value="tab-3" label="Tab 3" />`,
+          `  <TabButton value="tab-3" label="Tab 3" icon="settings" />`,
+        ),
       },
     },
   },
@@ -449,13 +518,22 @@ export const IconsTop: Story = {
     ]),
     iconPosition: "top",
   },
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
         code: panelsSource(`
   iconPosition="top"
-  // items include icon: "search" | "info" | "settings"`),
+`).replace(
+          `  <TabButton value="tab-1" label="Tab 1" />`,
+          `  <TabButton value="tab-1" label="Tab 1" icon="search" />`,
+        ).replace(
+          `  <TabButton value="tab-2" label="Tab 2" />`,
+          `  <TabButton value="tab-2" label="Tab 2" icon="info" />`,
+        ).replace(
+          `  <TabButton value="tab-3" label="Tab 3" />`,
+          `  <TabButton value="tab-3" label="Tab 3" icon="settings" />`,
+        ),
       },
     },
   },
@@ -470,13 +548,22 @@ export const IconsBottom: Story = {
     ]),
     iconPosition: "bottom",
   },
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
         code: panelsSource(`
   iconPosition="bottom"
-  // items include icon: "search" | "info" | "settings"`),
+`).replace(
+          `  <TabButton value="tab-1" label="Tab 1" />`,
+          `  <TabButton value="tab-1" label="Tab 1" icon="search" />`,
+        ).replace(
+          `  <TabButton value="tab-2" label="Tab 2" />`,
+          `  <TabButton value="tab-2" label="Tab 2" icon="info" />`,
+        ).replace(
+          `  <TabButton value="tab-3" label="Tab 3" />`,
+          `  <TabButton value="tab-3" label="Tab 3" icon="settings" />`,
+        ),
       },
     },
   },
@@ -491,13 +578,23 @@ export const IconOnly: Story = {
     ]),
     iconOnly: true,
   },
-  render: (args) => <TabsWithPanels {...args} />,
+  render: (args) => <CompoundTabsWithPanels {...args} />,
   parameters: {
     docs: {
       source: {
-        code: panelsSource(`
+        code: `const [activeTab, setActiveTab] = useState("tab-1");
+const tabsId = "demo-tabs";
+
+<TabList
+  id={tabsId}
+  value={activeTab}
+  onChange={setActiveTab}
   iconOnly
-  // items include icon + accessible label`),
+>
+  <TabButton value="tab-1" label="Search" icon="search" />
+  <TabButton value="tab-2" label="Info" icon="info" />
+  <TabButton value="tab-3" label="Settings" icon="settings" />
+</TabList>`,
       },
     },
   },
