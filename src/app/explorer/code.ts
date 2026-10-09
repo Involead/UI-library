@@ -289,6 +289,14 @@ function formatModalCode(
     typeof args.body === "string" && args.body
       ? args.body
       : "This is the modal body.";
+  const longBody = args.longBody === true;
+  const resolvedBody = longBody
+    ? Array.from(
+        { length: 5 },
+        (_, i) =>
+          `${i + 1}. Paragraph ${i + 1} of the long content demonstration. Add as many paragraphs as you need.`,
+      ).join("\\n\\n")
+    : body;
   const fullScreen = args.fullScreen === true;
   const scroll = args.scroll === "body" ? "body" : "paper";
   const disableEscapeKeyDown = args.disableEscapeKeyDown === true;
@@ -319,7 +327,7 @@ ${widths
     </div>
 
     <div style={{ padding: "0 24px 16px", flex: "1 1 auto", overflowY: "auto" }}>
-      <Typography variant="body" color="secondary">${body}</Typography>
+      <Typography variant="body" color="secondary">${resolvedBody}</Typography>
     </div>
 
     <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, padding: "12px 24px 16px", borderTop: "1px solid #e5e7eb" }}>
@@ -343,6 +351,11 @@ ${widths
   if (disableBackdropClick) modalProps.push(`  disableBackdropClick`);
   modalProps.push(`  ariaLabel="${title}"`);
 
+  const bodyOverflowStyle =
+    scroll === "body"
+      ? `{ padding: "0 24px 16px", flex: "1 1 auto" }`
+      : `{ padding: "0 24px 16px", flex: "1 1 auto", overflowY: "auto" }`;
+
   return `import { useState } from "react";
 import { Modal, Typography, Button } from "@involead/ui";
 import "@involead/ui/ui.css";
@@ -362,8 +375,8 @@ ${modalProps.join("\n")}
     </div>
 
     {/* Body */}
-    <div style={{ padding: "0 24px 16px", flex: "1 1 auto", overflowY: "auto" }}>
-      <Typography variant="body" color="secondary">${body}</Typography>
+    <div style={${bodyOverflowStyle}}>
+      <Typography variant="body" color="secondary">${resolvedBody}</Typography>
     </div>
 
     {/* Footer */}

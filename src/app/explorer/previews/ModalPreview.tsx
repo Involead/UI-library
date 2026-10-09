@@ -32,11 +32,19 @@ export function ModalPreview({ args, composition, layout, onChange }: Props) {
         : "xs";
 
   const title = getStringArg(args, "title", "Modal title");
-  const body = getStringArg(
-    args,
-    "body",
-    "This is the modal body. Add any content you like — text, forms, tables, or other components.",
-  );
+
+  const longBody = args.longBody === true;
+  const body = longBody
+    ? Array.from(
+        { length: 30 },
+        (_, i) =>
+          `${i + 1}. This paragraph is here to show how the modal handles long content. Only the designated scroll region moves when the content exceeds the panel height.`,
+      ).join("\n\n")
+    : getStringArg(
+        args,
+        "body",
+        "This is the modal body. Add any content you like — text, forms, tables, or other components.",
+      );
 
   const fullScreen = args.fullScreen === true;
   const scroll = getStringArg(args, "scroll", "paper") === "body" ? "body" : "paper";
@@ -87,17 +95,24 @@ export function ModalPreview({ args, composition, layout, onChange }: Props) {
         </Button>
       </div>
 
-      {/* Body text */}
+      {/* Body */}
       <div
         style={{
           padding: "0 24px 16px",
           flex: "1 1 auto",
-          overflowY: "auto",
+          overflowY: scroll === "body" ? undefined : "auto",
         }}
       >
-        <Typography variant="body" color="secondary">
-          {body}
-        </Typography>
+        {body.split("\n\n").map((paragraph, i) => (
+          <Typography
+            key={i}
+            variant="body"
+            color="secondary"
+            style={{ marginBottom: 12 }}
+          >
+            {paragraph}
+          </Typography>
+        ))}
       </div>
 
       {/* Footer */}

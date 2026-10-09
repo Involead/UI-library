@@ -448,6 +448,7 @@ export const explorerComponents: ExplorerComponent[] = [
   controls: [
     text("title", "Visible heading inside the modal"),
     text("body", "Body content"),
+    boolean("longBody", "Fill the body with long content to demonstrate scrolling"),
     select("maxWidth", "Preset width", ["xs", "sm", "md", "lg", "xl", "false"]),
     boolean("fullScreen", "Full-screen modal"),
     select("scroll", "Which element scrolls", ["paper", "body"]),
@@ -473,6 +474,28 @@ export const explorerComponents: ExplorerComponent[] = [
         body: "Each preset has a fixed width, clamped to fit the viewport.",
       },
       composition: "sizes",
+    },
+    {
+      name: "Long Body",
+      description: "Body scrolls when content exceeds the panel height",
+      args: {
+        title: "Scrollable body",
+        longBody: true,
+        maxWidth: "sm",
+        scroll: "paper",
+      },
+      composition: "default",
+    },
+    {
+      name: "Scroll Body",
+      description: "The whole panel scrolls — header, body, and footer",
+      args: {
+        title: "Scroll the whole panel",
+        longBody: true,
+        maxWidth: "sm",
+        scroll: "body",
+      },
+      composition: "default",
     },
     {
       name: "Full Screen",
