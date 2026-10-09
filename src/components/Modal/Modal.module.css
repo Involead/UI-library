@@ -1,0 +1,103 @@
+/* ------------------------------------------------------------------ */
+/* Modal — reset + backdrop + centering + overflow safety              */
+/* ------------------------------------------------------------------ */
+
+.dialog {
+  /* Reset the UA dialog styles */
+  border: none;
+  padding: 0;
+  margin: auto;
+  background: transparent;
+  max-width: none;
+  max-height: none;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+
+  /* Centering — flexbox on the dialog itself */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* If the panel ever exceeds the viewport, let the whole dialog scroll
+     so the panel's top edge stays reachable. */
+  overflow: auto;
+}
+
+.dialog::backdrop {
+  background: rgb(33 32 31 / 0.5);
+}
+
+/* ------------------------------------------------------------------ */
+/* Panel                                                               */
+/* ------------------------------------------------------------------ */
+
+.panel {
+  /* margin: auto centers the panel AND lets it scroll into view when it
+     overflows. Key fix for flexbox-centering clipping tall content. */
+  margin: auto;
+
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow:
+    0 11px 15px -7px rgb(0 0 0 / 0.2),
+    0 24px 38px 3px rgb(0 0 0 / 0.14),
+    0 9px 46px 8px rgb(0 0 0 / 0.12);
+  max-height: calc(100% - var(--spacing-16));
+  overflow: hidden;
+  color: var(--color-text-primary);
+}
+
+/* ------------------------------------------------------------------ */
+/* Preset widths — each sets a FIXED width, clamped to the viewport    */
+/* ------------------------------------------------------------------ */
+
+.maxWidth_xs {
+  width: min(444px, calc(100vw - var(--spacing-16)));
+}
+
+.maxWidth_sm {
+  width: min(600px, calc(100vw - var(--spacing-16)));
+}
+
+.maxWidth_md {
+  width: min(900px, calc(100vw - var(--spacing-16)));
+}
+
+.maxWidth_lg {
+  width: min(1200px, calc(100vw - var(--spacing-16)));
+}
+
+.maxWidth_xl {
+  width: min(1536px, calc(100vw - var(--spacing-16)));
+}
+
+/* ------------------------------------------------------------------ */
+/* Full screen                                                         */
+/* ------------------------------------------------------------------ */
+
+.fullScreen {
+  display: block;
+  overflow: hidden;
+}
+
+.fullScreen .panel,
+.fullScreenPanel {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+  margin: 0;
+  inset: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* scroll="body" — the whole panel scrolls instead of just the content */
+/* ------------------------------------------------------------------ */
+
+.scrollBody {
+  overflow-y: auto;
+}

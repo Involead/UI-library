@@ -15,7 +15,7 @@ export type ExplorerStory = {
   name: string;
   description: string;
   args: ExplorerArgs;
-  composition?: "all" | "sizes" | "states" | "headings" | "colors" | "label-clickable" | "group" | "gallery" | "column-spanning" | "row-spanning" | TableComposition;
+  composition?: "default"|"all" | "sizes" | "states" | "headings" | "colors" | "label-clickable" | "group" | "gallery" | "column-spanning" | "row-spanning" | TableComposition;
 };
 
 /** Table stories that need more than the base sample table; see TablePreview. */
@@ -435,4 +435,75 @@ export const explorerComponents: ExplorerComponent[] = [
       },
     ],
   },
+  {
+  name: "Modal",
+  description:
+    "Low-level overlay primitive built on the native <dialog> element. Bring your own layout — title, body, actions, and the close button are composed by the consumer.",
+  accessibility: [
+    "Uses the native <dialog> element, which traps focus and returns focus to the opener on close.",
+    "Esc closes unless disabled; backdrop click closes unless disabled.",
+    "Labelled by ariaLabel.",
+    "Content is inert to assistive technology while closed.",
+  ],
+  controls: [
+    text("title", "Visible heading inside the modal"),
+    text("body", "Body content"),
+    select("maxWidth", "Preset width", ["xs", "sm", "md", "lg", "xl", "false"]),
+    boolean("fullScreen", "Full-screen modal"),
+    select("scroll", "Which element scrolls", ["paper", "body"]),
+    boolean("disableEscapeKeyDown", "Disable Esc to close"),
+    boolean("disableBackdropClick", "Disable backdrop click to close"),
+  ],
+  stories: [
+    {
+      name: "Default",
+      description: "Standard modal with a title, body, and actions",
+      args: {
+        title: "Modal title",
+        body: "This is the modal body. Add any content you like — text, forms, tables, or other components.",
+        maxWidth: "xs",
+      },
+      composition: "default",
+    },
+    {
+      name: "Sizes",
+      description: "Compare the preset widths: xs · sm · md · lg · xl",
+      args: {
+        title: "Modal title",
+        body: "Each preset has a fixed width, clamped to fit the viewport.",
+      },
+      composition: "sizes",
+    },
+    {
+      name: "Full Screen",
+      description: "Fills the viewport",
+      args: {
+        title: "Full screen modal",
+        body: "This modal fills the entire viewport.",
+        fullScreen: true,
+      },
+      composition: "default",
+    },
+    {
+      name: "No Esc Close",
+      description: "Esc does not close the modal",
+      args: {
+        title: "Confirm",
+        body: "Esc is disabled. Use the ×, the buttons, or the backdrop.",
+        disableEscapeKeyDown: true,
+      },
+      composition: "default",
+    },
+    {
+      name: "No Backdrop Close",
+      description: "Clicking the backdrop does not close",
+      args: {
+        title: "Confirm",
+        body: "Backdrop click is disabled.",
+        disableBackdropClick: true,
+      },
+      composition: "default",
+    },
+  ],
+},
 ];
