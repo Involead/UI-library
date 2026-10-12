@@ -45,6 +45,11 @@ export interface ModalProps {
   scroll?: "body" | "paper";
   children?: ReactNode;
   className?: string;
+  /**
+   * Extra class on the outer <dialog>. Use it to style the ::backdrop,
+   * e.g. `.my-dialog::backdrop { backdrop-filter: blur(8px); }`.
+   */
+  dialogClassName?: string;
   /** Accessible name — required when there is no visible title. */
   ariaLabel?: string;
   /** Disables Esc-to-close. */
@@ -66,6 +71,7 @@ export function Modal({
   scroll = "paper",
   children,
   className,
+  dialogClassName,
   ariaLabel,
   disableEscapeKeyDown = false,
   disableBackdropClick = false,
@@ -143,7 +149,11 @@ export function Modal({
   return createPortal(
     <dialog
       ref={dialogRef}
-      className={cx(styles.dialog, fullScreen && styles.fullScreen)}
+      className={cx(
+        styles.dialog,
+        fullScreen && styles.fullScreen,
+        dialogClassName,
+      )}
       aria-label={ariaLabel}
       onCancel={handleCancel}
       onClick={handleBackdropClick}
