@@ -24,7 +24,7 @@
   border: none;
   cursor: pointer;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-md);
+  font-size: var(--tab-font-size, var(--font-size-md));
   font-weight: var(--font-weight-medium);
   transition: all 0.2s ease;
   position: relative;
@@ -34,22 +34,22 @@
 
 .tab.small {
   padding: var(--spacing-sm) var(--spacing-md);
-  font-size: var(--font-size-sm);
+  font-size: var(--tab-font-size, var(--font-size-sm));
 }
 
 .tab.medium {
   padding: var(--spacing-md) var(--spacing-lg);
-  font-size: var(--font-size-md);
+  font-size: var(--tab-font-size, var(--font-size-md));
 }
 
 .tab.large {
   padding: var(--spacing-lg) var(--spacing-xl);
-  font-size: var(--font-size-lg);
+  font-size: var(--tab-font-size, var(--font-size-lg));
 }
 
 /* Line variant */
 .tabList.line .tab.active {
-  color: var(--color-primary);
+  color: var(--tab-active-color, var(--color-primary));
 }
 
 .tabList.line .tab.active::after {
@@ -58,8 +58,8 @@
   bottom: -1px;
   left: 0;
   right: 0;
-  height: 2px;
-  background: var(--color-primary);
+  height: var(--tab-indicator-height, 2px);
+  background: var(--tab-indicator-color, var(--color-primary));
 }
 
 .tabList.line .tab:hover:not(:disabled) {
@@ -69,7 +69,7 @@
 .tabList.vertical .tab.active::after {
   bottom: auto;
   right: -1px;
-  width: 2px;
+  width: var(--tab-indicator-height, 2px);
   height: auto;
   top: 0;
   bottom: 0;
@@ -94,7 +94,8 @@
   padding: 0;
   background: transparent;
   border-radius: 0;
-  border-bottom: 1.5px solid var(--color-primary, #0a3ccc);
+  border-bottom: var(--tab-pill-border-width, 1.5px) solid
+    var(--tab-pill-border-color, var(--color-primary, #0a3ccc));
   border-right: none;
   width: 100%;
   align-items: flex-end;
@@ -117,8 +118,8 @@
 
 .tabList.pill .tab.active,
 .tabList.pill .tab.active:hover:not(:disabled) {
-  background: var(--color-primary, #0a3ccc);
-  color: var(--color-text-inverse, #ffffff);
+  background: var(--tab-pill-active-bg, var(--color-primary, #0a3ccc));
+  color: var(--tab-pill-active-fg, var(--color-text-inverse, #ffffff));
   font-weight: var(--font-weight-semibold, 600);
   box-shadow: none;
   border-radius: var(--pill-radius) var(--pill-radius) 0 0;
@@ -140,7 +141,8 @@
   align-items: stretch;
   width: fit-content;
   border-bottom: none;
-  border-right: 2px solid var(--color-primary, #0a3ccc);
+  border-right: var(--tab-pill-vertical-border-width, 2px) solid
+    var(--tab-pill-vertical-border-color, var(--color-primary, #0a3ccc));
 }
 
 .tabList.pill.vertical .tab,
