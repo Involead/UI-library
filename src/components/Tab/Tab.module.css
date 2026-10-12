@@ -112,8 +112,8 @@
 }
 
 .tabList.pill .tab:hover:not(:disabled) {
-  background: var(--pill-inactive-hover-bg);
-  color: var(--color-text-primary);
+  background: var(--tab-pill-hover-bg, var(--pill-inactive-hover-bg));
+  color: var(--tab-pill-hover-fg, var(--color-text-primary));
 }
 
 .tabList.pill .tab.active,

@@ -313,6 +313,7 @@ export function TabList({
           type="button"
           tabIndex={-1}
           aria-hidden="true"
+          data-tab-scroll="start"
           className={cx(styles.scrollButton, styles.scrollButtonStart)}
           onClick={() => scrollByPage(-1)}
         >
@@ -325,6 +326,7 @@ export function TabList({
           type="button"
           tabIndex={-1}
           aria-hidden="true"
+          data-tab-scroll="end"
           className={cx(styles.scrollButton, styles.scrollButtonEnd)}
           onClick={() => scrollByPage(1)}
         >
