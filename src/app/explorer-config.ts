@@ -28,31 +28,6 @@ export type ExplorerStory = {
     | "orientation";
 };
 
-/** Table stories that need more than the base sample table; see TablePreview. */
-export type TableComposition =
-  | "table-sizes"
-  | "table-borders"
-  | "table-hoverable"
-  | "table-sorting"
-  | "table-filtering"
-  | "table-selection"
-  | "table-expandable"
-  | "table-pagination"
-  | "table-loading"
-  | "table-empty"
-  | "table-sticky-header"
-  | "table-sticky-columns"
-  | "table-custom-rows"
-  | "table-editable"
-  | "table-reordering"
-  | "table-header-descriptions"
-  | "table-custom-cells"
-  | "table-links"
-  | "table-truncation"
-  | "table-download"
-  | "table-toolbar"
-  | "table-contact-directory"
-  | "table-all-features";
 
 /** Table stories that need more than the base sample table; see TablePreview. */
 export type TableComposition =
