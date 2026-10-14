@@ -15,8 +15,19 @@ export type ExplorerStory = {
   name: string;
   description: string;
   args: ExplorerArgs;
-  composition?: "default"|"all" | "sizes" | "states" | "headings" | "colors" | "label-clickable" | "group" | "gallery" | "column-spanning" | "row-spanning" | TableComposition;
+  composition?:
+    | "all"
+    | "sizes"
+    | "states"
+    | "headings"
+    | "colors"
+    | "label-clickable"
+    | "group"
+    | "gallery" | "column-spanning" | "row-spanning" | TableComposition
+    | "default"
+    | "orientation";
 };
+
 
 /** Table stories that need more than the base sample table; see TablePreview. */
 export type TableComposition =
@@ -529,4 +540,124 @@ export const explorerComponents: ExplorerComponent[] = [
     },
   ],
 },
+  {
+    name: "Tab",
+    description: "Switch between related sections of content with a keyboard-accessible tab control.",
+    accessibility: [
+      "Tabs use the tablist, tab, and tabpanel roles.",
+      "Arrow keys move focus between tabs, skipping disabled ones; Home and End jump to the first and last tab.",
+      "The selected tab exposes aria-selected, and aria-controls when panels are wired up.",
+      "Disabled tabs are not selectable.",
+    ],
+    controls: [
+      text("value", "Active tab value"),
+      select("variant", "Tab style", ["line", "pill"]),
+      select("size", "Tab size", ["small", "medium", "large"]),
+      select("orientation", "Layout direction", ["horizontal", "vertical"]),
+      select("disabledTab", "Disable a single tab", ["none", "tab-1", "tab-2", "tab-3"]),
+      boolean("scrollable", "Keeps tabs on one line and scrolls when they don't fit"),
+      boolean("withIcons", "Shows an icon on each tab"),
+      select("iconPosition", "Where the icon sits relative to the label", ["start", "end", "top", "bottom"]),
+      boolean("iconOnly", "Shows only the icons; labels become accessible names"),
+      boolean("disabled", "Disables all tabs"),
+    ],
+    stories: [
+      {
+  name: "Default",
+  description: "Pill tabs (default)",
+  args: { value: "tab-1", size: "small", orientation: "horizontal" },
+  composition: "default",
+},
+{
+  name: "Line",
+  description: "Line-style tabs",
+  args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal" },
+  composition: "default",
+},
+      {
+        name: "Sizes",
+        description: "Small, medium, and large tabs",
+        args: { value: "tab-1", variant: "line", orientation: "horizontal" },
+        composition: "sizes",
+      },
+      {
+        name: "Orientation",
+        description: "Horizontal and vertical layouts",
+        args: { value: "tab-1", variant: "line", size: "small" },
+        composition: "orientation",
+      },
+      {
+        name: "Disabled Tab",
+        description: "A single disabled tab that arrow keys skip",
+        args: {
+          value: "tab-1",
+          variant: "line",
+          size: "small",
+          orientation: "horizontal",
+          disabledTab: "tab-2",
+        },
+        composition: "default",
+      },
+      {
+        name: "Disabled",
+        description: "All tabs disabled",
+        args: {
+          value: "tab-1",
+          variant: "line",
+          size: "small",
+          orientation: "horizontal",
+          disabled: true,
+        },
+        composition: "default",
+      },
+            {
+        name: "Scrollable",
+        description: "Many tabs in a narrow container scroll horizontally",
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", scrollable: true },
+        composition: "default",
+      },
+      {
+        name: "Scrollable Pill",
+        description: "Pill-style tabs that scroll",
+        args: { value: "tab-1", variant: "pill", size: "small", orientation: "horizontal", scrollable: true },
+        composition: "default",
+      },
+      {
+        name: "Scrollable Vertical",
+        description: "Vertical tabs that scroll inside a fixed height",
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "vertical", scrollable: true },
+        composition: "default",
+      },
+            {
+        name: "Icons Start",
+        description: "Icon before the label",
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", withIcons: true, iconPosition: "start" },
+        composition: "default",
+      },
+      {
+        name: "Icons End",
+        description: "Icon after the label",
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", withIcons: true, iconPosition: "end" },
+        composition: "default",
+      },
+      {
+        name: "Icons Top",
+        description: "Icon above the label",
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", withIcons: true, iconPosition: "top" },
+        composition: "default",
+      },
+      {
+        name: "Icons Bottom",
+        description: "Icon below the label",
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", withIcons: true, iconPosition: "bottom" },
+        composition: "default",
+      },
+      {
+        name: "Icon Only",
+        description: "Icons without visible labels",
+        args: { value: "tab-1", variant: "line", size: "small", orientation: "horizontal", withIcons: true, iconOnly: true },
+        composition: "default",
+      },
+    ],
+  },
 ];
