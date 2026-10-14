@@ -111,3 +111,8 @@ export const iconSizes = [12, 16, 20, 24, 32, 48];
 export function isChoice<T extends string>(value: string, choices: T[]): value is T {
   return choices.includes(value as T);
 }
+
+
+export type TabSize = "small" | "medium" | "large";
+export type TabVariant = "line" | "pill";
+export type TabOrientation = "horizontal" | "vertical";

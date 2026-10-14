@@ -1,0 +1,293 @@
+.tabList {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+
+.tabList.vertical {
+  flex-direction: column;
+  border-bottom: none;
+  border-right: 1px solid var(--color-border);
+}
+
+.tabList.line {
+  gap: 0;
+}
+
+.tab {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: var(--tab-font-size, var(--font-size-md));
+  font-weight: var(--font-weight-medium);
+  transition: all 0.2s ease;
+  position: relative;
+  border-radius: 0;
+  white-space: nowrap;
+}
+
+.tab.small {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--tab-font-size, var(--font-size-sm));
+}
+
+.tab.medium {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--tab-font-size, var(--font-size-md));
+}
+
+.tab.large {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  font-size: var(--tab-font-size, var(--font-size-lg));
+}
+
+/* Line variant */
+.tabList.line .tab.active {
+  color: var(--tab-active-color, var(--color-primary));
+}
+
+.tabList.line .tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: var(--tab-indicator-height, 2px);
+  background: var(--tab-indicator-color, var(--color-primary));
+}
+
+.tabList.line .tab:hover:not(:disabled) {
+  color: var(--color-text-primary);
+}
+
+.tabList.vertical .tab.active::after {
+  bottom: auto;
+  right: -1px;
+  width: var(--tab-indicator-height, 2px);
+  height: auto;
+  top: 0;
+  bottom: 0;
+}
+
+/* Disabled (base) */
+.tab:disabled,
+.tab.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  color: var(--color-text-disabled);
+}
+
+/* Pill variant: tab strip with rounded top corners and a blue underline */
+.tabList.pill {
+  --pill-radius: 8px;
+  --pill-inactive-bg: #f3f3ef;       /* light grey for unselected tabs */
+  --pill-inactive-hover-bg: #eaeae5;
+  --pill-inactive-text: #55555a;
+
+  gap: 2px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: var(--tab-pill-border-width, 1.5px) solid
+    var(--tab-pill-border-color, var(--color-primary, #0a3ccc));
+  border-right: none;
+  width: 100%;
+  align-items: flex-end;
+}
+
+.tabList.pill .tab {
+  flex: 0 0 auto;                    /* size to content, don't stretch */
+  background: var(--pill-inactive-bg);
+  color: var(--pill-inactive-text);
+  border-radius: var(--pill-radius) var(--pill-radius) 0 0;
+  padding-left: var(--spacing-xl);
+  padding-right: var(--spacing-xl);
+  box-shadow: none;
+}
+
+.tabList.pill .tab:hover:not(:disabled) {
+  background: var(--tab-pill-hover-bg, var(--pill-inactive-hover-bg));
+  color: var(--tab-pill-hover-fg, var(--color-text-primary));
+}
+
+.tabList.pill .tab.active,
+.tabList.pill .tab.active:hover:not(:disabled) {
+  background: var(--tab-pill-active-bg, var(--color-primary, #0a3ccc));
+  color: var(--tab-pill-active-fg, var(--color-text-inverse, #ffffff));
+  font-weight: var(--font-weight-semibold, 600);
+  box-shadow: none;
+  border-radius: var(--pill-radius) var(--pill-radius) 0 0;
+}
+
+.tabList.pill .tab.active::after {
+  display: none;
+}
+
+.tabList.pill .tab:disabled,
+.tabList.pill .tab.disabled {
+  background: var(--pill-inactive-bg);
+  color: var(--color-text-disabled);
+}
+
+/* Vertical pill: strip on the side, rounded on the left corners */
+.tabList.pill.vertical {
+  flex-direction: column;
+  align-items: stretch;
+  width: fit-content;
+  border-bottom: none;
+  border-right: var(--tab-pill-vertical-border-width, 2px) solid
+    var(--tab-pill-vertical-border-color, var(--color-primary, #0a3ccc));
+}
+
+.tabList.pill.vertical .tab,
+.tabList.pill.vertical .tab.active,
+.tabList.pill.vertical .tab.active:hover:not(:disabled) {
+  border-radius: var(--pill-radius) 0 0 var(--pill-radius);
+}
+
+/* ---------- Icons ---------- */
+.tab.hasIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm, 8px);
+}
+
+.tab.iconStart {
+  flex-direction: row;
+}
+
+.tab.iconEnd {
+  flex-direction: row-reverse;
+}
+
+.tab.iconTop {
+  flex-direction: column;
+  gap: var(--spacing-xs, 4px);
+}
+
+.tab.iconBottom {
+  flex-direction: column-reverse;
+  gap: var(--spacing-xs, 4px);
+}
+
+/* Icon-only: square-ish tab, equal padding on all sides */
+.tab.iconOnly {
+  gap: 0;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+.tabList.pill .tab.iconOnly {
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+}
+
+/* ---------- Scrollable tabs (keep this block last) ---------- */
+.scrollWrapper {
+  position: relative;
+  display: flex;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.tabList.scrollList {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none; /* hide the scrollbar, the arrows replace it */
+}
+
+.tabList.scrollList::-webkit-scrollbar {
+  display: none;
+}
+
+.tabList.scrollList .tab {
+  flex: 0 0 auto;
+}
+
+/* Vertical: scroll up/down inside a fixed height */
+.tabList.scrollList.vertical {
+  flex: 0 1 auto;
+  overflow-x: visible;
+  overflow-y: auto;
+  max-height: 240px;
+}
+
+/* Scroll arrows: same button, same icon, only position and rotation differ */
+.scrollButton {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  --fade: var(--color-surface, #fff);
+}
+
+.scrollButton:hover {
+  color: var(--color-primary, #0a3ccc);
+}
+
+/* Horizontal: 32px wide, full height (clear of the underline) */
+.scrollButton {
+  top: 0;
+  bottom: 2px;
+  width: 32px;
+}
+
+.scrollButtonStart {
+  left: 0;
+  background: linear-gradient(to right, var(--fade) 60%, transparent);
+}
+
+.scrollButtonEnd {
+  right: 0;
+  background: linear-gradient(to left, var(--fade) 60%, transparent);
+}
+
+.scrollButtonStart svg {
+  transform: rotate(180deg); /* points left */
+}
+
+/* Vertical: 32px tall, full width */
+.scrollWrapperVertical {
+  flex-direction: column;
+  width: fit-content;
+}
+
+.scrollWrapperVertical .scrollButton {
+  top: auto;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  width: auto;
+  height: 32px;
+}
+
+.scrollWrapperVertical .scrollButtonStart {
+  top: 0;
+  background: linear-gradient(to bottom, var(--fade) 60%, transparent);
+}
+
+.scrollWrapperVertical .scrollButtonEnd {
+  bottom: 0;
+  background: linear-gradient(to top, var(--fade) 60%, transparent);
+}
+
+.scrollWrapperVertical .scrollButtonStart svg {
+  transform: rotate(-90deg); /* points up */
+}
+
+.scrollWrapperVertical .scrollButtonEnd svg {
+  transform: rotate(90deg); /* points down */
+}

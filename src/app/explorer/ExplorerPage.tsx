@@ -23,6 +23,7 @@ import { InputPreview } from "./previews/InputPreview";
 import { RadioPreview } from "./previews/RadioPreview";
 import { TablePreview, tableStackCompositions } from "./previews/TablePreview";
 import { TypographyPreview } from "./previews/TypographyPreview";
+import { TabPreview } from "./previews/TabPreview";
 import {
   isChoice,
   type ButtonSize,
@@ -340,6 +341,19 @@ export function ExplorerPage() {
         />
       );
     }
+    if (activeComponent === "Tab") {
+  return (
+    <TabPreview
+      args={componentArgs}
+      composition={composition}
+      layout={previewLayout}
+      onChange={(value) => {
+        updateComponentArg("value", value);
+        recordAction(`tab: change (${value})`);
+      }}
+    />
+  );
+}``
     return null;
   }
 
