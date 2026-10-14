@@ -20,6 +20,7 @@ import { CheckboxPreview } from "./previews/CheckboxPreview";
 import { DropdownPreview } from "./previews/DropdownPreview";
 import { IconPreview } from "./previews/IconPreview";
 import { InputPreview } from "./previews/InputPreview";
+import { ModalPreview } from "./previews/ModalPreview";
 import { RadioPreview } from "./previews/RadioPreview";
 import { TablePreview, tableStackCompositions } from "./previews/TablePreview";
 import { TypographyPreview } from "./previews/TypographyPreview";
@@ -232,11 +233,14 @@ export function ExplorerPage() {
   const composition = selectedExplorerStory?.composition;
   const previewLayout: PreviewLayout =
     componentArgs.orientation === "horizontal" ? "horizontal" : "vertical";
+  // Modal renders a single overlay and has no orientation, so no toggle.
   // Most Table stories render a single table, so there is nothing to arrange.
   const showLayoutToggle =
-    activeComponent === "Table"
-      ? tableStackCompositions.includes(composition ?? "")
-      : Boolean(composition);
+    activeComponent === "Modal"
+      ? false
+      : activeComponent === "Table"
+        ? tableStackCompositions.includes(composition ?? "")
+        : Boolean(composition);
 
   function updateComponentArg(name: string, value: ExplorerValue) {
     let nextValue = value;
@@ -354,6 +358,18 @@ export function ExplorerPage() {
     />
   );
 }``
+    if (activeComponent === "Modal") {
+      return (
+        <ModalPreview
+          args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
+          onChange={(value) => {
+            recordAction(`modal: ${value}`);
+          }}
+        />
+      );
+    }
     return null;
   }
 

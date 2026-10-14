@@ -7,13 +7,8 @@ import {
 } from "../explorer-config";
 import { getComponentDefaults } from "./args";
 import { formatTableCode } from "./tableCode";
-import {
-  iconSizes,
-  radioGroupOptions,
-  typographyColors,
-  typographyVariants,
-  type TypographyVariant,
-} from "./types";
+import { formatModalCode } from "./modalCode";
+import { iconSizes, radioGroupOptions, typographyColors, typographyVariants, type TypographyVariant } from "./types";
 
 export function formatExplorerCode(
   component: string,
@@ -21,6 +16,7 @@ export function formatExplorerCode(
   composition?: ExplorerComponent["stories"][number]["composition"],
 ): string {
   if (component === "Table") return formatTableCode(args, composition);
+  if (component === "Modal") return formatModalCode(args, composition);
   const componentCode = (nextArgs: ExplorerArgs): string =>
     formatExplorerCode(component, nextArgs).split("\n\n").slice(1).join("\n\n");
 
@@ -755,6 +751,17 @@ function parseAttributes(
     }
   }
 
+  if (component.name === "Modal") {
+    // The snippet renders title and body via <Typography>, not props.
+    const heading = code.match(
+      /<Typography[^>]*variant=["']h\d["'][^>]*>([^<]+)<\/Typography>/,
+    );
+    if (heading) args.title = heading[1].trim();
+    const paragraph = code.match(
+      /<Typography[^>]*variant=["'](?:body|bodySmall)["'][^>]*>([^<]+)<\/Typography>/,
+    );
+    if (paragraph) args.body = paragraph[1].trim();
+  }
   return args;
 }
 
