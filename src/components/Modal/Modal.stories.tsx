@@ -26,8 +26,6 @@ const meta = {
     open: false,
     onClose: () => {},
     maxWidth: "xs",
-    fullScreen: false,
-    scroll: "paper",
     disableEscapeKeyDown: false,
     disableBackdropClick: false,
   },
@@ -35,11 +33,6 @@ const meta = {
     maxWidth: {
       control: "select",
       options: ["xs", "sm", "md", "lg", "xl", false],
-    },
-    fullScreen: { control: "boolean" },
-    scroll: {
-      control: "select",
-      options: ["paper", "body"],
     },
     disableEscapeKeyDown: { control: "boolean" },
     disableBackdropClick: { control: "boolean" },
@@ -66,16 +59,11 @@ const headerStyle: CSSProperties = {
   flex: "0 0 auto",
 };
 
-// scroll="paper": header/footer stay pinned, only the body scrolls.
 const bodyStyle: CSSProperties = {
   padding: "0 24px 16px",
   flex: "1 1 auto",
   overflowY: "auto",
-};
-
-// scroll="body": no inner scrolling, the whole panel scrolls instead.
-const bodyStyleScrollWhole: CSSProperties = {
-  padding: "0 24px 16px",
+  minHeight: 0,
 };
 
 const footerStyle: CSSProperties = {
@@ -95,15 +83,12 @@ interface ModalContentProps {
   title?: string;
   body?: string;
   onClose?: () => void;
-  /** Disable inner body scrolling so the entire panel scrolls (use with scroll="body"). */
-  scrollWhole?: boolean;
 }
 
 function ModalContent({
   title = "Modal title",
   body = "This is the modal body. Add any content you like — text, forms, tables, or other components.",
   onClose,
-  scrollWhole = false,
 }: ModalContentProps) {
   // Split on double-newline so numbered paragraphs render one per block.
   const paragraphs = body.split("\n\n");
@@ -119,7 +104,7 @@ function ModalContent({
         </Button>
       </div>
 
-      <div style={scrollWhole ? bodyStyleScrollWhole : bodyStyle}>
+      <div style={bodyStyle}>
         {paragraphs.map((p, i) => (
           <Typography
             key={i}
@@ -212,7 +197,7 @@ function modalSource(extraProps = "") {
       <Button variant="ghost" size="small" aria-label="Close" onClick={() => setOpen(false)}>✕</Button>
     </div>
 
-    <div style={{ padding: "0 24px 16px", flex: "1 1 auto", overflowY: "auto" }}>
+    <div style={{ padding: "0 24px 16px", flex: "1 1 auto", overflowY: "auto", minHeight: 0 }}>
       <Typography variant="body" color="secondary">This is the modal body.</Typography>
     </div>
 
@@ -239,14 +224,6 @@ export const Default: Story = {
    STATES
    ========================= */
 
-export const FullScreen: Story = {
-  args: { fullScreen: true },
-  render: (args) => <InteractiveModal {...args} />,
-  parameters: {
-    docs: { source: { code: modalSource(`\n    fullScreen`) } },
-  },
-};
-
 export const NoEscClose: Story = {
   args: { disableEscapeKeyDown: true },
   render: (args) => <InteractiveModal {...args} />,
@@ -260,6 +237,21 @@ export const NoBackdropClose: Story = {
   render: (args) => <InteractiveModal {...args} />,
   parameters: {
     docs: { source: { code: modalSource(`\n    disableBackdropClick`) } },
+  },
+};
+
+export const Locked: Story = {
+  args: {
+    disableEscapeKeyDown: true,
+    disableBackdropClick: true,
+  },
+  render: (args) => <InteractiveModal {...args} />,
+  parameters: {
+    docs: {
+      source: {
+        code: modalSource(`\n    disableEscapeKeyDown\n    disableBackdropClick`),
+      },
+    },
   },
 };
 
@@ -300,27 +292,5 @@ export const LongBody: Story = {
   render: (args) => <InteractiveModal {...args} />,
   parameters: {
     docs: { source: { code: modalSource() } },
-  },
-};
-
-export const ScrollBody: Story = {
-  args: {
-    scroll: "body",
-    children: (
-      <ModalContent
-        scrollWhole
-        title="Scroll the whole panel"
-        body={Array.from(
-          { length: 30 },
-          (_, i) =>
-            `${i + 1}. With scroll="body", the entire panel scrolls — including the header and the footer. Watch the title disappear as you scroll down.`,
-        ).join("\n\n")}
-        onClose={() => {}}
-      />
-    ),
-  },
-  render: (args) => <InteractiveModal {...args} />,
-  parameters: {
-    docs: { source: { code: modalSource(`\n    scroll="body"`) } },
   },
 };
