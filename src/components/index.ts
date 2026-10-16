@@ -11,9 +11,9 @@ export type {
   SingleDropdownProps,
   MultipleDropdownProps,
 } from "./Dropdown";
+
 export { Radio } from "./Radio";
 export type { RadioProps } from "./Radio";
-
 
 export { Checkbox } from "./Checkbox";
 export type { CheckboxProps } from "./Checkbox";
@@ -47,3 +47,23 @@ export type {
   TableRowReorder,
   TableSize,
 } from "./Table";
+
+export { Tab, TabList, TabButton, TabPanel } from "./Tab";
+export type {
+  TabItem,
+  TabProps,
+  TabListProps,
+  TabButtonProps,
+  TabPanelProps,
+  TabSize,
+  TabVariant,
+  TabOrientation,
+  TabIconPosition,
+} from "./Tab";
+
+export { Modal } from "./Modal";
+export type {
+  ModalProps,
+  ModalCloseReason,
+  ModalMaxWidth,
+} from "./Modal";
