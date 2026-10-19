@@ -8,6 +8,7 @@ import {
 import { getComponentDefaults } from "./args";
 import { formatTableCode } from "./tableCode";
 import { formatModalCode } from "./modalCode";
+import { formatTooltipCode } from "./tooltipCode";
 import { iconSizes, radioGroupOptions, typographyColors, typographyVariants, type TypographyVariant } from "./types";
 
 export function formatExplorerCode(
@@ -17,6 +18,7 @@ export function formatExplorerCode(
 ): string {
   if (component === "Table") return formatTableCode(args, composition);
   if (component === "Modal") return formatModalCode(args, composition);
+  if (component === "Tooltip") return formatTooltipCode(args, composition);
   const componentCode = (nextArgs: ExplorerArgs): string =>
     formatExplorerCode(component, nextArgs).split("\n\n").slice(1).join("\n\n");
 

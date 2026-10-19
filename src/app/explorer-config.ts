@@ -28,7 +28,9 @@ export type ExplorerStory = {
     | "row-spanning"
     | TableComposition
     | "default"
-    | "orientation";
+    | "orientation"
+    | "placements"
+    | "variants";
 };
 
 /** Table stories that need more than the base sample table; see TablePreview. */
@@ -1356,6 +1358,81 @@ export const explorerComponents: ExplorerComponent[] = [
         },
         composition: "default",
       },
+      
     ],
+    
   },
+
+  {
+        name: "Tooltip",
+        description:
+          "Contextual text or rich content shown on hover or focus. Two variants: a compact dark tooltip for truncated text, and a light interactive panel for structured content like links or pagination.",
+        accessibility: [
+          "Trigger is linked to the tooltip with aria-describedby while open.",
+          "Opens on focus, so keyboard users can reach it.",
+          "Closes on Escape.",
+          "Non-interactive tooltips have pointer-events: none so they never steal hover.",
+          "The dark variant is text-only; use the light variant for interactive content.",
+        ],
+        controls: [
+          text("title", "Tooltip content (text or JSX in custom mode)"),
+          select("placement", "Preferred side; flips when there isn't room", [
+            "top",
+            "bottom",
+            "left",
+            "right",
+          ]),
+          select("variant", "Visual style", ["dark", "light"]),
+          boolean("interactive", "Allows the pointer to move into the tooltip"),
+          boolean("onlyWhenTruncated", "Only shows if the trigger text is cut off"),
+          boolean("disabled", "Disables the tooltip"),
+          text("enterDelay", "Delay in ms before opening"),
+          text("leaveDelay", "Delay in ms before closing"),
+        ],
+        stories: [
+          {
+            name: "Default",
+            description: "Dark tooltip with the default 100ms open delay",
+            args: { title: "This is a tooltip", placement: "top", variant: "dark" },
+            composition: "default",
+          },
+          {
+            name: "Placements",
+            description: "Top, bottom, left, and right",
+            args: { title: "This is a tooltip" },
+            composition: "placements",
+          },
+          {
+            name: "Variants",
+            description: "Dark (text-only) and light (rich content)",
+            args: { title: "This is a tooltip" },
+            composition: "variants",
+          },
+          {
+            name: "Light + Interactive",
+            description: "Rich content panel that stays open while the pointer moves into it",
+            args: {
+              title: "Event details",
+              variant: "light",
+              interactive: true,
+              placement: "top",
+            },
+          },
+          {
+            name: "Truncated Text",
+            description: "Only shows when the trigger's text is cut off (ellipsis overflow)",
+            args: {
+              title: "Queen's Hospital - Dietetics Department",
+              placement: "top",
+              variant: "dark",
+              onlyWhenTruncated: true,
+            },
+          },
+          {
+            name: "Disabled",
+            description: "No tooltip appears",
+            args: { title: "This is a tooltip", disabled: true },
+          },
+        ],
+      },
 ];

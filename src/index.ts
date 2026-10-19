@@ -23,6 +23,13 @@ export type { TypographyProps } from "./components/Typography";
 
 export * from "./components/Icon";
 
+export { Tooltip } from "./components/Tooltip";
+export type {
+  TooltipProps,
+  TooltipPlacement,
+  TooltipVariant,
+} from "./components/Tooltip";
+
 export { Table } from "./components/Table";
 export type {
   SortDirection,

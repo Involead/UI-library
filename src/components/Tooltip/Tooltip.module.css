@@ -1,0 +1,102 @@
+/* ------------------------------------------------------------------ */
+/* Tooltip — base                                                      */
+/* ------------------------------------------------------------------ */
+
+.tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-tooltip, 1500);
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(320px, calc(100vw - var(--spacing-4, 16px)));
+  border-radius: var(--radius-md, 6px);
+  font: inherit;
+  font-size: var(--font-size-sm, 14px);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  pointer-events: none; /* non-interactive tooltips never steal hover */
+  visibility: hidden; /* shown by JS after the first measurement */
+  animation: tooltip-in 120ms ease-out;
+}
+
+.interactive {
+  pointer-events: auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* Variant: dark (default) — short text, bold, with arrow              */
+/* ------------------------------------------------------------------ */
+
+.dark {
+  padding: 8px 12px;
+  background: var(--tooltip-bg, #3b3b3b);
+  color: var(--tooltip-color, #fff);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* Variant: light — rich content, soft tinted panel                    */
+/* ------------------------------------------------------------------ */
+
+.light {
+  max-width: min(380px, calc(100vw - var(--spacing-4, 16px)));
+  padding: 16px 20px;
+  background: var(--tooltip-rich-bg, #eef3fd);
+  color: var(--color-text-primary, #21201f);
+  text-align: left;
+  font-weight: 600;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 0.12);
+}
+
+/* ------------------------------------------------------------------ */
+/* Arrow                                                               */
+/* ------------------------------------------------------------------ */
+
+.arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+.tooltip[data-placement="top"] .arrow {
+  bottom: -4px;
+  margin-left: -4px;
+}
+
+.tooltip[data-placement="bottom"] .arrow {
+  top: -4px;
+  margin-left: -4px;
+}
+
+.tooltip[data-placement="left"] .arrow {
+  right: -4px;
+  margin-top: -4px;
+}
+
+.tooltip[data-placement="right"] .arrow {
+  left: -4px;
+  margin-top: -4px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion                                                              */
+/* ------------------------------------------------------------------ */
+
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tooltip {
+    animation: none;
+  }
+}
