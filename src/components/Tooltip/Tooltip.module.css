@@ -11,7 +11,7 @@
   width: max-content;
   max-width: min(320px, calc(100vw - var(--spacing-4, 16px)));
   border-radius: var(--radius-md, 6px);
-  font: inherit;
+   font-family: var(--font-family-primary);
   font-size: var(--font-size-sm, 14px);
   line-height: 1.4;
   overflow-wrap: anywhere;
