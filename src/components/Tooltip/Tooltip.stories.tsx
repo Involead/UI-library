@@ -49,8 +49,42 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /* =========================
-   SOURCE HELPER
+   STORY HELPERS
    ========================= */
+
+/**
+ * Every demo button goes through this wrapper so the size is set in ONE
+ * place. If your Button uses a different size name (e.g. "small"), or doesn't
+ * accept `style`, change it here only.
+ */
+function DemoButton(props: React.ComponentProps<typeof Button>) {
+  return (
+    <Button
+      size="small"
+      {...props}
+      style={{ fontSize: 12, ...(props.style ?? {}) }}
+    />
+  );
+}
+
+const row = { display: "flex", gap: 8, alignItems: "center" } as const;
+
+const hint = {
+  fontSize: 11,
+  margin: "0 0 6px",
+  color: "#6b7280",
+} as const;
+
+const truncatedBox = {
+  display: "inline-block",
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  border: "1px solid #e5e7eb",
+  padding: "4px 10px",
+  borderRadius: 6,
+  fontSize: 12,
+} as const;
 
 function tooltipSource(extraProps = "") {
   return `<Tooltip
@@ -58,7 +92,7 @@ function tooltipSource(extraProps = "") {
   placement="top"
   variant="dark"${extraProps}
 >
-  <Button variant="primary">Hover me</Button>
+  <Button size="sm" variant="primary">Hover me</Button>
 </Tooltip>`;
 }
 
@@ -69,7 +103,7 @@ function tooltipSource(extraProps = "") {
 export const Default: Story = {
   render: (args) => (
     <Tooltip {...args} title={args.title as string}>
-      <Button variant="primary">Hover me</Button>
+      <DemoButton variant="primary">Hover me</DemoButton>
     </Tooltip>
   ),
   parameters: {
@@ -81,7 +115,7 @@ export const Light: Story = {
   args: { variant: "light" },
   render: (args) => (
     <Tooltip {...args} title={args.title as string}>
-      <Button variant="primary">Hover me</Button>
+      <DemoButton variant="primary">Hover me</DemoButton>
     </Tooltip>
   ),
   parameters: {
@@ -95,18 +129,18 @@ export const Light: Story = {
 
 export const Placements: Story = {
   render: () => (
-    <div style={{ display: "flex", gap: 16 }}>
+    <div style={row}>
       <Tooltip title="Top placement" placement="top">
-        <Button variant="outline">Top</Button>
+        <DemoButton variant="outline">Top</DemoButton>
       </Tooltip>
       <Tooltip title="Bottom placement" placement="bottom">
-        <Button variant="outline">Bottom</Button>
+        <DemoButton variant="outline">Bottom</DemoButton>
       </Tooltip>
       <Tooltip title="Left placement" placement="left">
-        <Button variant="outline">Left</Button>
+        <DemoButton variant="outline">Left</DemoButton>
       </Tooltip>
       <Tooltip title="Right placement" placement="right">
-        <Button variant="outline">Right</Button>
+        <DemoButton variant="outline">Right</DemoButton>
       </Tooltip>
     </div>
   ),
@@ -115,16 +149,16 @@ export const Placements: Story = {
       source: {
         code: `<>
   <Tooltip title="Top" placement="top">
-    <Button variant="outline">Top</Button>
+    <Button size="sm" variant="outline">Top</Button>
   </Tooltip>
   <Tooltip title="Bottom" placement="bottom">
-    <Button variant="outline">Bottom</Button>
+    <Button size="sm" variant="outline">Bottom</Button>
   </Tooltip>
   <Tooltip title="Left" placement="left">
-    <Button variant="outline">Left</Button>
+    <Button size="sm" variant="outline">Left</Button>
   </Tooltip>
   <Tooltip title="Right" placement="right">
-    <Button variant="outline">Right</Button>
+    <Button size="sm" variant="outline">Right</Button>
   </Tooltip>
 </>`,
       },
@@ -138,15 +172,15 @@ export const Placements: Story = {
 
 export const Delays: Story = {
   render: () => (
-    <div style={{ display: "flex", gap: 16 }}>
+    <div style={row}>
       <Tooltip title="Opens immediately" enterDelay={0}>
-        <Button variant="outline">0ms</Button>
+        <DemoButton variant="outline">0ms</DemoButton>
       </Tooltip>
       <Tooltip title="Opens after 500ms" enterDelay={500}>
-        <Button variant="outline">500ms</Button>
+        <DemoButton variant="outline">500ms</DemoButton>
       </Tooltip>
       <Tooltip title="Opens after 1s" enterDelay={1000}>
-        <Button variant="outline">1000ms</Button>
+        <DemoButton variant="outline">1000ms</DemoButton>
       </Tooltip>
     </div>
   ),
@@ -155,7 +189,7 @@ export const Delays: Story = {
       source: {
         code: `// Pass enterDelay in milliseconds
 <Tooltip title="..." enterDelay={500}>
-  <Button variant="outline">Hover me</Button>
+  <Button size="sm" variant="outline">Hover me</Button>
 </Tooltip>`,
       },
     },
@@ -170,7 +204,7 @@ export const Disabled: Story = {
   args: { disabled: true },
   render: (args) => (
     <Tooltip {...args} title={args.title as string}>
-      <Button variant="outline">Disabled tooltip</Button>
+      <DemoButton variant="outline">Disabled tooltip</DemoButton>
     </Tooltip>
   ),
   parameters: {
@@ -184,32 +218,35 @@ export const Disabled: Story = {
 
 export const Interactive: Story = {
   render: () => (
-    <div style={{ display: "flex", gap: 24 }}>
+    <div style={{ ...row, gap: 16 }}>
       <Tooltip
         title="Move your pointer down here — it closes before you arrive."
         variant="light"
       >
-        <Button variant="outline">Non-interactive</Button>
+        <DemoButton variant="outline">Non-interactive</DemoButton>
       </Tooltip>
 
       <Tooltip
         variant="light"
         interactive
         title={
-          <div>
-            <strong style={{ display: "block", marginBottom: 4 }}>
+          <div style={{ fontSize: 12 }}>
+            <strong
+              style={{ display: "block", marginBottom: 2, fontSize: 13 }}
+            >
               Event details
             </strong>
-            <span style={{ fontSize: 12 }}>
+            <span style={{ fontSize: 11 }}>
               Move your pointer down here and click the link.
             </span>
             <a
               href="#"
               style={{
-                display: "inline-block",
-                marginTop: 8,
+                display: "block",
+                marginTop: 6,
                 color: "var(--color-primary)",
                 textDecoration: "underline",
+                fontSize: 12,
               }}
               onClick={(e) => e.preventDefault()}
             >
@@ -218,7 +255,7 @@ export const Interactive: Story = {
           </div>
         }
       >
-        <Button variant="outline">Interactive</Button>
+        <DemoButton variant="outline">Interactive</DemoButton>
       </Tooltip>
     </div>
   ),
@@ -236,7 +273,7 @@ export const Interactive: Story = {
     </div>
   }
 >
-  <Button variant="outline">Interactive</Button>
+  <Button size="sm" variant="outline">Interactive</Button>
 </Tooltip>`,
       },
     },
@@ -252,48 +289,18 @@ export const Truncated: Story = {
     const text = "Queen's Hospital - Dietetics Department";
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <div>
-          <p style={{ fontSize: 12, marginBottom: 8, color: "#6b7280" }}>
-            Fits — no tooltip
-          </p>
+          <p style={hint}>Fits — no tooltip</p>
           <Tooltip title={text} onlyWhenTruncated>
-            <span
-              style={{
-                display: "inline-block",
-                maxWidth: 400,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                border: "1px solid #e5e7eb",
-                padding: "8px 12px",
-                borderRadius: 6,
-              }}
-            >
-              {text}
-            </span>
+            <span style={{ ...truncatedBox, maxWidth: 320 }}>{text}</span>
           </Tooltip>
         </div>
 
         <div>
-          <p style={{ fontSize: 12, marginBottom: 8, color: "#6b7280" }}>
-            Truncated — tooltip on hover
-          </p>
+          <p style={hint}>Truncated — tooltip on hover</p>
           <Tooltip title={text} onlyWhenTruncated>
-            <span
-              style={{
-                display: "inline-block",
-                maxWidth: 160,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                border: "1px solid #e5e7eb",
-                padding: "8px 12px",
-                borderRadius: 6,
-              }}
-            >
-              {text}
-            </span>
+            <span style={{ ...truncatedBox, maxWidth: 140 }}>{text}</span>
           </Tooltip>
         </div>
       </div>
@@ -308,7 +315,7 @@ export const Truncated: Story = {
   <span
     style={{
       display: "inline-block",
-      maxWidth: 160,
+      maxWidth: 140,
       whiteSpace: "nowrap",
       overflow: "hidden",
       textOverflow: "ellipsis",
