@@ -46,8 +46,6 @@ export function ModalPreview({ args, composition, layout, onChange }: Props) {
         "This is the modal body. Add any content you like — text, forms, tables, or other components.",
       );
 
-  const fullScreen = args.fullScreen === true;
-  const scroll = getStringArg(args, "scroll", "paper") === "body" ? "body" : "paper";
   const disableEscapeKeyDown = args.disableEscapeKeyDown === true;
   const disableBackdropClick = args.disableBackdropClick === true;
 
@@ -65,8 +63,6 @@ export function ModalPreview({ args, composition, layout, onChange }: Props) {
       open={modalOpen}
       onClose={modalClose}
       maxWidth={modalMaxWidth}
-      fullScreen={fullScreen}
-      scroll={scroll}
       ariaLabel={title}
       disableEscapeKeyDown={disableEscapeKeyDown}
       disableBackdropClick={disableBackdropClick}
@@ -79,6 +75,7 @@ export function ModalPreview({ args, composition, layout, onChange }: Props) {
           justifyContent: "space-between",
           gap: 12,
           padding: "16px 24px",
+          borderBottom: "1px solid var(--color-border)",
           flex: "0 0 auto",
         }}
       >
@@ -98,9 +95,10 @@ export function ModalPreview({ args, composition, layout, onChange }: Props) {
       {/* Body */}
       <div
         style={{
-          padding: "0 24px 16px",
+          padding: "16px 24px",
           flex: "1 1 auto",
-          overflowY: scroll === "body" ? undefined : "auto",
+          overflowY: "auto",
+          minHeight: 0,
         }}
       >
         {body.split("\n\n").map((paragraph, i) => (
@@ -123,7 +121,7 @@ export function ModalPreview({ args, composition, layout, onChange }: Props) {
           alignItems: "center",
           gap: 8,
           padding: "12px 24px 16px",
-          borderTop: "1px solid #e5e7eb",
+          borderTop: "1px solid var(--color-border)",
           flex: "0 0 auto",
         }}
       >

@@ -48,6 +48,28 @@ export type {
   TableSize,
 } from "./components/Table";
 
+export { Tab, TabList, TabButton } from "./components/Tab";
+export type {
+  TabItem,
+  TabProps,
+  TabListProps,
+  TabButtonProps,
+  TabSize,
+  TabVariant,
+  TabOrientation,
+  TabIconPosition,
+} from "./components/Tab";
+
+export { TabPanel } from "./components/Tab";
+export type { TabPanelProps } from "./components/Tab";
+
+export { Modal } from "./components/Modal";
+export type {
+  ModalProps,
+  ModalCloseReason,
+  ModalMaxWidth,
+} from "./components/Modal";
+
 export { cx } from "./utils";
 export type { ClassValue } from "./utils";
 
