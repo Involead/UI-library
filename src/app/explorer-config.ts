@@ -1108,7 +1108,7 @@ export const explorerComponents: ExplorerComponent[] = [
       text("title", "Visible heading inside the modal"),
       text("body", "Body content"),
       boolean("longBody", "Fill the body with long content to demonstrate scrolling"),
-      select("maxWidth", "Preset width", ["xs", "sm", "md", "lg", "xl", "false"]),
+      select("maxWidth", "Preset width", ["xs", "sm", "medium", "lg", "xl", "false"]),
       boolean("disableEscapeKeyDown", "Disable Esc to close"),
       boolean("disableBackdropClick", "Disable backdrop click to close"),
     ],
@@ -1125,7 +1125,7 @@ export const explorerComponents: ExplorerComponent[] = [
       },
       {
         name: "Sizes",
-        description: "Compare the preset widths: xs · sm · md · lg · xl",
+        description: "Compare the preset widths: xs · sm · medium · lg · xl",
         args: {
           title: "Modal title",
           body: "Each preset has a fixed width, clamped to fit the viewport.",
@@ -1447,7 +1447,7 @@ export const explorerComponents: ExplorerComponent[] = [
     controls: [
       text("activeStep", "Current step index (0-based)"),
       select("orientation", "Layout direction", ["horizontal", "vertical"]),
-      select("size", "Stepper size", ["sm", "md"]),
+      select("size", "Stepper size", ["small", "medium"]),
       boolean("alternativeLabel", "Place labels under the circles (horizontal only)"),
       boolean("nonLinear", "Allow jumping to any step"),
       boolean("clickable", "Enable onStepClick to make steps interactive"),
@@ -1461,37 +1461,37 @@ export const explorerComponents: ExplorerComponent[] = [
       {
         name: "Default",
         description: "Standard horizontal stepper",
-        args: { activeStep: "1", orientation: "horizontal", size: "md" },
+        args: { activeStep: "1", orientation: "horizontal", size: "medium" },
         composition: "default",
       },
       {
         name: "With Icons",
         description: "Custom icons inside the circles",
-        args: { activeStep: "1", withIcons: true, orientation: "horizontal", size: "md" },
+        args: { activeStep: "1", withIcons: true, orientation: "horizontal", size: "medium" },
         composition: "default",
       },
       {
         name: "With Descriptions",
         description: "Supporting text under the labels",
-        args: { activeStep: "1", withDescriptions: true, orientation: "horizontal", size: "md" },
+        args: { activeStep: "1", withDescriptions: true, orientation: "horizontal", size: "medium" },
         composition: "default",
       },
       {
         name: "Alternative Label",
         description: "Labels positioned under the circles",
-        args: { activeStep: "1", alternativeLabel: true, orientation: "horizontal", size: "md" },
+        args: { activeStep: "1", alternativeLabel: true, orientation: "horizontal", size: "medium" },
         composition: "default",
       },
       {
         name: "Error State",
         description: "Highlights a specific step as failed",
-        args: { activeStep: "1", withError: true, orientation: "horizontal", size: "md" },
+        args: { activeStep: "1", withError: true, orientation: "horizontal", size: "medium" },
         composition: "default",
       },
       {
         name: "Interactive (Clickable)",
         description: "Steps can be clicked to jump back",
-        args: { activeStep: "2", clickable: true, orientation: "horizontal", size: "md" },
+        args: { activeStep: "2", clickable: true, orientation: "horizontal", size: "medium" },
         composition: "default",
       },
       {
@@ -1503,7 +1503,7 @@ export const explorerComponents: ExplorerComponent[] = [
       {
         name: "Orientation",
         description: "Compare horizontal and vertical layouts",
-        args: { activeStep: "1", size: "md" },
+        args: { activeStep: "1", size: "medium" },
         composition: "orientation",
       },
     ],
