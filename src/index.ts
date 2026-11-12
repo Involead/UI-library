@@ -77,6 +77,14 @@ export type {
   ModalMaxWidth,
 } from "./components/Modal";
 
+export { Stepper } from "./components/Stepper";
+export type {
+  StepItem,
+  StepperProps,
+  StepperOrientation,
+  StepperSize,
+} from "./components/Stepper";
+
 export { cx } from "./utils";
 export type { ClassValue } from "./utils";
 

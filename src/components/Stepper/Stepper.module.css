@@ -1,0 +1,316 @@
+/* ------------------------------------------------------------------ */
+/* Stepper — root, sizes, orientation                                  */
+/* ------------------------------------------------------------------ */
+
+.root {
+  --stepper-circle: 28px;
+  --stepper-font: 14px;
+  --stepper-active: var(--color-primary, #1d4ed8);
+  --stepper-line: var(--color-border, #d5dbe5);
+  --stepper-error: var(--color-error, #dc2626);
+  --stepper-text: var(--color-text-primary, #21201f);
+  --stepper-muted: var(--color-text-secondary, #6b7280);
+
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--stepper-font);
+  color: var(--stepper-text);
+}
+
+/* Size modifiers */
+.medium {
+  --stepper-circle: 28px;
+  --stepper-font: 14px;
+}
+
+.small {
+  --stepper-circle: 22px;
+  --stepper-font: 12px;
+}
+
+.horizontal {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.vertical {
+  flex-direction: column;
+}
+
+/* ------------------------------------------------------------------ */
+/* Item                                                                */
+/* ------------------------------------------------------------------ */
+
+.item {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+.horizontal .item {
+  flex: 1 1 auto;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.horizontal .itemLast {
+  flex: 0 0 auto;
+}
+
+.vertical .item {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.alt .item,
+.alt .itemLast {
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* Step (circle + text)                                                */
+/* ------------------------------------------------------------------ */
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+.alt .step {
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.stepButton {
+  cursor: pointer;
+  border-radius: var(--radius-md, 6px);
+}
+
+.stepButton:hover .label {
+  text-decoration: underline;
+}
+
+.stepButton:focus-visible {
+  outline: 2px solid var(--stepper-active);
+  outline-offset: 4px;
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ------------------------------------------------------------------ */
+/* Circle                                                              */
+/* ------------------------------------------------------------------ */
+
+.circle {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: var(--stepper-circle);
+  height: var(--stepper-circle);
+  border: 2px solid transparent;
+  border-radius: 50%;
+  box-sizing: border-box;
+  font-size: calc(var(--stepper-font) - 1px);
+  font-weight: 700;
+  line-height: 1;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.circle_upcoming {
+  border-color: var(--stepper-line);
+  color: var(--stepper-muted);
+  background: transparent;
+}
+
+.circle_active {
+  background: var(--stepper-active);
+  border-color: var(--stepper-active);
+  color: #fff;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--stepper-active) 18%, transparent);
+}
+
+.circle_completed {
+  background: var(--stepper-active);
+  border-color: var(--stepper-active);
+  color: #fff;
+}
+
+.circle_error {
+  background: var(--stepper-error);
+  border-color: var(--stepper-error);
+  color: #fff;
+}
+
+/* ------------------------------------------------------------------ */
+/* Text                                                                */
+/* ------------------------------------------------------------------ */
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-top: calc((var(--stepper-circle) - 1.4em) / 2);
+}
+
+.alt .text {
+  align-items: center;
+  padding-top: 0;
+}
+
+.label {
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.labelMuted {
+  color: var(--stepper-muted);
+  font-weight: 500;
+}
+
+.labelActive {
+  color: var(--stepper-text);
+}
+
+.labelError {
+  color: var(--stepper-error);
+}
+
+.caption,
+.description {
+  font-size: calc(var(--stepper-font) - 2px);
+  line-height: 1.4;
+  color: var(--stepper-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* Connector                                                           */
+/* ------------------------------------------------------------------ */
+
+.connector {
+  position: relative;
+  background: var(--stepper-line);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.connectorFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--stepper-active);
+  transition: width 200ms ease, height 200ms ease;
+}
+
+.horizontal .connector {
+  flex: 1 1 auto;
+  min-width: 24px;
+  height: 2px;
+  margin: calc(var(--stepper-circle) / 2 - 1px) 12px 0;
+}
+
+.horizontal .connectorFill {
+  width: 0;
+  height: 100%;
+}
+
+.horizontal .connectorDone .connectorFill {
+  width: 100%;
+}
+
+.vertical .connector {
+  flex: none;
+  width: 2px;
+  min-height: 24px;
+  margin: 4px 0 4px calc(var(--stepper-circle) / 2 - 1px);
+}
+
+.vertical .connectorFill {
+  width: 100%;
+  height: 0;
+}
+
+.vertical .connectorDone .connectorFill {
+  height: 100%;
+}
+
+.alt .connector {
+  position: absolute;
+  top: calc(var(--stepper-circle) / 2 - 1px);
+  left: calc(50% + var(--stepper-circle) / 2 + 8px);
+  right: calc(-50% + var(--stepper-circle) / 2 + 8px);
+  min-width: 0;
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Screen-reader only text                                             */
+/* ------------------------------------------------------------------ */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Mobile Responsiveness                                               */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 600px) {
+  .horizontal:not(.alt) {
+    flex-direction: column;
+  }
+  
+  .horizontal:not(.alt) .item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .horizontal:not(.alt) .connector {
+    width: 2px;
+    height: auto;
+    min-height: 24px;
+    margin: 4px 0 4px calc(var(--stepper-circle) / 2 - 1px);
+  }
+
+  .horizontal:not(.alt) .connectorFill {
+    width: 100%;
+    height: 0;
+  }
+
+  .horizontal:not(.alt) .connectorDone .connectorFill {
+    height: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circle,
+  .connectorFill {
+    transition: none;
+  }
+}
