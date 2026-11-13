@@ -20,7 +20,7 @@ export function formatExplorerCode(
   if (component === "Table") return formatTableCode(args, composition);
   if (component === "Modal") return formatModalCode(args, composition);
   if (component === "Tooltip") return formatTooltipCode(args, composition);
-  if (component === "Card") return formatCardCode(args, composition);
+  if (component === "Card") return formatCardCode(args);
   const componentCode = (nextArgs: ExplorerArgs): string =>
     formatExplorerCode(component, nextArgs).split("\n\n").slice(1).join("\n\n");
 
