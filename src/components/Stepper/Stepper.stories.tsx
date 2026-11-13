@@ -101,11 +101,7 @@ function Card({
       {title && (
         <div style={{ marginBottom: 12, paddingLeft: 4 }}>
           <div style={{ fontSize: 13, fontWeight: 700 }}>{title}</div>
-          {hint && (
-            <div style={{ fontSize: 12, color: muted, marginTop: 2 }}>
-              {hint}
-            </div>
-          )}
+          {hint && <div style={{ fontSize: 12, color: muted, marginTop: 2 }}>{hint}</div>}
         </div>
       )}
       <div style={cardStyle}>{children}</div>
@@ -168,9 +164,7 @@ function WizardDemo({
       <div>
         <div style={{ fontSize: 36 }}>🎉</div>
         <h4 style={{ margin: "8px 0 4px", fontSize: 16 }}>Order placed</h4>
-        <p style={{ margin: 0, fontSize: 13, color: muted }}>
-          All steps are complete.
-        </p>
+        <p style={{ margin: 0, fontSize: 13, color: muted }}>All steps are complete.</p>
       </div>
     </div>
   ) : (
@@ -184,9 +178,7 @@ function WizardDemo({
         border: `1px dashed ${border}`,
       }}
     >
-      <p style={{ margin: 0, fontSize: 14, fontWeight: 500 }}>
-        Content for {items[active].label}
-      </p>
+      <p style={{ margin: 0, fontSize: 14, fontWeight: 500 }}>Content for {items[active].label}</p>
     </div>
   );
 
@@ -207,19 +199,11 @@ function WizardDemo({
         </Button>
       ) : (
         <>
-          <Button
-            variant="outline"
-            onClick={() => go(active - 1)}
-            disabled={!canBack}
-          >
+          <Button variant="outline" onClick={() => go(active - 1)} disabled={!canBack}>
             Back
           </Button>
 
-          <Button
-            variant="primary"
-            onClick={() => go(active + 1)}
-            disabled={!canNext}
-          >
+          <Button variant="primary" onClick={() => go(active + 1)} disabled={!canNext}>
             {isLast ? "Place order" : "Next"}
           </Button>
         </>
@@ -262,6 +246,147 @@ function stepperSource(extraProps = "") {
   activeStep={1}${extraProps}
 />`;
 }
+
+/* =========================
+   BASIC (Driven by Controls)
+   ========================= */
+
+export const Default: Story = {
+  args: { steps: baseSteps },
+  render: (args) => (
+    <Card>
+      <Stepper {...args} />
+    </Card>
+  ),
+  parameters: {
+    docs: { source: { code: stepperSource() } },
+  },
+};
+
+export const WithDescriptions: Story = {
+  args: { steps: detailedSteps },
+  render: (args) => (
+    <Card>
+      <Stepper {...args} />
+    </Card>
+  ),
+  parameters: {
+    docs: {
+      source: {
+        code: stepperSource(`\n  // steps include a description property:
+  // { label: "Account", description: "Create your credentials" }`),
+      },
+    },
+  },
+};
+
+export const WithOptional: Story = {
+  args: {
+    steps: [{ label: "Account" }, { label: "Payment", optional: true }, { label: "Review" }],
+  },
+  render: (args) => (
+    <Card>
+      <Stepper {...args} />
+    </Card>
+  ),
+  parameters: {
+    docs: {
+      source: {
+        code: stepperSource(`\n  // steps include optional: true
+  // { label: "Payment", optional: true }`),
+      },
+    },
+  },
+};
+
+export const WithIcons: Story = {
+  args: { steps: iconSteps },
+  render: (args) => (
+    <Card>
+      <Stepper {...args} />
+    </Card>
+  ),
+  parameters: {
+    docs: {
+      source: {
+        code: stepperSource(`\n  // steps include an icon property:
+  // icon: <Icon name="user" size={16} />`),
+      },
+    },
+  },
+};
+
+export const IconByStatus: Story = {
+  name: "Icon by status",
+  args: {
+    activeStep: 1,
+    steps: ["Account", "Search", "Review"].map((label) => ({
+      label,
+      icon: (status: string) => (
+        <Icon name={status === "completed" ? "check-circle" : "user"} size={16} />
+      ),
+    })) as StepItem[],
+  },
+  render: (args) => (
+    <Card>
+      <Stepper {...args} />
+    </Card>
+  ),
+  parameters: {
+    docs: {
+      source: {
+        code: `{
+  label: "Account",
+  icon: (status) => (
+    <Icon name={status === "completed" ? "check-circle" : "user"} size={16} />
+  ),
+}`,
+      },
+    },
+  },
+};
+
+/* =========================
+   STATES & LAYOUTS
+   ========================= */
+
+export const ErrorState: Story = {
+  name: "Error state",
+  args: { steps: baseSteps, activeStep: 1, error: true },
+  render: (args) => (
+    <Card>
+      <Stepper {...args} />
+    </Card>
+  ),
+  parameters: {
+    docs: { source: { code: stepperSource(`\n  error`) } },
+  },
+};
+
+export const AlternativeLabel: Story = {
+  name: "Label below",
+  args: { steps: baseSteps, alternativeLabel: true },
+  render: (args) => (
+    <Card>
+      <Stepper {...args} />
+    </Card>
+  ),
+  parameters: {
+    docs: { source: { code: stepperSource(`\n  alternativeLabel`) } },
+  },
+};
+
+export const Vertical: Story = {
+  args: { steps: detailedSteps, orientation: "vertical" },
+  render: (args) => (
+    <Card width={360}>
+      <Stepper {...args} />
+    </Card>
+  ),
+  parameters: {
+    docs: { source: { code: stepperSource(`\n  orientation="vertical"`) } },
+  },
+};
 
 /* =========================
    INTERACTIVE
@@ -347,182 +472,17 @@ export const NonLinear: Story = {
 };
 
 /* =========================
-   BASIC
-   ========================= */
-
-export const Default: Story = {
-  args: { steps: baseSteps },
-  render: (args) => (
-    <Card>
-      <Stepper {...args} />
-    </Card>
-  ),
-  parameters: {
-    docs: { source: { code: stepperSource() } },
-  },
-};
-
-export const WithDescriptions: Story = {
-  args: { steps: detailedSteps },
-  render: (args) => (
-    <Card>
-      <Stepper {...args} />
-    </Card>
-  ),
-  parameters: {
-    docs: {
-      source: {
-        code: stepperSource(`\n  // steps include a description property:
-  // { label: "Account", description: "Create your credentials" }`),
-      },
-    },
-  },
-};
-
-export const WithOptional: Story = {
-  args: {
-    steps: [
-      { label: "Account" },
-      { label: "Payment", optional: true },
-      { label: "Review" },
-    ],
-  },
-  render: (args) => (
-    <Card>
-      <Stepper {...args} />
-    </Card>
-  ),
-  parameters: {
-    docs: {
-      source: {
-        code: stepperSource(`\n  // steps include optional: true
-  // { label: "Payment", optional: true }`),
-      },
-    },
-  },
-};
-
-export const WithIcons: Story = {
-  args: { steps: iconSteps },
-  render: (args) => (
-    <Card>
-      <Stepper {...args} />
-    </Card>
-  ),
-  parameters: {
-    docs: {
-      source: {
-        code: stepperSource(`\n  // steps include an icon property:
-  // icon: <Icon name="user" size={16} />`),
-      },
-    },
-  },
-};
-
-export const IconByStatus: Story = {
-  name: "Icon by status",
-  args: {
-    activeStep: 1,
-    steps: ["Account", "Search", "Review"].map((label) => ({
-      label,
-      icon: (status: string) => (
-        <Icon
-          name={status === "completed" ? "check-circle" : "user"}
-          size={16}
-        />
-      ),
-    })) as StepItem[],
-  },
-  render: (args) => (
-    <Card>
-      <Stepper {...args} />
-    </Card>
-  ),
-  parameters: {
-    docs: {
-      source: {
-        code: `{
-  label: "Account",
-  icon: (status) => (
-    <Icon name={status === "completed" ? "check-circle" : "user"} size={16} />
-  ),
-}`,
-      },
-    },
-  },
-};
-
-/* =========================
-   STATES & LAYOUTS
-   ========================= */
-
-export const ErrorState: Story = {
-  name: "Error state",
-  args: { steps: baseSteps, activeStep: 1, error: true },
-  render: (args) => (
-    <Card>
-      <Stepper {...args} />
-    </Card>
-  ),
-  parameters: {
-    docs: { source: { code: stepperSource(`\n  error`) } },
-  },
-};
-
-export const AlternativeLabel: Story = {
-  name: "Label below",
-  args: { steps: baseSteps, alternativeLabel: true },
-  render: (args) => (
-    <Card>
-      <Stepper {...args} />
-    </Card>
-  ),
-  parameters: {
-    docs: { source: { code: stepperSource(`\n  alternativeLabel`) } },
-  },
-};
-
-export const Vertical: Story = {
-  args: { steps: detailedSteps, orientation: "vertical" },
-  render: (args) => (
-    <Card width={360}>
-      <Stepper {...args} />
-    </Card>
-  ),
-  parameters: {
-    docs: { source: { code: stepperSource(`\n  orientation="vertical"`) } },
-  },
-};
-
-export const AllLayouts: Story = {
-  name: "All layouts",
-  render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-      <Card title="Horizontal" hint="Default layout">
-        <Stepper steps={detailedSteps} activeStep={1} />
-      </Card>
-      <Card title="Label below" hint="alternativeLabel">
-        <Stepper steps={baseSteps} activeStep={1} alternativeLabel />
-      </Card>
-      <Card width={360} title="Vertical" hint='orientation="vertical"'>
-        <Stepper steps={detailedSteps} activeStep={1} orientation="vertical" />
-      </Card>
-    </div>
-  ),
-};
-
-/* =========================
-   SIZES
+   SIZES (Fixed layout)
    ========================= */
 
 export const Sizes: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
       <Card title="Medium" hint="Default">
-        <Stepper steps={detailedSteps} activeStep={1} size="medium" />
+        <Stepper steps={detailedSteps} activeStep={1} size="medium" orientation="horizontal" />
       </Card>
       <Card title="Small" hint='size="small"'>
-        <Stepper steps={detailedSteps} activeStep={1} size="small" />
+        <Stepper steps={detailedSteps} activeStep={1} size="small" orientation="horizontal" />
       </Card>
     </div>
   ),
