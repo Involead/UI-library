@@ -1435,4 +1435,41 @@ export const explorerComponents: ExplorerComponent[] = [
           },
         ],
       },
+        {
+    name: "Card",
+    description: "A flexible container for grouping related content and actions.",
+    accessibility: [
+      "Use semantic HTML inside the card (headings, paragraphs).",
+      "If the card is clickable, it automatically gets role='button' and tabIndex={0}.",
+      "Media requires alt text for screen readers.",
+    ],
+    controls: [
+      text("title", "Card title"),
+      text("description", "Card subtitle or description"),
+      boolean("withMedia", "Show an image at the top"),
+      boolean("withAction", "Show an icon in the header"),
+      boolean("withFooter", "Show action buttons at the bottom"),
+      boolean("interactive", "Make the whole card clickable"),
+    ],
+    stories: [
+      {
+        name: "Default",
+        description: "Standard card with header and body.",
+        args: { title: "Project Alpha", description: "Created 2 days ago", withFooter: true },
+        composition: "default",
+      },
+      {
+        name: "With Media",
+        description: "Includes an edge-to-edge image at the top.",
+        args: { title: "Design System", description: "A guide to scalable UI", withMedia: true, withFooter: true },
+        composition: "default",
+      },
+      {
+        name: "Interactive",
+        description: "The whole card is clickable and focusable.",
+        args: { title: "Clickable Card", description: "Hover or tab to me", interactive: true },
+        composition: "default",
+      },
+    ],
+  },
 ];
