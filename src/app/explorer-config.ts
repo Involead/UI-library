@@ -1,6 +1,6 @@
 import { icons } from "@/icons";
 
-export type ExplorerValue = string | boolean | string[] | null;
+export type ExplorerValue = string | boolean | string[] | Record<string, string> | null;
 export type ExplorerArgs = Record<string, ExplorerValue>;
 export type ExplorerControlKind = "text" | "boolean" | "select" | "json" | "multi-select";
 
@@ -16,21 +16,24 @@ export type ExplorerStory = {
   description: string;
   args: ExplorerArgs;
   composition?:
-    | "all"
-    | "sizes"
-    | "states"
-    | "headings"
-    | "colors"
-    | "label-clickable"
-    | "group"
-    | "gallery"
-    | "column-spanning"
-    | "row-spanning"
-    | TableComposition
-    | "default"
-    | "orientation"
-    | "placements"
-    | "variants";
+  | "all"
+  | "sizes"
+  | "states"
+  | "headings"
+  | "colors"
+  | "label-clickable"
+  | "group"
+  | "gallery"
+  | "column-spanning"
+  | "row-spanning"
+  | TableComposition
+  | "default"
+  | "orientation"
+  | "placements"
+  | "variants"
+  | "content"
+  | "overlap";
+
 };
 
 /** Table stories that need more than the base sample table; see TablePreview. */
@@ -1358,81 +1361,241 @@ export const explorerComponents: ExplorerComponent[] = [
         },
         composition: "default",
       },
-      
+
     ],
-    
+
   },
 
   {
-        name: "Tooltip",
-        description:
-          "Contextual text or rich content shown on hover or focus. Two variants: a compact dark tooltip for truncated text, and a light interactive panel for structured content like links or pagination.",
-        accessibility: [
-          "Trigger is linked to the tooltip with aria-describedby while open.",
-          "Opens on focus, so keyboard users can reach it.",
-          "Closes on Escape.",
-          "Non-interactive tooltips have pointer-events: none so they never steal hover.",
-          "The dark variant is text-only; use the light variant for interactive content.",
-        ],
-        controls: [
-          text("title", "Tooltip content (text or JSX in custom mode)"),
-          select("placement", "Preferred side; flips when there isn't room", [
-            "top",
-            "bottom",
-            "left",
-            "right",
-          ]),
-          select("variant", "Visual style", ["dark", "light"]),
-          boolean("interactive", "Allows the pointer to move into the tooltip"),
-          boolean("onlyWhenTruncated", "Only shows if the trigger text is cut off"),
-          boolean("disabled", "Disables the tooltip"),
-          text("enterDelay", "Delay in ms before opening"),
-          text("leaveDelay", "Delay in ms before closing"),
-        ],
-        stories: [
-          {
-            name: "Default",
-            description: "Dark tooltip with the default 100ms open delay",
-            args: { title: "This is a tooltip", placement: "top", variant: "dark" },
-            composition: "default",
-          },
-          {
-            name: "Placements",
-            description: "Top, bottom, left, and right",
-            args: { title: "This is a tooltip" },
-            composition: "placements",
-          },
-          {
-            name: "Variants",
-            description: "Dark (text-only) and light (rich content)",
-            args: { title: "This is a tooltip" },
-            composition: "variants",
-          },
-          {
-            name: "Light + Interactive",
-            description: "Rich content panel that stays open while the pointer moves into it",
-            args: {
-              title: "Event details",
-              variant: "light",
-              interactive: true,
-              placement: "top",
-            },
-          },
-          {
-            name: "Truncated Text",
-            description: "Only shows when the trigger's text is cut off (ellipsis overflow)",
-            args: {
-              title: "Queen's Hospital - Dietetics Department",
-              placement: "top",
-              variant: "dark",
-              onlyWhenTruncated: true,
-            },
-          },
-          {
-            name: "Disabled",
-            description: "No tooltip appears",
-            args: { title: "This is a tooltip", disabled: true },
-          },
-        ],
+    name: "Tooltip",
+    description:
+      "Contextual text or rich content shown on hover or focus. Two variants: a compact dark tooltip for truncated text, and a light interactive panel for structured content like links or pagination.",
+    accessibility: [
+      "Trigger is linked to the tooltip with aria-describedby while open.",
+      "Opens on focus, so keyboard users can reach it.",
+      "Closes on Escape.",
+      "Non-interactive tooltips have pointer-events: none so they never steal hover.",
+      "The dark variant is text-only; use the light variant for interactive content.",
+    ],
+    controls: [
+      text("title", "Tooltip content (text or JSX in custom mode)"),
+      select("placement", "Preferred side; flips when there isn't room", [
+        "top",
+        "bottom",
+        "left",
+        "right",
+      ]),
+      select("variant", "Visual style", ["dark", "light"]),
+      boolean("interactive", "Allows the pointer to move into the tooltip"),
+      boolean("onlyWhenTruncated", "Only shows if the trigger text is cut off"),
+      boolean("disabled", "Disables the tooltip"),
+      text("enterDelay", "Delay in ms before opening"),
+      text("leaveDelay", "Delay in ms before closing"),
+    ],
+    stories: [
+      {
+        name: "Default",
+        description: "Dark tooltip with the default 100ms open delay",
+        args: { title: "This is a tooltip", placement: "top", variant: "dark" },
+        composition: "default",
       },
+      {
+        name: "Placements",
+        description: "Top, bottom, left, and right",
+        args: { title: "This is a tooltip" },
+        composition: "placements",
+      },
+      {
+        name: "Variants",
+        description: "Dark (text-only) and light (rich content)",
+        args: { title: "This is a tooltip" },
+        composition: "variants",
+      },
+      {
+        name: "Light + Interactive",
+        description: "Rich content panel that stays open while the pointer moves into it",
+        args: {
+          title: "Event details",
+          variant: "light",
+          interactive: true,
+          placement: "top",
+        },
+      },
+      {
+        name: "Truncated Text",
+        description: "Only shows when the trigger's text is cut off (ellipsis overflow)",
+        args: {
+          title: "Queen's Hospital - Dietetics Department",
+          placement: "top",
+          variant: "dark",
+          onlyWhenTruncated: true,
+        },
+      },
+      {
+        name: "Disabled",
+        description: "No tooltip appears",
+        args: { title: "This is a tooltip", disabled: true },
+      },
+    ],
+  },
+
+  {
+    name: "Notification",
+    description:
+      "Small count or dot anchored to a child element, such as unread counts on a bell icon or a presence dot on an avatar. Not a toast — for transient messages, use a Toast component.",
+
+    accessibility: [
+      "The notification is decorative by default and hidden from assistive technology when invisible.",
+      "Screen readers should get the count from the child's accessible name (e.g. 'Inbox, 12 unread'), not from the notification span itself.",
+      "Counts above the max value render as 'N+' and the full number should still be announced via the child.",
+      "The dot variant carries no text, so pair it with a visible or programmatic status message on the parent.",
+    ],
+
+    controls: [
+      text("content", "Count, string, or node shown inside the notification"),
+
+      select("variant", "Standard count or a small dot", [
+        "standard",
+        "dot",
+      ]),
+
+      select("color", "Palette colour", [
+        "primary",
+        "secondary",
+        "success",
+        "error",
+        "warning",
+        "info",
+        "default",
+      ]),
+
+      text("max", "Cap for numeric content; values above render as '{max}+'"),
+
+      select("overlap", "How the notification sits on the child's corner", [
+        "rectangular",
+        "circular",
+      ]),
+
+      select("anchorOrigin.vertical", "Vertical position", [
+        "top",
+        "bottom",
+      ]),
+
+      select("anchorOrigin.horizontal", "Horizontal position", [
+        "left",
+        "right",
+      ]),
+
+      boolean("invisible", "Hides the notification but keeps the child"),
+
+      boolean("showZero", "Shows the notification when content is 0"),
+
+      boolean(
+        "children",
+        "Whether to render a wrapped child (set false for a standalone notification)",
+      ),
+
+    ],
+
+    stories: [
+      {
+        name: "Default",
+        description: "Count on a rectangular icon",
+        args: {
+          content: "4",
+          color: "primary",
+          variant: "standard",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+        },
+        composition: "default",
+      },
+
+      {
+        name: "Dot",
+        description: "Small status dot on the child",
+        args: {
+          variant: "dot",
+          color: "success",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+        },
+        composition: "default",
+      },
+
+      {
+        name: "Colors",
+        description: "Primary, secondary, success, error, warning, default",
+        args: {
+          content: "4",
+          orientation: "horizontal",
+        },
+        composition: "colors",
+      },
+
+      {
+        name: "Max Value",
+        description: "99, 100, and 1000 with max={99} / max={999}",
+        args: {
+          content: "100",
+          max: "99",
+          color: "primary",
+          orientation: "horizontal",
+        },
+        composition: "states",
+      },
+
+
+      {
+        name: "Anchor Origins",
+        description:
+          "All four corners: top-left, top-right, bottom-left, bottom-right",
+        args: {
+          content: "4",
+          color: "error",
+          orientation: "horizontal",
+        },
+        composition: "placements",
+      },
+
+      {
+        name: "Show Zero",
+        description: "Zero hidden by default vs visible with showZero",
+        args: {
+          content: "0",
+          color: "primary",
+          orientation: "horizontal",
+        },
+        composition: "states",
+      },
+
+      {
+        name: "Invisible",
+        description: "Visible vs invisible",
+        args: {
+          content: "4",
+          color: "primary",
+          orientation: "horizontal",
+        },
+        composition: "states",
+      },
+
+
+      {
+        name: "Text Content",
+        description: "Strings such as 'New', 'HOT' and custom content",
+        args: {
+          content: "New",
+          color: "primary",
+          orientation: "horizontal",
+        },
+        composition: "content",
+      },
+    ],
+  },
+
 ];
