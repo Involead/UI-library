@@ -6,7 +6,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: inherit;   
+  color: inherit; /* Let wrapper color flow down for color="inherit" */
   font-family: var(--font-family-primary);
   font-size: var(--loader-font);
   line-height: var(--line-height-normal);
@@ -55,7 +55,7 @@
 }
 
 /* ============================================================
-   Visual wrapper
+   Visual wrapper & Custom Icon
    ============================================================ */
 
 .visual {
@@ -68,51 +68,44 @@
   flex: none;
 }
 
-/* ============================================================
-   Colour (on the visual span, so cascade is unambiguous)
-   ============================================================ */
-
-.visual.color_primary {
-  color: var(--color-primary);
-}
-
-.visual.color_secondary {
-  color: var(--color-secondary);
-}
-
-.visual.color_success {
-  color: var(--color-success);
-}
-
-.visual.color_error {
-  color: var(--color-error);
-}
-
-.visual.color_warning {
-  color: var(--color-warning);
-}
-
-.visual.color_info {
-  color: var(--color-info);
-}
-
-.visual.color_inherit {
-  color: inherit;
-}
-
-/* ============================================================
-   SVG base
-   ============================================================ */
-
-.svg {
+.customIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
-  display: block;
 }
+
+/* Ensure images, GIFs, and custom SVGs scale perfectly */
+.customIconWrapper img,
+.customIconWrapper svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: inherit;
+}
+
+/* ============================================================
+   Colour
+   ============================================================ */
+
+.visual.color_primary { color: var(--color-primary); }
+.visual.color_secondary { color: var(--color-secondary); }
+.visual.color_success { color: var(--color-success); }
+.visual.color_error { color: var(--color-error); }
+.visual.color_warning { color: var(--color-warning); }
+.visual.color_info { color: var(--color-info); }
+.visual.color_inherit { color: inherit; }
 
 /* ============================================================
    Variant: spinner
    ============================================================ */
+
+.variant_spinner .svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 
 .variant_spinner .arc {
   transform-origin: center;
@@ -124,7 +117,6 @@
 }
 
 .disableShrink .arc {
-  /* Drop the dasharray animation; only rotate. */
   stroke-dasharray: 22 44;
   animation: spinner-rotate 0.9s linear infinite;
 }
@@ -134,6 +126,9 @@
    ============================================================ */
 
 .variant_ring .svg {
+  width: 100%;
+  height: 100%;
+  display: block;
   animation: spinner-rotate 1.2s linear infinite;
 }
 
@@ -157,13 +152,8 @@
   animation: dot-bounce 1.2s ease-in-out infinite;
 }
 
-.dot:nth-child(2) {
-  animation-delay: 0.16s;
-}
-
-.dot:nth-child(3) {
-  animation-delay: 0.32s;
-}
+.dot:nth-child(2) { animation-delay: 0.16s; }
+.dot:nth-child(3) { animation-delay: 0.32s; }
 
 /* ============================================================
    Variant: bars
@@ -182,20 +172,12 @@
   animation: bar-scale 1s ease-in-out infinite;
 }
 
-.bar:nth-child(2) {
-  animation-delay: 0.12s;
-}
-
-.bar:nth-child(3) {
-  animation-delay: 0.24s;
-}
-
-.bar:nth-child(4) {
-  animation-delay: 0.36s;
-}
+.bar:nth-child(2) { animation-delay: 0.12s; }
+.bar:nth-child(3) { animation-delay: 0.24s; }
+.bar:nth-child(4) { animation-delay: 0.36s; }
 
 /* ============================================================
-   Variant: pulse — solid core + expanding halo (never invisible)
+   Variant: pulse — solid core + expanding halo
    ============================================================ */
 
 .pulseCore {
@@ -221,60 +203,28 @@
    ============================================================ */
 
 @keyframes spinner-rotate {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes dot-bounce {
-  0%,
-  80%,
-  100% {
-    transform: scale(0.6);
-    opacity: 0.5;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes bar-scale {
-  0%,
-  100% {
-    transform: scaleY(0.4);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scaleY(1);
-    opacity: 1;
-  }
+  0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
 }
 
 @keyframes pulse-ring {
-  0% {
-    transform: scale(0.4);
-    opacity: 0.6;
-  }
-  80% {
-    transform: scale(1);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-  }
+  0% { transform: scale(0.4); opacity: 0.6; }
+  80% { transform: scale(1); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
 }
 
 @keyframes loader-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: none; }
 }
 
 /* ============================================================
@@ -282,17 +232,7 @@
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-  .root {
-    animation: none;
-  }
-
-  .arc,
-  .arcDet,
-  .ringDash,
-  .dot,
-  .bar,
-  .pulseRing,
-  .variant_ring .svg {
+  .root, .arc, .arcDet, .ringDash, .dot, .bar, .pulseRing, .variant_ring .svg {
     animation: none;
   }
 }

@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
-import { Loader } from "./Loader";
+import { Loader } from "./";
+import { Icon } from "../Icon"; // Adjust path to your Icon component if needed
 
 const meta = {
   title: "Components/Loader",
@@ -224,37 +225,6 @@ export const Determinate: Story = {
   },
 };
 
-export const Thickness: Story = {
-  render: () => (
-    <div style={{ ...row, gap: 32 }}>
-      {[2, 3, 4, 6].map((t) => (
-        <div key={t} style={column}>
-          <Loader
-            variant="spinner"
-            progressVariant="determinate"
-            value={65}
-            size={48}
-            thickness={t}
-          />
-          <span style={hint}>thickness {t}</span>
-        </div>
-      ))}
-    </div>
-  ),
-  parameters: {
-    docs: {
-      source: {
-        code: `<Loader
-  progressVariant="determinate"
-  value={65}
-  size={48}
-  thickness={4}
-/>`,
-      },
-    },
-  },
-};
-
 /* =========================
    MUI disableShrink
    ========================= */
@@ -405,47 +375,47 @@ export const HideVisual: Story = {
    DELAY
    ========================= */
 
-function DelayedExample() {
+const DelayedRender = () => {
   const [key, setKey] = useState(0);
 
   return (
-    <div style={{ ...column, gap: 24 }}>
-      <button
-        type="button"
-        onClick={() => setKey((k) => k + 1)}
-        style={{
-          padding: "6px 14px",
-          border: "1px solid var(--color-border)",
-          borderRadius: "var(--radius-md)",
-          background: "var(--color-surface)",
-          fontFamily: "var(--font-family-primary)",
-          fontSize: 13,
-          cursor: "pointer",
-        }}
-      >
-        Restart
-      </button>
+      <div style={{ ...column, gap: 24 }}>
+        <button
+          type="button"
+          onClick={() => setKey((k) => k + 1)}
+          style={{
+            padding: "6px 14px",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-md)",
+            background: "var(--color-surface)",
+            fontFamily: "var(--font-family-primary)",
+            fontSize: 13,
+            cursor: "pointer",
+          }}
+        >
+          Restart
+        </button>
 
-      <div style={{ ...row, gap: 48 }}>
-        <div style={column}>
-          <Loader key={`a-${key}`} delay={0} variant="dots" />
-          <span style={hint}>delay=0</span>
-        </div>
-        <div style={column}>
-          <Loader key={`b-${key}`} delay={1000} variant="dots" />
-          <span style={hint}>delay=1000</span>
-        </div>
-        <div style={column}>
-          <Loader key={`c-${key}`} delay={2000} variant="dots" />
-          <span style={hint}>delay=2000</span>
+        <div style={{ ...row, gap: 48 }}>
+          <div style={column}>
+            <Loader key={`a-${key}`} delay={0} variant="dots" />
+            <span style={hint}>delay=0</span>
+          </div>
+          <div style={column}>
+            <Loader key={`b-${key}`} delay={1000} variant="dots" />
+            <span style={hint}>delay=1000</span>
+          </div>
+          <div style={column}>
+            <Loader key={`c-${key}`} delay={2000} variant="dots" />
+            <span style={hint}>delay=2000</span>
+          </div>
         </div>
       </div>
-    </div>
   );
-}
+};
 
 export const Delayed: Story = {
-  render: () => <DelayedExample />,
+  render: () => <DelayedRender />,
   parameters: {
     docs: {
       source: {
@@ -457,45 +427,136 @@ export const Delayed: Story = {
 };
 
 /* =========================
+   CUSTOM ICONS (Images, GIFs, Library Icons)
+   ========================= */
+
+export const CustomIcons: Story = {
+  render: () => (
+    <div style={{ ...row, gap: 48 }}>
+      <div style={column}>
+        <Loader
+          color="primary"
+          label="Saving changes…"
+          customIcon={
+            <span style={{ display: "inline-flex", animation: "spin 2s linear infinite" }}>
+              <Icon name="settings" />
+            </span>
+          }
+        />
+        <span style={hint}>Library Icon (Inherits Color)</span>
+      </div>
+
+      <div style={column}>
+        <Loader
+          size={48}
+          label="Processing..."
+          customIcon={
+            /* Note: Using a public GIF URL for demonstration */
+            <img 
+              src="https://i.gifer.com/origin/34/34338d26023e5515f6cc8969aa027bca_w200.gif" 
+              alt="" 
+            />
+          }
+        />
+        <span style={hint}>Custom GIF (Auto-scales)</span>
+      </div>
+
+      <div style={column}>
+        <Loader
+          color="success"
+          label="Uploading..."
+          customIcon={
+            <svg viewBox="0 0 24 24" fill="currentColor" style={{ animation: "bounce 1s infinite" }}>
+              <circle cx="12" cy="12" r="8"></circle>
+            </svg>
+          }
+        />
+        <span style={hint}>Custom SVG</span>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      source: {
+        code: `// You can pass any ReactNode into customIcon.
+// Images and GIFs scale automatically to the \`size\` prop.
+
+<>
+  {/* Using your own UI library Icon */}
+  <Loader
+    color="primary"
+    label="Saving changes…"
+    customIcon={
+      <Icon 
+        name="settings" 
+        style={{ animation: "spin 2s linear infinite" }} 
+      />
+    }
+  />
+
+  {/* Using an Image or GIF */}
+  <Loader
+    size={48}
+    label="Processing..."
+    customIcon={<img src="/loading.gif" alt="" />}
+  />
+
+  {/* Using a custom animated SVG */}
+  <Loader
+    color="success"
+    label="Uploading..."
+    customIcon={
+      <svg viewBox="0 0 24 24" fill="currentColor" style={{ animation: "bounce 1s infinite" }}>
+        <circle cx="12" cy="12" r="8"></circle>
+      </svg>
+    }
+  />
+</>`,
+      },
+    },
+  },
+};
+
+/* =========================
    FULLSCREEN
    ========================= */
 
-function FullscreenExample() {
+const FullscreenStory = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div style={column}>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        style={{
-          padding: "6px 14px",
-          border: "1px solid var(--color-border)",
-          borderRadius: "var(--radius-md)",
-          background: "var(--color-surface)",
-          fontFamily: "var(--font-family-primary)",
-          fontSize: 13,
-          cursor: "pointer",
-        }}
-      >
-        Show fullscreen loader
-      </button>
-      {open && (
-        <Loader
-          fullscreen
-          variant="dots"
-          size="large"
-          label="Loading…"
-          ariaLabel="Loading application"
-          delay={300}
-        />
-      )}
-    </div>
-  );
-}
+      <div style={column}>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          style={{
+            padding: "6px 14px",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-md)",
+            background: "var(--color-surface)",
+            fontFamily: "var(--font-family-primary)",
+            fontSize: 13,
+            cursor: "pointer",
+          }}
+        >
+          Show fullscreen loader
+        </button>
+        {open && (
+          <Loader
+            fullscreen
+            variant="dots"
+            size="large"
+            label="Loading…"
+            ariaLabel="Loading application"
+            delay={300}
+          />
+        )}
+      </div>
+    );
+};
 
 export const Fullscreen: Story = {
-  render: () => <FullscreenExample />,
+  render: () => <FullscreenStory />,
   parameters: {
     docs: {
       source: {
@@ -506,6 +567,63 @@ export const Fullscreen: Story = {
   label="Loading…"
   ariaLabel="Loading application"
   delay={300}
+/>`,
+      },
+    },
+  },
+};
+
+const FullscreenCustomStory = () => {
+  const [open, setOpen] = useState(false);
+
+  return (
+      <div style={column}>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          style={{
+            padding: "6px 14px",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-md)",
+            background: "var(--color-surface)",
+            fontFamily: "var(--font-family-primary)",
+            fontSize: 13,
+            cursor: "pointer",
+          }}
+        >
+          Show fullscreen custom loader
+        </button>
+        {open && (
+          <Loader
+            fullscreen
+            size={64}
+            label="Signing you in…"
+            ariaLabel="Authenticating"
+            delay={300}
+            customIcon={
+              <img 
+                src="https://i.gifer.com/origin/34/34338d26023e5515f6cc8969aa027bca_w200.gif" 
+                alt="" 
+              />
+            }
+          />
+        )}
+      </div>
+    );
+};
+
+export const FullscreenCustom: Story = {
+  render: () => <FullscreenCustomStory />,
+  parameters: {
+    docs: {
+      source: {
+        code: `<Loader
+  fullscreen
+  size={64}
+  label="Signing you in…"
+  ariaLabel="Authenticating"
+  delay={300}
+  customIcon={<img src="/brand-loader.gif" alt="" />}
 />`,
       },
     },

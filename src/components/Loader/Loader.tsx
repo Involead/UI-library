@@ -18,12 +18,7 @@ import styles from "./Loader.module.css";
    Types
    ============================================================ */
 
-export type LoaderVariant =
-  | "spinner"
-  | "dots"
-  | "bars"
-  | "pulse"
-  | "ring";
+export type LoaderVariant = "spinner" | "dots" | "bars" | "pulse" | "ring";
 
 export type LoaderSize = "small" | "medium" | "large";
 
@@ -57,15 +52,18 @@ export interface LoaderProps
   /** Milliseconds to wait before showing. Default 0 (immediate). */
   delay?: number;
 
+  /**
+   * Provide a completely custom visual (image, GIF, icon, custom SVG).
+   * This overrides the `variant` prop visually.
+   */
+  customIcon?: ReactNode;
+
   /* ---------- MUI CircularProgress parity ---------- */
 
   /**
    * MUI-style variant:
    *  - "indeterminate" → the spinner animates indefinitely
    *  - "determinate"   → a fixed arc based on `value` (0–100)
-   *
-   * Note: this is orthogonal to `variant` (the visual shape). If you set
-   * `progressVariant="determinate"`, only the ring shape is used.
    */
   progressVariant?: "indeterminate" | "determinate";
   /** 0–100, only when progressVariant="determinate". */
@@ -117,6 +115,7 @@ export const Loader = forwardRef<HTMLSpanElement, LoaderProps>(function Loader(
     ariaLabel = "Loading",
     fullscreen = false,
     delay = 0,
+    customIcon,
     progressVariant,
     value,
     thickness,
@@ -191,109 +190,117 @@ export const Loader = forwardRef<HTMLSpanElement, LoaderProps>(function Loader(
           <span
             className={cx(
               styles.visual,
-              styles[`variant_${variant}`],
+              !customIcon && styles[`variant_${variant}`],
               styles[`color_${color}`],
               isDeterminate && styles.determinate,
               disableShrink && styles.disableShrink,
             )}
             aria-hidden="true"
           >
-            {/* ---------- Ring (spinner + ring + determinate) ---------- */}
+            {customIcon ? (
+              <span className={styles.customIconWrapper}>
+                {customIcon}
+              </span>
+            ) : (
+              <>
+                {/* ---------- Ring (spinner + ring + determinate) ---------- */}
 
-            {variant === "spinner" && (
-              <svg
-                viewBox="0 0 24 24"
-                className={styles.svg}
-                role="presentation"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r={RADIUS}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeOpacity="0.2"
-                  strokeWidth="var(--loader-stroke)"
-                />
-                {isDeterminate ? (
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r={RADIUS}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="var(--loader-stroke)"
-                    strokeLinecap="round"
-                    strokeDasharray={CIRCUMFERENCE}
-                    strokeDashoffset={
-                      CIRCUMFERENCE * (1 - (clampedValue ?? 0) / 100)
-                    }
-                    transform="rotate(-90 12 12)"
-                    className={styles.arcDet}
-                  />
-                ) : (
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r={RADIUS}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="var(--loader-stroke)"
-                    strokeLinecap="round"
-                    strokeDasharray="14 44"
-                    className={styles.arc}
-                  />
+                {variant === "spinner" && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    className={styles.svg}
+                    role="presentation"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r={RADIUS}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeOpacity="0.2"
+                      strokeWidth="var(--loader-stroke)"
+                    />
+                    {isDeterminate ? (
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r={RADIUS}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="var(--loader-stroke)"
+                        strokeLinecap="round"
+                        strokeDasharray={CIRCUMFERENCE}
+                        strokeDashoffset={
+                          CIRCUMFERENCE * (1 - (clampedValue ?? 0) / 100)
+                        }
+                        transform="rotate(-90 12 12)"
+                        className={styles.arcDet}
+                      />
+                    ) : (
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r={RADIUS}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="var(--loader-stroke)"
+                        strokeLinecap="round"
+                        strokeDasharray="14 44"
+                        className={styles.arc}
+                      />
+                    )}
+                  </svg>
                 )}
-              </svg>
-            )}
 
-            {variant === "ring" && (
-              <svg
-                viewBox="0 0 24 24"
-                className={styles.svg}
-                role="presentation"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r={RADIUS}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="var(--loader-stroke)"
-                  strokeLinecap="round"
-                  strokeDasharray="1 56"
-                  className={styles.ringDash}
-                />
-              </svg>
-            )}
+                {variant === "ring" && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    className={styles.svg}
+                    role="presentation"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r={RADIUS}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="var(--loader-stroke)"
+                      strokeLinecap="round"
+                      strokeDasharray="1 56"
+                      className={styles.ringDash}
+                    />
+                  </svg>
+                )}
 
-            {/* ---------- Dots ---------- */}
+                {/* ---------- Dots ---------- */}
 
-            {variant === "dots" && (
-              <>
-                <span className={styles.dot} />
-                <span className={styles.dot} />
-                <span className={styles.dot} />
-              </>
-            )}
+                {variant === "dots" && (
+                  <>
+                    <span className={styles.dot} />
+                    <span className={styles.dot} />
+                    <span className={styles.dot} />
+                  </>
+                )}
 
-            {/* ---------- Bars ---------- */}
+                {/* ---------- Bars ---------- */}
 
-            {variant === "bars" && (
-              <>
-                <span className={styles.bar} />
-                <span className={styles.bar} />
-                <span className={styles.bar} />
-                <span className={styles.bar} />
-              </>
-            )}
+                {variant === "bars" && (
+                  <>
+                    <span className={styles.bar} />
+                    <span className={styles.bar} />
+                    <span className={styles.bar} />
+                    <span className={styles.bar} />
+                  </>
+                )}
 
-            {/* ---------- Pulse (core + ring) ---------- */}
+                {/* ---------- Pulse (core + ring) ---------- */}
 
-            {variant === "pulse" && (
-              <>
-                <span className={styles.pulseCore} />
-                <span className={styles.pulseRing} />
+                {variant === "pulse" && (
+                  <>
+                    <span className={styles.pulseCore} />
+                    <span className={styles.pulseRing} />
+                  </>
+                )}
               </>
             )}
           </span>
