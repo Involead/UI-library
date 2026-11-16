@@ -1,0 +1,298 @@
+/* ============================================================
+   Root
+   ============================================================ */
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;   
+  font-family: var(--font-family-primary);
+  font-size: var(--loader-font);
+  line-height: var(--line-height-normal);
+  animation: loader-fade-in var(--transition-fast, 150ms) ease-out;
+}
+
+.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-toast);
+  display: flex;
+  background: color-mix(in srgb, var(--color-black) 32%, transparent);
+}
+
+/* ============================================================
+   Content wrapper + label placement
+   ============================================================ */
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--loader-gap);
+  flex-direction: column;
+}
+
+.placement_bottom {
+  flex-direction: column;
+}
+
+.placement_top {
+  flex-direction: column-reverse;
+}
+
+.placement_start {
+  flex-direction: row;
+}
+
+.placement_end {
+  flex-direction: row-reverse;
+}
+
+.label {
+  font-size: var(--loader-font);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ============================================================
+   Visual wrapper
+   ============================================================ */
+
+.visual {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--loader-box);
+  height: var(--loader-box);
+  flex: none;
+}
+
+/* ============================================================
+   Colour (on the visual span, so cascade is unambiguous)
+   ============================================================ */
+
+.visual.color_primary {
+  color: var(--color-primary);
+}
+
+.visual.color_secondary {
+  color: var(--color-secondary);
+}
+
+.visual.color_success {
+  color: var(--color-success);
+}
+
+.visual.color_error {
+  color: var(--color-error);
+}
+
+.visual.color_warning {
+  color: var(--color-warning);
+}
+
+.visual.color_info {
+  color: var(--color-info);
+}
+
+.visual.color_inherit {
+  color: inherit;
+}
+
+/* ============================================================
+   SVG base
+   ============================================================ */
+
+.svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ============================================================
+   Variant: spinner
+   ============================================================ */
+
+.variant_spinner .arc {
+  transform-origin: center;
+  animation: spinner-rotate 0.9s linear infinite;
+}
+
+.variant_spinner .arcDet {
+  transition: stroke-dashoffset 200ms ease;
+}
+
+.disableShrink .arc {
+  /* Drop the dasharray animation; only rotate. */
+  stroke-dasharray: 22 44;
+  animation: spinner-rotate 0.9s linear infinite;
+}
+
+/* ============================================================
+   Variant: ring
+   ============================================================ */
+
+.variant_ring .svg {
+  animation: spinner-rotate 1.2s linear infinite;
+}
+
+.variant_ring .ringDash {
+  transform-origin: center;
+}
+
+/* ============================================================
+   Variant: dots
+   ============================================================ */
+
+.variant_dots {
+  gap: calc(var(--loader-gap) / 2);
+}
+
+.dot {
+  width: var(--loader-dot);
+  height: var(--loader-dot);
+  border-radius: var(--radius-full);
+  background: currentColor;
+  animation: dot-bounce 1.2s ease-in-out infinite;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+/* ============================================================
+   Variant: bars
+   ============================================================ */
+
+.variant_bars {
+  gap: calc(var(--loader-gap) / 2);
+}
+
+.bar {
+  width: var(--loader-bar-w);
+  height: var(--loader-bar-h);
+  border-radius: var(--radius-sm);
+  background: currentColor;
+  transform-origin: center;
+  animation: bar-scale 1s ease-in-out infinite;
+}
+
+.bar:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.bar:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.bar:nth-child(4) {
+  animation-delay: 0.36s;
+}
+
+/* ============================================================
+   Variant: pulse — solid core + expanding halo (never invisible)
+   ============================================================ */
+
+.pulseCore {
+  position: absolute;
+  width: 40%;
+  height: 40%;
+  border-radius: var(--radius-full);
+  background: currentColor;
+}
+
+.pulseRing {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: currentColor;
+  opacity: 0.4;
+  animation: pulse-ring 1.4s ease-out infinite;
+}
+
+/* ============================================================
+   Keyframes
+   ============================================================ */
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dot-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bar-scale {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.6;
+  }
+  80% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes loader-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    animation: none;
+  }
+
+  .arc,
+  .arcDet,
+  .ringDash,
+  .dot,
+  .bar,
+  .pulseRing,
+  .variant_ring .svg {
+    animation: none;
+  }
+}
