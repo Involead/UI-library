@@ -51,18 +51,18 @@ function buildSteps(args: ExplorerArgs): StepItem[] {
     { 
       label: "Account", 
       description: withDescriptions ? "Create your credentials" : undefined,
-      icon: withIcons ? <Icon name="user" size={16} color="currentColor" /> : undefined,
+      icon: withIcons ? <Icon name="user" size={14} color="currentColor" /> : undefined,
     },
     { 
       label: "Search", 
       description: withDescriptions ? "Searching the data" : undefined,
       optional: args.withOptional === true,
-      icon: withIcons ? <Icon name="search" size={16} color="currentColor" /> : undefined,
+      icon: withIcons ? <Icon name="search" size={14} color="currentColor" /> : undefined,
     },
     { 
       label: "Review", 
       description: withDescriptions ? "Confirm your order" : undefined,
-      icon: withIcons ? <Icon name="check-circle" size={16} color="currentColor" /> : undefined,
+      icon: withIcons ? <Icon name="check-circle" size={14} color="currentColor" /> : undefined,
     },
   ];
 
@@ -88,8 +88,8 @@ export function StepperPreview({ args, composition, onChange }: Props) {
     : "horizontal";
 
   // Updated to "small" | "medium"
-  const rawSize = getStringArg(args, "size", "medium");
-  const size: Size = isChoice(rawSize, ["small", "medium"]) ? rawSize : "medium";
+  const rawSize = getStringArg(args, "size", "small");
+  const size: Size = isChoice(rawSize, ["small", "medium"]) ? rawSize : "small";
 
   const alternativeLabel = args.alternativeLabel === true;
   const nonLinear = args.nonLinear === true;
@@ -104,19 +104,32 @@ export function StepperPreview({ args, composition, onChange }: Props) {
   };
 
   if (composition === "sizes") {
-    return (
-      <div style={containerStyle}>
-        <div>
-          <h3 style={headerStyle}>Small</h3>
-          <Stepper steps={steps} activeStep={activeStep} size="small" orientation={orientation} alternativeLabel={alternativeLabel} />
-        </div>
-        <div>
-          <h3 style={headerStyle}>Medium</h3>
-          <Stepper steps={steps} activeStep={activeStep} size="medium" orientation={orientation} alternativeLabel={alternativeLabel} />
-        </div>
+  return (
+    <div style={containerStyle}>
+      <div>
+        <h3 style={headerStyle}>Small</h3>
+        <Stepper
+          steps={steps}
+          activeStep={activeStep}
+          size="small"
+          orientation={orientation}
+          alternativeLabel={alternativeLabel}
+        />
       </div>
-    );
-  }
+
+      <div>
+        <h3 style={headerStyle}>Medium</h3>
+        <Stepper
+          steps={steps}
+          activeStep={activeStep}
+          size="medium"
+          orientation={orientation}
+          alternativeLabel={alternativeLabel}
+        />
+      </div>
+    </div>
+  );
+}
 
   if (composition === "orientation") {
     return (

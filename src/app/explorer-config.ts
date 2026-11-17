@@ -1461,37 +1461,37 @@ export const explorerComponents: ExplorerComponent[] = [
       {
         name: "Default",
         description: "Standard horizontal stepper",
-        args: { activeStep: "1", orientation: "horizontal", size: "medium" },
+        args: { activeStep: "1", orientation: "horizontal", size: "small" },
         composition: "default",
       },
       {
         name: "With Icons",
         description: "Custom icons inside the circles",
-        args: { activeStep: "1", withIcons: true, orientation: "horizontal", size: "medium" },
+        args: { activeStep: "1", withIcons: true, orientation: "horizontal", size: "small" },
         composition: "default",
       },
       {
         name: "With Descriptions",
         description: "Supporting text under the labels",
-        args: { activeStep: "1", withDescriptions: true, orientation: "horizontal", size: "medium" },
+        args: { activeStep: "1", withDescriptions: true, orientation: "horizontal", size: "small" },
         composition: "default",
       },
       {
         name: "Alternative Label",
         description: "Labels positioned under the circles",
-        args: { activeStep: "1", alternativeLabel: true, orientation: "horizontal", size: "medium" },
+        args: { activeStep: "1", alternativeLabel: true, orientation: "horizontal", size: "small" },
         composition: "default",
       },
       {
         name: "Error State",
         description: "Highlights a specific step as failed",
-        args: { activeStep: "1", withError: true, orientation: "horizontal", size: "medium" },
+        args: { activeStep: "1", withError: true, orientation: "horizontal", size: "small" },
         composition: "default",
       },
       {
         name: "Interactive (Clickable)",
         description: "Steps can be clicked to jump back",
-        args: { activeStep: "2", clickable: true, orientation: "horizontal", size: "medium" },
+        args: { activeStep: "2", clickable: true, orientation: "horizontal", size: "small" },
         composition: "default",
       },
       {
@@ -1503,7 +1503,7 @@ export const explorerComponents: ExplorerComponent[] = [
       {
         name: "Orientation",
         description: "Compare horizontal and vertical layouts",
-        args: { activeStep: "1", size: "medium" },
+        args: { activeStep: "1", size: "small" },
         composition: "orientation",
       },
     ],

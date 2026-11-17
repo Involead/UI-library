@@ -15,7 +15,7 @@ export function formatStepperCode(
     args.orientation === "vertical" ? "vertical" : "horizontal";
   
 
-  const size = args.size === "small" ? "small" : "medium";
+  const size = args.size === "medium" ? "medium" : "small";
   
   const alternativeLabel = args.alternativeLabel === true;
   const nonLinear = args.nonLinear === true;
@@ -28,13 +28,13 @@ export function formatStepperCode(
 
   const stepsCode = `[
     { 
-      label: "Account",${withDescriptions ? '\n      description: "Create your credentials",' : ""}${withIcons ? '\n      icon: <Icon name="user" size={16} />,' : ""}${disabled ? '\n      disabled: true,' : ""}
+      label: "Account",${withDescriptions ? '\n      description: "Create your credentials",' : ""}${withIcons ? '\n      icon: <Icon name="user" size={14} />,' : ""}${disabled ? '\n      disabled: true,' : ""}
     },
     { 
-      label: "Search",${withDescriptions ? '\n      description: "Searching the data",' : ""}${withOptional ? '\n      optional: true,' : ""}${withIcons ? '\n      icon: <Icon name="search" size={16} />,' : ""}${withError ? '\n      error: true,' : ""}${disabled ? '\n      disabled: true,' : ""}
+      label: "Search",${withDescriptions ? '\n      description: "Searching the data",' : ""}${withOptional ? '\n      optional: true,' : ""}${withIcons ? '\n      icon: <Icon name="search" size={14} />,' : ""}${withError ? '\n      error: true,' : ""}${disabled ? '\n      disabled: true,' : ""}
     },
     { 
-      label: "Review",${withDescriptions ? '\n      description: "Confirm your order",' : ""}${withIcons ? '\n      icon: <Icon name="check-circle" size={16} />,' : ""}${disabled ? '\n      disabled: true,' : ""}
+      label: "Review",${withDescriptions ? '\n      description: "Confirm your order",' : ""}${withIcons ? '\n      icon: <Icon name="check-circle" size={14} />,' : ""}${disabled ? '\n      disabled: true,' : ""}
     },
   ]`;
 

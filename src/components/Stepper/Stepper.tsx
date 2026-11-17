@@ -16,6 +16,7 @@ export interface StepItem {
   icon?: ReactNode | ((status: Status) => ReactNode);
 }
 
+
 export interface StepperProps {
   steps: StepItem[];
   activeStep?: number;
@@ -53,7 +54,7 @@ export function Stepper({
   steps,
   activeStep = 0,
   orientation = "horizontal",
-  size = "medium",
+  size = "small",
   alternativeLabel = false,
   onStepClick,
   nonLinear = false,
@@ -65,6 +66,11 @@ export function Stepper({
   const activeLabel = steps[activeStep]?.label;
 
   return (
+    <>
+
+    <div className={styles.srOnly} aria-live="polite" aria-atomic="true">
+      {`Step ${activeStep + 1} of ${steps.length}: ${activeLabel ?? ""}`}
+    </div>
     <ol
       className={cx(
         styles.root,
@@ -75,9 +81,7 @@ export function Stepper({
       )}
       aria-label={ariaLabel}
     >
-      <div className={styles.srOnly} aria-live="polite">
-        {`Step ${activeStep + 1} of ${steps.length}: ${activeLabel ?? ""}`}
-      </div>
+     
 
       {steps.map((step, index) => {
         const isError = error && index === activeStep ? true : step.error;
@@ -177,5 +181,6 @@ export function Stepper({
         );
       })}
     </ol>
+    </>
   );
 }

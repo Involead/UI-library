@@ -53,6 +53,8 @@
   flex: 1 1 auto;
   flex-direction: row;
   align-items: flex-start;
+  /* Added min-width: 0 to ensure flex items can shrink and allow wrapping */
+  min-width: 0; 
 }
 
 .horizontal .itemLast {
@@ -179,6 +181,9 @@
 .label {
   font-weight: 600;
   line-height: 1.4;
+  /* Ensure labels can wrap if needed */
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .labelMuted {
@@ -199,6 +204,11 @@
   font-size: calc(var(--stepper-font) - 2px);
   line-height: 1.4;
   color: var(--stepper-muted);
+  
+  /* 👈 The fix for long descriptions */
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* ------------------------------------------------------------------ */
@@ -277,6 +287,16 @@
   border: 0;
 }
 
+/* In Horizontal, cap the text width so it never pushes the connector */
+.horizontal .text {
+  max-width: 140px; /* Adjust as needed */
+}
+
+/* In Vertical, let the text take up the full width */
+.vertical .text {
+  max-width: 140px;
+}
+
 /* ------------------------------------------------------------------ */
 /* Mobile Responsiveness                                               */
 /* ------------------------------------------------------------------ */
@@ -292,6 +312,7 @@
   }
 
   .horizontal:not(.alt) .connector {
+    flex: none;
     width: 2px;
     height: auto;
     min-height: 24px;
