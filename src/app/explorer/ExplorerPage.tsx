@@ -28,6 +28,7 @@ import { TablePreview, tableStackCompositions } from "./previews/TablePreview";
 import { TypographyPreview } from "./previews/TypographyPreview";
 import { TabPreview } from "./previews/TabPreview";
 import { TooltipPreview } from "./previews/Tooltip.preview";
+import { CardPreview } from "./previews/CardPreview";
 import {
   isChoice,
   type ButtonSize,
@@ -353,6 +354,8 @@ export function ExplorerPage() {
       ? false
       : activeComponent === "Tooltip"
         ? false
+        : activeComponent === "Card"
+        ? false
         : activeComponent === "Table"
           ? tableStackCompositions.includes(composition ?? "")
           : Boolean(composition);
@@ -494,6 +497,16 @@ export function ExplorerPage() {
             updateComponentArg("title", value);
             recordAction(`tooltip: title changed`);
           }}
+        />
+      );
+    }
+    if (activeComponent === "Card") {
+      return (
+        <CardPreview
+          args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
+          onChange={() => { }}
         />
       );
     }

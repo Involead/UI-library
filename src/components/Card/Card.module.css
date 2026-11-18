@@ -1,0 +1,188 @@
+.card {
+  position: relative; /* anchors the stretched link and focus ring */
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: var(--radius-lg, 8px);
+  overflow: hidden;
+  color: var(--color-text-primary, #111827);
+  font-family: var(--font-family-primary, system-ui, sans-serif);
+}
+
+/* ------------------------------------------------------------------ */
+/* Interactive card                                                    */
+/* ------------------------------------------------------------------ */
+
+.card.interactive {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent; /* no grey flash on iOS/Android */
+  touch-action: manipulation; /* no double-tap-zoom delay */
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+/* Hover only where a real pointer exists, so touch screens don't get a
+   "stuck" hover state after a tap. */
+@media (hover: hover) {
+  .card.interactive:hover {
+    border-color: var(--color-border-hover, #d1d5db);
+    transform: translateY(-2px);
+  }
+}
+
+/* Pressed: the card settles back down. */
+.card.interactive:active {
+  transform: translateY(0) scale(0.995);
+  transition-duration: 0.05s;
+}
+
+/* Keyboard focus. Covers both a focusable card (role="button") and a
+   card that contains a stretched link. */
+.card.interactive:focus-visible,
+.card:has(.stretchedLink:focus-visible) {
+  outline: 2px solid var(--color-primary, #1d4ed8);
+  outline-offset: 2px;
+}
+
+.card.interactive:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Selected / disabled                                                 */
+/* ------------------------------------------------------------------ */
+
+.card.selected {
+  border-color: var(--color-primary, #1d4ed8);
+}
+
+.card.interactive.selected:hover {
+  border-color: var(--color-primary, #1d4ed8);
+}
+
+.card.disabled,
+.card[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* A disabled card must not react to hover or press. */
+.card.interactive:is(.disabled, [aria-disabled="true"]):hover,
+.card.interactive:is(.disabled, [aria-disabled="true"]):active {
+  transform: none;
+  border-color: var(--color-border, #e5e7eb);
+}
+
+/* ------------------------------------------------------------------ */
+/* Stretched link: the whole card becomes one real <a>                 */
+/*                                                                     */
+/*   <h3 class="title"><a class="stretchedLink" href="…">Title</a></h3>*/
+/*                                                                     */
+/* Links and buttons elsewhere in the card are lifted above it so they */
+/* stay separately clickable.                                          */
+/* ------------------------------------------------------------------ */
+
+.stretchedLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.stretchedLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.stretchedLink:focus-visible {
+  outline: none; /* the ring is drawn on the card instead */
+}
+
+.header :is(a, button, input, select, [role="button"]):not(.stretchedLink),
+.body :is(a, button, input, select, [role="button"]),
+.footer :is(a, button, input, select, [role="button"]) {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Sub-components --- */
+
+.media {
+  position: relative; /* Required for next/image fill */
+  width: 100%;
+  overflow: hidden;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mediaImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+@media (hover: hover) {
+  .card.interactive:hover .mediaImage {
+    transform: scale(1.03);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-md, 12px);
+  padding: var(--spacing-lg, 16px) var(--spacing-lg, 16px) 0;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-lg, 18px);
+  font-weight: var(--font-weight-semibold, 600);
+  line-height: 1.25;
+}
+
+.description {
+  margin: var(--spacing-xs, 4px) 0 0;
+  color: var(--color-text-secondary, #6b7280);
+  font-size: var(--font-size-sm, 14px);
+  line-height: 1.4;
+}
+
+.body {
+  padding: var(--spacing-lg, 16px);
+  flex: 1 1 auto;
+}
+
+.footer {
+  padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-sm, 8px);
+}
+
+/* ------------------------------------------------------------------ */
+/* Reduced motion                                                      */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .card.interactive,
+  .mediaImage {
+    transition: none;
+  }
+
+  .card.interactive:hover,
+  .card.interactive:active,
+  .card.interactive:hover .mediaImage {
+    transform: none;
+  }
+}

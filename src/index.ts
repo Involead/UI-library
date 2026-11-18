@@ -77,6 +77,20 @@ export type {
   ModalMaxWidth,
 } from "./components/Modal";
 
+export { 
+  Card, 
+  CardHeader, 
+  CardBody, 
+  CardFooter, 
+  CardMedia 
+} from "./components/Card"; 
+
+export type {
+  CardProps,
+  CardHeaderProps,
+  CardMediaProps,
+} from "./components/Card";
+
 export { cx } from "./utils";
 export type { ClassValue } from "./utils";
 
