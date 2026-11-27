@@ -1455,7 +1455,6 @@ export const explorerComponents: ExplorerComponent[] = [
       boolean("defaultChecked", "Initial state"),
       boolean("disabled", "Disables interaction"),
       boolean("loading", "Shows a loading state"),
-      select("orientation", "Arrange examples", ["horizontal", "vertical"]),
     ],
     stories: [
       {
