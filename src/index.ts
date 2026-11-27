@@ -82,3 +82,6 @@ export type { ClassValue } from "./utils";
 
 export { tokens } from "./theme";
 export type { DesignTokens } from "./theme";
+
+export { Switch } from "./components/Switch";
+export type { SwitchProps, SwitchSize, SwitchColor } from "./components/Switch";

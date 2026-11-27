@@ -183,15 +183,22 @@ export const States: Story = {
 
 export const LabelPlacement: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <Switch label="Label at end (default)" labelPlacement="end" defaultChecked />
-      <Switch label="Label at start" labelPlacement="start" defaultChecked />
+    <div style={{ display: "flex", gap: 48, alignItems: "center" }}>
+      <Switch label="End" labelPlacement="end" defaultChecked />
+      <Switch label="Start" labelPlacement="start" defaultChecked />
+      <Switch label="Top" labelPlacement="top" defaultChecked />
+      <Switch label="Bottom" labelPlacement="bottom" defaultChecked />
     </div>
   ),
   parameters: {
     docs: {
       source: {
-        code: `<>\n  <Switch label="Label at end" labelPlacement="end" defaultChecked />\n  <Switch label="Label at start" labelPlacement="start" defaultChecked />\n</>`,
+        code: `<>
+  <Switch label="End" labelPlacement="end" defaultChecked />
+  <Switch label="Start" labelPlacement="start" defaultChecked />
+  <Switch label="Top" labelPlacement="top" defaultChecked />
+  <Switch label="Bottom" labelPlacement="bottom" defaultChecked />
+</>`,
       },
     },
   },

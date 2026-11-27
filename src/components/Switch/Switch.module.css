@@ -7,17 +7,26 @@
   flex-direction: column;
   gap: 4px;
   font-family: var(--font-family-primary);
-  /* NO color here — let it inherit from the wrapper */
 }
 
 .row {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 10px;
 }
 
-.labelStart {
-  flex-direction: row-reverse;
+/* 👈 Vertical layouts */
+.labelTop {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.labelBottom {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 /* ============================================================
@@ -27,7 +36,7 @@
 .label {
   font-size: var(--switch-font);
   font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary); /* Default label color */
+  color: var(--color-text-primary);
   cursor: pointer;
   user-select: none;
 }
@@ -159,7 +168,6 @@
   --switch-track-bg: currentColor;
 }
 
-/* Apply the color. No trackColor custom var anymore */
 .checked .track {
   background: var(--switch-track-bg);
   border-color: transparent;

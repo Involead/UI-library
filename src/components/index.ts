@@ -74,3 +74,6 @@ export type {
   ModalCloseReason,
   ModalMaxWidth,
 } from "./Modal";
+
+export { Switch } from "./Switch";
+export type { SwitchProps, SwitchSize, SwitchColor } from "./Switch";

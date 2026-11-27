@@ -41,7 +41,7 @@ export interface SwitchProps
   /** Visible label. */
   label?: ReactNode;
   /** Where the label sits relative to the switch. Default "end". */
-  labelPlacement?: "start" | "end";
+  labelPlacement?: "start" | "end" | "top" | "bottom";
   /** Supporting text under the label. */
   helperText?: ReactNode;
   /** Error message. Replaces helper text and sets the error style. */
@@ -145,6 +145,14 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
     </label>
   );
 
+  // Determine the modifier class for the row based on placement
+  const placementClass =
+    labelPlacement === "top"
+      ? styles.labelTop
+      : labelPlacement === "bottom"
+        ? styles.labelBottom
+        : undefined;
+
   return (
     <div
       className={cx(
@@ -153,15 +161,14 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
         className,
       )}
     >
-      <div
-        className={cx(
-          styles.row,
-          labelPlacement === "start" && styles.labelStart,
-        )}
-      >
-        {labelPlacement === "start" && labelEl}
+      <div className={cx(styles.row, placementClass)}>
+        {/* Render label first if placement is "start" or "top" */}
+        {(labelPlacement === "start" || labelPlacement === "top") && labelEl}
+        
         {control}
-        {labelPlacement === "end" && labelEl}
+        
+        {/* Render label second if placement is "end" or "bottom" */}
+        {(labelPlacement === "end" || labelPlacement === "bottom") && labelEl}
       </div>
       {(error || helperText) && (
         <p
