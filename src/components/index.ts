@@ -74,3 +74,12 @@ export type {
   ModalCloseReason,
   ModalMaxWidth,
 } from "./Modal";
+
+export { Stepper } from "./Stepper";
+export type {
+  StepItem,
+  StepperProps,
+  StepperOrientation,
+  StepperSize,
+} from "./Stepper";
+

@@ -28,6 +28,7 @@ import { TablePreview, tableStackCompositions } from "./previews/TablePreview";
 import { TypographyPreview } from "./previews/TypographyPreview";
 import { TabPreview } from "./previews/TabPreview";
 import { TooltipPreview } from "./previews/Tooltip.preview";
+import { StepperPreview } from "./previews/StepperPreview";
 import {
   isChoice,
   type ButtonSize,
@@ -494,6 +495,16 @@ export function ExplorerPage() {
             updateComponentArg("title", value);
             recordAction(`tooltip: title changed`);
           }}
+        />
+      );
+    }
+    if (activeComponent === "Stepper") {
+      return (
+        <StepperPreview
+          args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
+          onChange={(val) => updateComponentArg("activeStep", val)}
         />
       );
     }
