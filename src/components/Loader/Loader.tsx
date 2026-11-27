@@ -1,317 +1,233 @@
 "use client";
-
-import {
-  forwardRef,
-  useEffect,
-  useState,
-  type CSSProperties,
-  type HTMLAttributes,
-  type ReactNode,
-} from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useId, useRef, type CSSProperties } from "react";
 
 import { cx } from "@/utils";
 
 import styles from "./Loader.module.css";
 
-/* ============================================================
-   Types
-   ============================================================ */
+export type LoaderVariant = "spinner" | "progress";
 
-export type LoaderVariant = "spinner" | "dots" | "bars" | "pulse" | "ring";
-
-export type LoaderSize = "small" | "medium" | "large";
-
-export type LoaderColor =
-  | "primary"
-  | "secondary"
-  | "success"
-  | "error"
-  | "warning"
-  | "info"
-  | "inherit";
-
-export interface LoaderProps
-  extends Omit<HTMLAttributes<HTMLSpanElement>, "color"> {
-  /** Visual style. Default "spinner". */
+export interface LoaderProps {
+  /**
+   * `"spinner"`: a gradient ring spins while the logo assembles inside it.
+   * `"progress"`: the logo fills from the bottom. Default `"spinner"`.
+   */
   variant?: LoaderVariant;
-  /** Size preset OR exact pixel number. Default "medium" (24px). */
-  size?: LoaderSize | number;
-  /** Palette token. Use "inherit" to pick up the surrounding text colour. */
-  color?: LoaderColor;
-  /** Visible label under or beside the loader. */
-  label?: ReactNode;
-  /** Where the label sits relative to the spinner. Default "bottom". */
-  labelPlacement?: "top" | "bottom" | "start" | "end";
-  /** Hides the visual part and keeps only the accessible name. */
-  hideVisual?: boolean;
-  /** Accessible label for screen readers. Defaults to "Loading". */
-  ariaLabel?: string;
-  /** Renders a full-viewport overlay with a backdrop (portals to body). */
-  fullscreen?: boolean;
-  /** Milliseconds to wait before showing. Default 0 (immediate). */
-  delay?: number;
-
   /**
-   * Provide a completely custom visual (image, GIF, icon, custom SVG).
-   * This overrides the `variant` prop visually.
+   * `progress` variant only. 0 to 1. Leave it undefined while a request is in
+   * flight and the loader trickles toward ~92% on its own; pass `1` when the
+   * work is done to fill it up.
    */
-  customIcon?: ReactNode;
-
-  /* ---------- MUI CircularProgress parity ---------- */
-
-  /**
-   * MUI-style variant:
-   *  - "indeterminate" → the spinner animates indefinitely
-   *  - "determinate"   → a fixed arc based on `value` (0–100)
-   */
-  progressVariant?: "indeterminate" | "determinate";
-  /** 0–100, only when progressVariant="determinate". */
-  value?: number;
-  /** Ring thickness in px. Default derived from size. */
-  thickness?: number;
-  /** Turn off the indeterminate stroke shrink; keeps rotation only. */
-  disableShrink?: boolean;
+  progress?: number;
+  /** Accessible name for screen readers. Not shown on screen. Default `"Loading"`. */
+  label?: string;
+  /** Width in px (the spinner's ring is included). Default `160`. */
+  size?: number;
+  className?: string;
+  style?: CSSProperties;
 }
 
-/* ============================================================
-   Size map
-   ============================================================ */
+const PROGRESS_VIEW = { x: 330, y: 60, w: 470, h: 450 };
+const SPINNER_VIEWBOX = "246 -15 630 610";
 
-const presetSizes = {
-  small: { box: 16, gap: 6, font: "12px", dot: 6, barW: 3, barH: 12 },
-  medium: { box: 24, gap: 8, font: "14px", dot: 8, barW: 4, barH: 18 },
-  large: { box: 36, gap: 10, font: "16px", dot: 12, barW: 5, barH: 26 },
-} as const;
-
-function resolveDims(size: LoaderSize | number) {
-  if (typeof size === "number") {
-    return {
-      box: size,
-      gap: Math.round(size * 0.33),
-      font: `${Math.max(11, Math.round(size * 0.55))}px`,
-      stroke: Math.max(2, Math.round(size / 10)),
-      dot: Math.round(size / 3),
-      barW: Math.max(3, Math.round(size / 6)),
-      barH: Math.round(size * 0.75),
-    };
-  }
-  const p = presetSizes[size];
-  return { ...p, stroke: Math.max(2, Math.round(p.box / 10)) };
+interface Piece {
+  name: string;
+  shape: "polygon" | "rect" | "path";
+  d?: string;
+  /** Gradient id suffix, or `null` to use `fill`. */
+  gradient: string | null;
+  fill?: string;
+  /** Where the piece flies in from (spinner assembly), in px. */
+  from: [number, number];
 }
 
-/* ============================================================
-   Component
-   ============================================================ */
-
-export const Loader = forwardRef<HTMLSpanElement, LoaderProps>(function Loader(
+const PIECES: Piece[] = [
   {
-    variant = "spinner",
-    size = "medium",
-    color = "primary",
-    label,
-    labelPlacement = "bottom",
-    hideVisual = false,
-    ariaLabel = "Loading",
-    fullscreen = false,
-    delay = 0,
-    customIcon,
-    progressVariant,
-    value,
-    thickness,
-    disableShrink = false,
-    className,
-    style,
-    ...rest
+    name: "top",
+    shape: "polygon",
+    d: "553,82 513,153 595,153",
+    gradient: null,
+    fill: "var(--loader-top)",
+    from: [0, -60],
   },
-  ref,
-) {
-  /* ---------- Delay gate ---------- */
+  {
+    name: "left",
+    shape: "polygon",
+    d: "513,172 543,172 410,403 575,403 575,441 347,441",
+    gradient: "L",
+    from: [-90, 60],
+  },
+  {
+    name: "right",
+    shape: "polygon",
+    d: "575,172 612,172 775,441 636,441 636,403 710,403",
+    gradient: "R",
+    from: [90, 60],
+  },
+  { name: "i", shape: "rect", gradient: "I", from: [0, -70] },
+  {
+    name: "l",
+    shape: "path",
+    d: "M585 311a8 8 0 0 1 8-8h27a8 8 0 0 1 8 8V455H675a8 8 0 0 1 8 8V490a8 8 0 0 1-8 8H593a8 8 0 0 1-8-8Z",
+    gradient: "LL",
+    from: [0, 80],
+  },
+];
 
-  const [visible, setVisible] = useState(delay === 0);
+const STOPS: Record<string, [string, string, Record<string, number>]> = {
+  L: ["--loader-p1", "--loader-p2", { x1: 347, y1: 0, x2: 575, y2: 0 }],
+  R: ["--loader-t1", "--loader-t2", { x1: 575, y1: 172, x2: 775, y2: 441 }],
+  I: ["--loader-p2", "--loader-p1", { x1: 0, y1: 190, x2: 0, y2: 370 }],
+  LL: ["--loader-t1", "--loader-t2", { x1: 585, y1: 303, x2: 683, y2: 498 }],
+};
+
+function Shapes({ uid, animated }: { uid: string; animated: boolean }) {
+  return (
+    <>
+      {PIECES.map((p, i) => {
+        const common = {
+          fill: p.gradient ? `url(#${uid}-${p.gradient})` : p.fill,
+          ...(animated
+            ? {
+                className: styles.loader__piece,
+                style: {
+                  "--i": i,
+                  "--x": `${p.from[0]}px`,
+                  "--y": `${p.from[1]}px`,
+                } as CSSProperties,
+              }
+            : {}),
+        };
+        if (p.shape === "polygon") return <polygon key={p.name} {...common} points={p.d} />;
+        if (p.shape === "rect")
+          return <rect key={p.name} {...common} x="537" y="190" width="38" height="180" rx="5" />;
+        return <path key={p.name} {...common} d={p.d} />;
+      })}
+    </>
+  );
+}
+
+export function Loader({
+  variant = "spinner",
+  progress,
+  label = "Loading",
+  size = 50,
+  className,
+  style,
+}: LoaderProps) {
+  const uid = useId().replace(/:/g, "");
+  const isProgress = variant === "progress";
+  const root = useRef<HTMLDivElement>(null);
+  const clipRect = useRef<SVGRectElement>(null);
+  const target = useRef<number | undefined>(progress);
 
   useEffect(() => {
-    if (delay === 0) {
-      setVisible(true);
-      return;
-    }
-    setVisible(false);
-    const id = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(id);
-  }, [delay]);
+    target.current = progress;
+  }, [progress]);
 
-  if (!visible) return null;
+  // Progress variant: ease toward the given value, or trickle when undefined.
+  useEffect(() => {
+    if (!isProgress) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const start = performance.now();
+    const { y, h } = PROGRESS_VIEW;
+    let shown = 0;
+    let raf = 0;
 
-  /* ---------- Resolve dims + progress mode ---------- */
+    const tick = (now: number) => {
+      const raw = target.current ?? 0.92 * (1 - Math.exp(-(now - start) / 2500));
+      const goal = Math.min(1, Math.max(0, raw));
+      shown = reduce ? goal : shown + (goal - shown) * 0.1;
+      if (Math.abs(goal - shown) < 0.001) shown = goal;
+      clipRect.current?.setAttribute("y", String(y + h - h * shown));
+      clipRect.current?.setAttribute("height", String(h * shown));
+      root.current?.setAttribute("aria-valuenow", String(Math.round(shown * 100)));
+      raf = requestAnimationFrame(tick);
+    };
 
-  const dims = resolveDims(size);
-  const stroke = thickness ?? dims.stroke;
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [isProgress]);
 
-  const isDeterminate = progressVariant === "determinate" && typeof value === "number";
-  const clampedValue = isDeterminate
-    ? Math.min(Math.max(value, 0), 100)
-    : undefined;
+  const a11y = isProgress
+    ? { role: "progressbar", "aria-valuemin": 0, "aria-valuemax": 100, "aria-valuenow": 0 }
+    : { role: "status", "aria-live": "polite" as const };
 
-  /* ---------- SVG geometry (ring / determinate) ---------- */
-
-  const RADIUS = 9;
-  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-
-  /* ---------- CSS variables ---------- */
-
-  const cssVars = {
-    "--loader-box": `${dims.box}px`,
-    "--loader-gap": `${dims.gap}px`,
-    "--loader-font": dims.font,
-    "--loader-stroke": stroke,
-    "--loader-dot": `${dims.dot}px`,
-    "--loader-bar-w": `${dims.barW}px`,
-    "--loader-bar-h": `${dims.barH}px`,
-    ...style,
-  } as CSSProperties;
-
-  /* ---------- Render ---------- */
-
-  const root = (
-    <span
-      ref={ref}
-      role={isDeterminate ? "progressbar" : "status"}
-      aria-live={isDeterminate ? undefined : "polite"}
-      aria-label={ariaLabel}
-      aria-valuenow={clampedValue}
-      aria-valuemin={isDeterminate ? 0 : undefined}
-      aria-valuemax={isDeterminate ? 100 : undefined}
-      className={cx(styles.root, fullscreen && styles.fullscreen, className)}
-      style={cssVars}
-      {...rest}
+  return (
+    <div
+      ref={root}
+      className={cx(styles.loader, className)}
+      style={{ width: size, ...style }}
+      aria-label={label}
+      {...a11y}
     >
-      <span className={cx(styles.content, styles[`placement_${labelPlacement}`])}>
-        {!hideVisual && (
-          <span
-            className={cx(
-              styles.visual,
-              !customIcon && styles[`variant_${variant}`],
-              styles[`color_${color}`],
-              isDeterminate && styles.determinate,
-              disableShrink && styles.disableShrink,
-            )}
-            aria-hidden="true"
-          >
-            {customIcon ? (
-              <span className={styles.customIconWrapper}>
-                {customIcon}
-              </span>
-            ) : (
-              <>
-                {/* ---------- Ring (spinner + ring + determinate) ---------- */}
+      <svg
+        viewBox={
+          isProgress
+            ? `${PROGRESS_VIEW.x} ${PROGRESS_VIEW.y} ${PROGRESS_VIEW.w} ${PROGRESS_VIEW.h}`
+            : SPINNER_VIEWBOX
+        }
+        aria-hidden="true"
+      >
+        <defs>
+          {Object.entries(STOPS).map(([id, [from, to, coords]]) => (
+            <linearGradient key={id} id={`${uid}-${id}`} gradientUnits="userSpaceOnUse" {...coords}>
+              <stop offset="0" style={{ stopColor: `var(${from})` }} />
+              <stop offset="1" style={{ stopColor: `var(${to})` }} />
+            </linearGradient>
+          ))}
+          {isProgress ? (
+            <clipPath id={`${uid}-clip`}>
+              <rect
+                ref={clipRect}
+                x={PROGRESS_VIEW.x}
+                y={PROGRESS_VIEW.y + PROGRESS_VIEW.h}
+                width={PROGRESS_VIEW.w}
+                height="0"
+              />
+            </clipPath>
+          ) : (
+            <linearGradient id={`${uid}-ring`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" style={{ stopColor: "var(--loader-p1)" }} />
+              <stop offset="1" style={{ stopColor: "var(--loader-t2)" }} />
+            </linearGradient>
+          )}
+        </defs>
 
-                {variant === "spinner" && (
-                  <svg
-                    viewBox="0 0 24 24"
-                    className={styles.svg}
-                    role="presentation"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r={RADIUS}
-                      fill="none"
-                      stroke="currentColor"
-                      strokeOpacity="0.2"
-                      strokeWidth="var(--loader-stroke)"
-                    />
-                    {isDeterminate ? (
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r={RADIUS}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="var(--loader-stroke)"
-                        strokeLinecap="round"
-                        strokeDasharray={CIRCUMFERENCE}
-                        strokeDashoffset={
-                          CIRCUMFERENCE * (1 - (clampedValue ?? 0) / 100)
-                        }
-                        transform="rotate(-90 12 12)"
-                        className={styles.arcDet}
-                      />
-                    ) : (
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r={RADIUS}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="var(--loader-stroke)"
-                        strokeLinecap="round"
-                        strokeDasharray="14 44"
-                        className={styles.arc}
-                      />
-                    )}
-                  </svg>
-                )}
-
-                {variant === "ring" && (
-                  <svg
-                    viewBox="0 0 24 24"
-                    className={styles.svg}
-                    role="presentation"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r={RADIUS}
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="var(--loader-stroke)"
-                      strokeLinecap="round"
-                      strokeDasharray="1 56"
-                      className={styles.ringDash}
-                    />
-                  </svg>
-                )}
-
-                {/* ---------- Dots ---------- */}
-
-                {variant === "dots" && (
-                  <>
-                    <span className={styles.dot} />
-                    <span className={styles.dot} />
-                    <span className={styles.dot} />
-                  </>
-                )}
-
-                {/* ---------- Bars ---------- */}
-
-                {variant === "bars" && (
-                  <>
-                    <span className={styles.bar} />
-                    <span className={styles.bar} />
-                    <span className={styles.bar} />
-                    <span className={styles.bar} />
-                  </>
-                )}
-
-                {/* ---------- Pulse (core + ring) ---------- */}
-
-                {variant === "pulse" && (
-                  <>
-                    <span className={styles.pulseCore} />
-                    <span className={styles.pulseRing} />
-                  </>
-                )}
-              </>
-            )}
-          </span>
+        {isProgress ? (
+          <>
+            <g opacity=".14">
+              <Shapes uid={uid} animated={false} />
+            </g>
+            <g clipPath={`url(#${uid}-clip)`}>
+              <Shapes uid={uid} animated={false} />
+            </g>
+          </>
+        ) : (
+          <>
+            <circle
+              cx="561"
+              cy="290"
+              r="292"
+              fill="none"
+              strokeWidth="14"
+              className={styles.loader__track}
+            />
+            <circle
+              className={styles.loader__ring}
+              cx="561"
+              cy="290"
+              r="292"
+              fill="none"
+              stroke={`url(#${uid}-ring)`}
+              strokeWidth="14"
+              strokeLinecap="round"
+              strokeDasharray="520 1320"
+            />
+            <Shapes uid={uid} animated />
+          </>
         )}
-        {label && <span className={styles.label}>{label}</span>}
-      </span>
-    </span>
+      </svg>
+    </div>
   );
-
-  if (!fullscreen) return root;
-  if (typeof document === "undefined") return root;
-
-  return createPortal(root, document.body);
-});
+}

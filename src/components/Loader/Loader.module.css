@@ -1,238 +1,93 @@
-/* ============================================================
-   Root
-   ============================================================ */
+.loader {
+  --loader-track: rgba(59, 42, 94, 0.12);
+  --loader-p1: #3b2a5e;
+  --loader-p2: #1f4e8c;
+  --loader-t1: #2f86b3;
+  --loader-t2: #6cc4d8;
+  --loader-top: #1f4e8c;
 
-.root {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: inherit; /* Let wrapper color flow down for color="inherit" */
-  font-family: var(--font-family-primary);
-  font-size: var(--loader-font);
-  line-height: var(--line-height-normal);
-  animation: loader-fade-in var(--transition-fast, 150ms) ease-out;
-}
-
-.fullscreen {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-toast);
-  display: flex;
-  background: color-mix(in srgb, var(--color-black) 32%, transparent);
-}
-
-/* ============================================================
-   Content wrapper + label placement
-   ============================================================ */
-
-.content {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--loader-gap);
-  flex-direction: column;
-}
-
-.placement_bottom {
-  flex-direction: column;
-}
-
-.placement_top {
-  flex-direction: column-reverse;
-}
-
-.placement_start {
-  flex-direction: row;
-}
-
-.placement_end {
-  flex-direction: row-reverse;
-}
-
-.label {
-  font-size: var(--loader-font);
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-medium);
-}
-
-/* ============================================================
-   Visual wrapper & Custom Icon
-   ============================================================ */
-
-.visual {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--loader-box);
-  height: var(--loader-box);
-  flex: none;
-}
-
-.customIconWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-/* Ensure images, GIFs, and custom SVGs scale perfectly */
-.customIconWrapper img,
-.customIconWrapper svg {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: inherit;
-}
-
-/* ============================================================
-   Colour
-   ============================================================ */
-
-.visual.color_primary { color: var(--color-primary); }
-.visual.color_secondary { color: var(--color-secondary); }
-.visual.color_success { color: var(--color-success); }
-.visual.color_error { color: var(--color-error); }
-.visual.color_warning { color: var(--color-warning); }
-.visual.color_info { color: var(--color-info); }
-.visual.color_inherit { color: inherit; }
-
-/* ============================================================
-   Variant: spinner
-   ============================================================ */
-
-.variant_spinner .svg {
-  width: 100%;
-  height: 100%;
   display: block;
+  max-width: 100%;
 }
 
-.variant_spinner .arc {
-  transform-origin: center;
-  animation: spinner-rotate 0.9s linear infinite;
+@media (prefers-color-scheme: dark) {
+  .loader {
+    --loader-track: rgba(201, 214, 242, 0.14);
+    --loader-p1: #7d63c4;
+    --loader-p2: #3b7ac9;
+    --loader-t1: #4aa3c7;
+    --loader-t2: #8fe0ee;
+    --loader-top: #4a86d6;
+  }
 }
 
-.variant_spinner .arcDet {
-  transition: stroke-dashoffset 200ms ease;
+[data-theme="dark"] .loader {
+  --loader-track: rgba(201, 214, 242, 0.14);
+  --loader-p1: #7d63c4;
+  --loader-p2: #3b7ac9;
+  --loader-t1: #4aa3c7;
+  --loader-t2: #8fe0ee;
+  --loader-top: #4a86d6;
 }
 
-.disableShrink .arc {
-  stroke-dasharray: 22 44;
-  animation: spinner-rotate 0.9s linear infinite;
-}
-
-/* ============================================================
-   Variant: ring
-   ============================================================ */
-
-.variant_ring .svg {
-  width: 100%;
-  height: 100%;
+.loader svg {
   display: block;
-  animation: spinner-rotate 1.2s linear infinite;
-}
-
-.variant_ring .ringDash {
-  transform-origin: center;
-}
-
-/* ============================================================
-   Variant: dots
-   ============================================================ */
-
-.variant_dots {
-  gap: calc(var(--loader-gap) / 2);
-}
-
-.dot {
-  width: var(--loader-dot);
-  height: var(--loader-dot);
-  border-radius: var(--radius-full);
-  background: currentColor;
-  animation: dot-bounce 1.2s ease-in-out infinite;
-}
-
-.dot:nth-child(2) { animation-delay: 0.16s; }
-.dot:nth-child(3) { animation-delay: 0.32s; }
-
-/* ============================================================
-   Variant: bars
-   ============================================================ */
-
-.variant_bars {
-  gap: calc(var(--loader-gap) / 2);
-}
-
-.bar {
-  width: var(--loader-bar-w);
-  height: var(--loader-bar-h);
-  border-radius: var(--radius-sm);
-  background: currentColor;
-  transform-origin: center;
-  animation: bar-scale 1s ease-in-out infinite;
-}
-
-.bar:nth-child(2) { animation-delay: 0.12s; }
-.bar:nth-child(3) { animation-delay: 0.24s; }
-.bar:nth-child(4) { animation-delay: 0.36s; }
-
-/* ============================================================
-   Variant: pulse — solid core + expanding halo
-   ============================================================ */
-
-.pulseCore {
-  position: absolute;
-  width: 40%;
-  height: 40%;
-  border-radius: var(--radius-full);
-  background: currentColor;
-}
-
-.pulseRing {
-  position: absolute;
   width: 100%;
-  height: 100%;
-  border-radius: var(--radius-full);
-  background: currentColor;
-  opacity: 0.4;
-  animation: pulse-ring 1.4s ease-out infinite;
+  height: auto;
+  overflow: visible;
 }
 
-/* ============================================================
-   Keyframes
-   ============================================================ */
-
-@keyframes spinner-rotate {
-  to { transform: rotate(360deg); }
+/* ---------- spinner ---------- */
+.loader__track {
+  stroke: var(--loader-track);
 }
 
-@keyframes dot-bounce {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
-  40% { transform: scale(1); opacity: 1; }
+.loader__ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: loader-rotate 1.4s linear infinite;
 }
 
-@keyframes bar-scale {
-  0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
-  50% { transform: scaleY(1); opacity: 1; }
+@keyframes loader-rotate {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-@keyframes pulse-ring {
-  0% { transform: scale(0.4); opacity: 0.6; }
-  80% { transform: scale(1); opacity: 0; }
-  100% { transform: scale(1); opacity: 0; }
+.loader__piece {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: loader-assemble 3s cubic-bezier(0.22, 0.9, 0.3, 1) infinite;
+  animation-delay: calc(var(--i) * 0.22s);
 }
 
-@keyframes loader-fade-in {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: none; }
+@keyframes loader-assemble {
+  0% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) scale(0.6);
+  }
+  22% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  78% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.92);
+  }
 }
-
-/* ============================================================
-   Reduced motion
-   ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-  .root, .arc, .arcDet, .ringDash, .dot, .bar, .pulseRing, .variant_ring .svg {
+  .loader__ring {
     animation: none;
+  }
+  .loader__piece {
+    animation: none;
+    opacity: 1;
   }
 }

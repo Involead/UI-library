@@ -82,3 +82,6 @@ export type { ClassValue } from "./utils";
 
 export { tokens } from "./theme";
 export type { DesignTokens } from "./theme";
+
+export { Loader } from "./components/Loader";
+export type { LoaderProps, LoaderVariant } from "./components/Loader";
