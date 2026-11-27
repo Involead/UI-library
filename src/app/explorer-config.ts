@@ -1435,4 +1435,52 @@ export const explorerComponents: ExplorerComponent[] = [
           },
         ],
       },
+
+        {
+    name: "Loader",
+    description: "Animated SVG loader used to indicate loading states, either indefinitely (spinner) or with determinate progress.",
+    accessibility: [
+      "Uses role=\"status\" and aria-live for the spinner.",
+      "Uses role=\"progressbar\" and updates aria-valuenow during progress.",
+      "The label prop provides an accessible name for screen readers.",
+    ],
+    controls: [
+      select("variant", "Visual style", ["spinner", "progress"]),
+      text("size", "Width in pixels (e.g. 80, 160, 240)"),
+      text("label", "Accessible label"),
+      text("progress", "Progress value (0 to 1)"),
+    ],
+    stories: [
+      {
+        name: "Spinner",
+        description: "Continuous loading animation",
+        args: { variant: "spinner", size: "50", label: "Loading" },
+        composition: "default",
+      },
+      {
+        name: "Progress (Trickle)",
+        description: "Fills automatically toward 92%",
+        args: { variant: "progress", size: "50", label: "Loading" },
+        composition: "default",
+      },
+      {
+        name: "Progress (100%)",
+        description: "Completely filled state",
+        args: { variant: "progress", size: "50", label: "Loading", progress: "1" },
+        composition: "default",
+      },
+      {
+        name: "Sizes",
+        description: "Small, medium, and large sizes",
+        args: { variant: "spinner", orientation: "horizontal" },
+        composition: "sizes",
+      },
+      {
+        name: "All Variants",
+        description: "Spinner, trickle progress, and 100% progress side by side",
+        args: { orientation: "horizontal" },
+        composition: "variants",
+      },
+    ],
+  },
 ];

@@ -1,0 +1,93 @@
+.loader {
+  --loader-track: rgba(59, 42, 94, 0.12);
+  --loader-p1: #3b2a5e;
+  --loader-p2: #1f4e8c;
+  --loader-t1: #2f86b3;
+  --loader-t2: #6cc4d8;
+  --loader-top: #1f4e8c;
+
+  display: block;
+  max-width: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  .loader {
+    --loader-track: rgba(201, 214, 242, 0.14);
+    --loader-p1: #7d63c4;
+    --loader-p2: #3b7ac9;
+    --loader-t1: #4aa3c7;
+    --loader-t2: #8fe0ee;
+    --loader-top: #4a86d6;
+  }
+}
+
+[data-theme="dark"] .loader {
+  --loader-track: rgba(201, 214, 242, 0.14);
+  --loader-p1: #7d63c4;
+  --loader-p2: #3b7ac9;
+  --loader-t1: #4aa3c7;
+  --loader-t2: #8fe0ee;
+  --loader-top: #4a86d6;
+}
+
+.loader svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* ---------- spinner ---------- */
+.loader__track {
+  stroke: var(--loader-track);
+}
+
+.loader__ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: loader-rotate 1.4s linear infinite;
+}
+
+@keyframes loader-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader__piece {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: loader-assemble 3s cubic-bezier(0.22, 0.9, 0.3, 1) infinite;
+  animation-delay: calc(var(--i) * 0.22s);
+}
+
+@keyframes loader-assemble {
+  0% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) scale(0.6);
+  }
+  22% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  78% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader__ring {
+    animation: none;
+  }
+  .loader__piece {
+    animation: none;
+    opacity: 1;
+  }
+}

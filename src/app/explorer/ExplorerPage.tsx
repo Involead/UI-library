@@ -28,6 +28,7 @@ import { TablePreview, tableStackCompositions } from "./previews/TablePreview";
 import { TypographyPreview } from "./previews/TypographyPreview";
 import { TabPreview } from "./previews/TabPreview";
 import { TooltipPreview } from "./previews/Tooltip.preview";
+import { LoaderPreview } from "./previews/LoaderPreview";
 import {
   isChoice,
   type ButtonSize,
@@ -353,9 +354,11 @@ export function ExplorerPage() {
       ? false
       : activeComponent === "Tooltip"
         ? false
-        : activeComponent === "Table"
-          ? tableStackCompositions.includes(composition ?? "")
-          : Boolean(composition);
+        : activeComponent === "Loader"
+          ? false
+          : activeComponent === "Table"
+            ? tableStackCompositions.includes(composition ?? "")
+            : Boolean(composition);
 
   function updateComponentArg(name: string, value: ExplorerValue) {
     let nextValue = value;
@@ -493,6 +496,19 @@ export function ExplorerPage() {
           onChange={(value) => {
             updateComponentArg("title", value);
             recordAction(`tooltip: title changed`);
+          }}
+        />
+      );
+    }
+    if (activeComponent === "Loader") {
+      return (
+        <LoaderPreview
+          args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
+          onChange={(progress) => {
+            recordAction(`loader: ${Math.round(progress * 100)}%`);
+
           }}
         />
       );

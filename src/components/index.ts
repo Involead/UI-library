@@ -74,3 +74,6 @@ export type {
   ModalCloseReason,
   ModalMaxWidth,
 } from "./Modal";
+
+export { Loader } from "./Loader";
+export type { LoaderProps, LoaderVariant } from "./Loader";
