@@ -77,8 +77,18 @@ export type {
   ModalMaxWidth,
 } from "./components/Modal";
 
+export { Notification } from "./components/Notification";
+export type {
+  NotificationProps,
+  NotificationColor,
+  NotificationVariant,
+  NotificationOverlap,
+  NotificationAnchorOrigin,
+} from "./components/Notification";
+
 export { cx } from "./utils";
 export type { ClassValue } from "./utils";
 
 export { tokens } from "./theme";
 export type { DesignTokens } from "./theme";
+
