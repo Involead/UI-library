@@ -28,6 +28,7 @@ import { TablePreview, tableStackCompositions } from "./previews/TablePreview";
 import { TypographyPreview } from "./previews/TypographyPreview";
 import { TabPreview } from "./previews/TabPreview";
 import { TooltipPreview } from "./previews/Tooltip.preview";
+import {SwitchPreview} from "./previews/SwitchPreview";
 import {
   isChoice,
   type ButtonSize,
@@ -353,6 +354,8 @@ export function ExplorerPage() {
       ? false
       : activeComponent === "Tooltip"
         ? false
+        : activeComponent === "Switch"
+        ? false
         : activeComponent === "Table"
           ? tableStackCompositions.includes(composition ?? "")
           : Boolean(composition);
@@ -493,6 +496,19 @@ export function ExplorerPage() {
           onChange={(value) => {
             updateComponentArg("title", value);
             recordAction(`tooltip: title changed`);
+          }}
+        />
+      );
+    }
+        if (activeComponent === "Switch") {
+      return (
+        <SwitchPreview
+          args={componentArgs}
+          composition={composition}
+          layout={previewLayout}
+          onChange={(checked) => {
+            updateComponentArg("checked", checked);
+            recordAction(`switch: toggled ${checked ? "on" : "off"}`);
           }}
         />
       );

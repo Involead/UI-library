@@ -30,7 +30,8 @@ export type ExplorerStory = {
     | "default"
     | "orientation"
     | "placements"
-    | "variants";
+    | "variants"
+    | "inherit";
 };
 
 /** Table stories that need more than the base sample table; see TablePreview. */
@@ -1435,4 +1436,67 @@ export const explorerComponents: ExplorerComponent[] = [
           },
         ],
       },
+
+        {
+    name: "Switch",
+    description: "Toggle switches allow users to turn an option on or off.",
+    accessibility: [
+      "Uses role=\"switch\" and aria-checked to announce the on/off state.",
+      "Screen readers announce the label, helper text, and error state.",
+      "Loading state uses aria-busy.",
+    ],
+    controls: [
+      text("label", "Visible label"),
+      select("labelPlacement", "Where the label sits", ["start", "end", "top", "bottom"]),
+      select("size", "Switch size", ["small", "medium", "large"]),
+      select("color", "Track color", ["primary", "secondary", "success", "error", "warning", "inherit"]),
+      text("helperText", "Supporting guidance"),
+      text("error", "Validation error message"),
+      boolean("defaultChecked", "Initial state"),
+      boolean("disabled", "Disables interaction"),
+      boolean("loading", "Shows a loading state"),
+    ],
+    stories: [
+      {
+        name: "Default",
+        description: "Standard switch with label",
+        args: { label: "Enable notifications", defaultChecked: false },
+        composition: "default",
+      },
+      {
+        name: "Colors",
+        description: "Available track colors",
+        args: { orientation: "horizontal" },
+        composition: "colors",
+      },
+      {
+        name: "Sizes",
+        description: "Small, medium, and large",
+        args: { orientation: "horizontal" },
+        composition: "sizes",
+      },
+      {
+        name: "States",
+        description: "Off, on, disabled, loading",
+        args: { orientation: "horizontal" },
+        composition: "states",
+      },
+      {
+        name: "Inherit",
+        description: "Color inherits from parent",
+        args: { orientation: "horizontal" },
+        composition: "inherit",
+      },
+      {
+        name: "Helper and Error",
+        description: "Supporting and validation text",
+        args: { 
+          label: "Accept terms", 
+          error: "You must accept the terms to continue.",
+          defaultChecked: false
+        },
+        composition: "default",
+      },
+    ],
+  },
 ];

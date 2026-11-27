@@ -1,0 +1,218 @@
+/* ============================================================
+   Root
+   ============================================================ */
+
+.root {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-family-primary);
+}
+
+.row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+/* 👈 Vertical layouts */
+.labelTop {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.labelBottom {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* ============================================================
+   Label
+   ============================================================ */
+
+.label {
+  font-size: var(--switch-font);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.rootDisabled .label {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   Helper / error text
+   ============================================================ */
+
+.helper {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.helperError {
+  color: var(--color-error);
+}
+
+/* ============================================================
+   Control & Input
+   ============================================================ */
+
+.control {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  width: var(--switch-track-w);
+  height: var(--switch-track-h);
+  vertical-align: middle;
+}
+
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.input:focus-visible + .track {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Track & Thumb
+   ============================================================ */
+
+.track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  transition:
+    background-color var(--transition-fast, 150ms) ease,
+    border-color var(--transition-fast, 150ms) ease;
+  pointer-events: none;
+}
+
+.thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--switch-thumb-off);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--switch-thumb);
+  height: var(--switch-thumb);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transform: translateY(-50%);
+  transition: transform var(--transition-fast, 150ms) ease;
+  z-index: 1;
+}
+
+.checked .thumb {
+  transform: translate(
+    calc(
+      var(--switch-track-w) - var(--switch-thumb) -
+        var(--switch-thumb-off) * 2 - 2px
+    ),
+    -50%
+  );
+}
+
+/* ============================================================
+   Colour when checked
+   ============================================================ */
+
+.checked.color_primary {
+  --switch-track-bg: var(--color-primary);
+}
+
+.checked.color_secondary {
+  --switch-track-bg: var(--color-secondary);
+}
+
+.checked.color_success {
+  --switch-track-bg: var(--color-success);
+}
+
+.checked.color_error {
+  --switch-track-bg: var(--color-error);
+}
+
+.checked.color_warning {
+  --switch-track-bg: var(--color-warning);
+}
+
+.checked.color_inherit {
+  --switch-track-bg: currentColor;
+}
+
+.checked .track {
+  background: var(--switch-track-bg);
+  border-color: transparent;
+}
+
+/* ============================================================
+   Error & Disabled states
+   ============================================================ */
+
+.hasError .track {
+  border-color: var(--color-border-error);
+}
+
+.disabled .track {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   Loading
+   ============================================================ */
+
+.spinner {
+  display: block;
+  width: 60%;
+  height: 60%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--radius-full);
+  animation: switch-spin 0.6s linear infinite;
+  color: var(--color-text-secondary);
+}
+
+@keyframes switch-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track,
+  .thumb {
+    transition: none;
+  }
+  .spinner {
+    animation: none;
+  }
+}
